@@ -1,3 +1,323 @@
+2016-05-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	glob: merge glibc changes into lib/glob.c
+	* lib/glob.c (glob_in_dir): Sync with glibc/posix/glob.c,
+	dated 2016-05-04 12:09:35 2016 +0200.  Here are the changes:
+	2016-05-04 CVE-2016-1234: glob: Do not copy d_name field of
+	  struct dirent [BZ #19779]
+	2016-04-29 glob: Simplify the interface for the GLOB_ALTDIRFUNC
+	  callback gl_readdir
+	2015-10-20 Convert miscellaneous function definitions to prototype style
+	2015-10-20 Convert 113 more function definitions to prototype style
+	  (files with assertions)
+	2015-06-12 Fix getlogin_r namespace (bug 18527).
+	2014-02-10 Use glibc_likely instead __builtin_expect.
+	2013-10-20 When glob pattern contains a trailing slash match only
+	  directories. Fixes bug 10278.
+	2013-09-04 glob: silence -Wattribute warnings
+	2013-06-07 Avoid use of "register" as optimization hint.
+	2012-09-25 Use size_t instead of int for internal variables in glob
+	  (bug 14621)
+	2011-07-20 Check for overflows in expressions
+	2011-05-28 Remove unused variable
+	2011-05-22 Add a few more alloca size checks
+	2010-03-27 Whitespace fixes
+	2010-03-27 Fix one more issue with the glob patch
+	2010-03-24 Fix glob with empty pattern
+	2008-05-27 Remove useless more "if" tests before "free"
+	* modules/glob (Depends-on): Add stdint.
+
+2016-05-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	mktime: port to stricter signed overflow checking
+	* lib/mktime.c: Omit 'pragma GCC optimize ("wrapv")'.
+	(long_int): Require width for INT_MAX * 3 * (seconds per year),
+	instead of merely for INT_MAX * 2.  In practice platforms that
+	do the latter also do the former.
+	(TIME_T_MIN, TIME_T_MAX, TIME_T_MIDPOINT, SHR): Remove.
+	(shr): New static function, replacing SHR.  All uses changed.
+	(mktime_min, mktime_max): New constants, replacing TIME_T_MIN
+	and TIME_T_MAX.  All uses changed.
+	(ydhms_diff, guess_time_tm, ranged_convert, __mktime_internal):
+	Use long_int, not time_t.
+	(long_int_avg): New static function, replacing time_t_avg.
+	All uses changed.  Round toward positive infinity, as that
+	generates slightly better code.
+	(time_t_add_ok, time_t_int_add_ok): Remove.  All uses replaced
+	by INT_ADD_WRAPV.
+	(guess_time_tm): Accept time, not a pointer to it.  All uses changed.
+	(convert_time): New static function.
+	(ranged_convert): Use it
+	(ranged_convert): Check for *T out of [mktime_min, mktime_max] range.
+	Use simpler test for loop exit.
+	(__mktime_internal): Store negative of guessed offset, to simplify
+	overflow checking.  Remove no-longer-needed test for small time_t
+	overflows.
+
+	mktime: speed up DEBUG_MKTIME benchmarks
+	Call tzset just once, at the start, rather than for every test
+	case.  This lets us measure the CPU cost of mktime as opposed to
+	that of tzset.  This is relevant when TZ is not set and glibc is
+	being used.  This speeds up tests by a factor of 40 on my Fedora
+	23 x86-64 platform.
+	* lib/mktime.c (main) [DEBUG_MKTIME]: Call localtime at the start,
+	to call tzset and as a sanity check.  Later on, use localtime_r
+	instead of localtime.
+
+	mktime: resurrect DEBUG_MKTIME testing
+	* lib/mktime.c [DEBUG_MKTIME]: Do not include <config.h>.
+	Include <string.h>, for strcmp.
+
+	mktime: simplify DEBUG_MKTIME
+	* lib/mktime.c (DEBUG_MKTIME): Define to 0 if not defined.
+	Simplify later usage accordingly.
+
+	Port mktime_internal offset to unsigned time_t
+	This avoids some assumptions about wraparound arithmetic on
+	signed integer overflow.
+	* lib/mktime-internal.h (mktime_offset_t): New type.
+	(mktime_internal): Use it in decl.
+	* lib/mktime.c, lib/timegm.c (mktime_offset_t) [_LIBC]: New type.
+
+	* lib/mktime.c (__mktime_internal, localtime_offset):
+	* lib/timegm.c (timegm): Use it.
+	* m4/mktime.m4 (gl_TIME_T_IS_SIGNED): New macro.
+	(gl_FUNC_MKTIME): Require it.
+
+2016-04-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	xstrtol: prohibit monstrosities like "1bB"
+	Problem reported by Young Mo Kang in: http://bugs.gnu.org/23388
+	* lib/xstrtol.c (__xstrtol): Allow trailing second suffixes like
+	"B" only if the first suffix needs a base.
+	* tests/test-xstrtol.sh: Test this.
+
+2016-04-21  Pádraig Brady  <P@draigBrady.com>
+
+	xstrtod: reinstate setting of *result upon ERANGE
+	* lib/xstrtod.c (XSTRTOD): The user may decide to use
+	the returned limits upon ERANGE, so allow and document that.
+
+2016-04-20  Tino Calancha  <f92capac@gmail.com>  (tiny change)
+
+	xstrtod: modify *result only if no errors
+	* lib/xstrtod.c (XSTRTOD).
+
+2016-04-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	btowc: document problems in C locale
+	* doc/posix-functions/btowc.texi (btowc): Mention incompatibility
+	with mbrtowc.  See: http://bugs.gnu.org/23269#32
+
+2016-04-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	mktime: improve integer overflow checking
+	* lib/mktime.c: Include stdbool.h, intprops.h, verify.h.
+	(WRAPV): Remove; no longer needed.
+	(verify): Remove.  Replace all uses with call to verify.h 'verify'.
+	(TYPE_IS_INTEGER, TYPE_SIGNED, TYPE_MINIMUM, TYPE_MAXIMUM):
+	Remove.  Use intprops.h defns instead.
+	(leapyear, isdst_differ, time_t_add_ok, time_t_int_ok):
+	Use bool for Boolean, for clarity.
+	(time_t_add_ok, time_t_int_add_ok): Use INT_ADD_WRAPV to
+	detect integer overflow.
+	* modules/mktime (Depends-on): Add intprops, stdbool, verify.
+
+	intprops: check two's complement assumption
+	Suggested by Eric Blake in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-04/msg00016.html
+	* lib/intprops.h: Include <verify.h>.  Verify that signed char,
+	short, int, long, and (if available) long long are two's complement.
+	* modules/intprops (Depends-on): Add 'verify'.
+
+	intprops, mktime, strtol: assume two's complement
+	These macros were not portable to every conforming C11 ones'
+	complement platform.  It's not worth the hassle of porting to some
+	platforms that use ones' complement or signed magnitude, as such
+	platforms are almost purely theoretical nowadays and porting even
+	to some of them makes the code harder to review for little
+	practical benefit.  Problem reported by Florian Weimer in:
+	https://sourceware.org/ml/libc-alpha/2016-04/msg00295.html
+	* lib/intprops.h (TYPE_TWOS_COMPLEMENT, TYPE_ONES_COMPLEMENT)
+	(TYPE_SIGNED_MAGNITUDE, _GL_INT_TWOS_COMPLEMENT):
+	* lib/mktime.c (TYPE_TWOS_COMPLEMENT):
+	* lib/strtol.c (TYPE_TWOS_COMPLEMENT, TYPE_ONES_COMPLEMENT)
+	(TYPE_SIGNED_MAGNITUDE):
+	Remove.  All uses rewritten to assume two's complement, which is
+	all we can reasonably test nowadays anyway.
+	* top/maint.mk (_intprops_names): Remove the removed macros.
+
+2016-04-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	stdint: port to strict C11 left shift
+	* lib/stdint.in.h (_STDINT_MIN, _STDINT_MAX):
+	Pacify clang -Wshift-negative-value, which should be an issue only
+	on clang setups where stdint.h does not conform to C11 or to C++11.
+	Problem reported by Philipp Stephani in: http://bugs.gnu.org/23261
+
+2016-04-09  Paul Eggert  <eggert@penguin.cs.ucla.edu>
+
+	mbrtowc: work around glibc bug#19932
+	Fix mbrtowc so that it never returns -1 in the C locale,
+	as this conflicts with a future version of POSIX
+	http://austingroupbugs.net/view.php?id=663#c2738
+	and causes problems with GNU grep: http://bugs.gnu.org/23234
+	See glibc bug 19932:
+	https://sourceware.org/bugzilla/show_bug.cgi?id=19932
+	* doc/posix-functions/mbrlen.texi (mbrlen):
+	* doc/posix-functions/mbrtowc.texi (mbrtowc):
+	Document the glibc bug.
+	* lib/mbrtowc.c [C_LOCALE_MAYBE_EILSEQ]:
+	Include hard-locale.h, locale.h.
+	(rpl_mbrtowc): Work around the C_LOCALE_MAYBE_EILSEQ bug,
+	if the bug is possible.
+	* m4/mbrtowc.m4 (gl_MBRTOWC_C_LOCALE): New macro.
+	(gl_FUNC_MBRTOWC): Use it, and define C_LOCALE_MAYBE_EILSEQ as needed.
+	* modules/hard-locale (License): Now LGPLv2+, for mbrtowc.
+	* modules/mbrtowc (Depends-on): Add hard-locale.
+	* modules/mbrtowc-tests (Files, TESTS): Add tests/test-mbrtowc5.sh.
+	* tests/test-mbrtowc.c (main): Test for bug fix if arg is '5'.
+	* tests/test-mbrtowc5.sh: New file.
+
+2016-04-03  Pedro Alves  <palves@redhat.com>
+
+	stdint: detect good enough pre-C++11 stdint.h in C++ mode
+	When gnulib is configured in C++ mode for a system with a working C99
+	implementation of stdint.h that predates C++11, gnulib ends up
+	substituting stdint.h anyway.  This works on most targets, but on e.g.,
+	64-bit MinGW, it doesn't, as gnulib's substitute assumes LP64, while
+	MinGW is LLP64.  Instead of trying to detect the right types, detect
+	good-enough-pre-C++11 stdint.h and in such case define
+	__STDC_CONSTANT_MACROS/__STDC_LIMIT_MACROS in config.h.
+	* m4/stdint.m4 (gl_STDINT_H): Always define __STDC_CONSTANT_MACROS
+	/ __STDC_LIMIT_MACROS while checking whether the system stdint.h
+	conforms to C99.  If it does, check whether it hides symbols
+	behind the __STDC_{CONSTANT|LIMIT}_MACROS macros.  Then if it
+	does, define those macros in config.h.
+
+2016-04-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	argp: merge changes from glibc
+	Among other things, this should fix problems found by a Coverity
+	scan and reported by Andrei Borzenkov:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-01/msg00015.html
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-01/msg00016.html
+	* lib/argp-ba.c, lib/argp-fmtstream.c, lib/argp-fmtstream.h:
+	* lib/argp-fs-xinl.c, lib/argp-help.c, lib/argp-namefrob.h:
+	* lib/argp-parse.c, lib/argp-pv.c, lib/argp-pvh.c, lib/argp-xinl.c:
+	* lib/argp.h:
+	Merge changes from glibc.
+	* tests/test-argp-2.sh: Adjust to match new behavior.
+
+2016-04-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	stddef: support configuring with g++
+	Problem reported by Ángel González in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-04/msg00003.html
+	* lib/stddef.in.h (_GL_STDDEF_ALIGNAS, max_align_t):
+	Do not define if _GCC_MAX_ALIGN_T is defined.
+
+2016-03-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	test-framework-sh: minor cleanups
+	* tests/init.sh (testdir_prefix_): Output a trailing newline,
+	since strictly speaking POSIX requires this.
+	(setup_): Do not use the variable 'fail', as that makes the
+	trace output harder to read ('fail' is typically used by
+	tests to mean the test failed).  Treat // portably.
+	Check that new directory is not merely a sibling of the tmp dir.
+	Avoid unnecessary invocation of tr.
+
+	test-framework-sh: revert port to NetBSD 7.0
+	It was a false alarm; I misinterpreted Assaf Gordon's report.
+	* tests/init.sh (testdir_prefix_, pfx_, template_length_):
+	Restore.
+	(test_dir_): Adjust to mktempd_ change.
+	(mktempd_): Restore 2nd arg.  Use -t again.
+	(base_template_, template_, nx_): Resurrect old code.
+
+	Port better to Alpine Linux
+	Its diff implementation does not support -c, but does support -U3.
+	Problem reported by Assaf Gordon in: http://bugs.gnu.org/23107#13
+	* tests/init.sh (diff_opt_): New var.
+	(compare_): Prefer diff -U3 to diff -c to plain diff.
+
+2016-03-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	test-framework-sh: port to NetBSD 7.0
+	Problem reported by Assaf Gordon in: http://bugs.gnu.org/23107#13
+	* tests/init.sh (testdir_prefix_, pfx_, template_length_):
+	Remove.  All uses removed.
+	(test_dir_): Adjust to mktempd_ change.
+	(mktempd_): Omit 2nd arg.  Stop using -t, as it is not portable.
+	(base_template_, template_, nx_): Simplify by hardcoding.
+
+2016-03-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	gitlog-to-changelog: suppress ignored chatter
+	* build-aux/gitlog-to-changelog: Do not warn about skipping
+	an SHA if it would have been ignored anyway.
+
+2016-03-22  Geert Janssens  <janssens-geert@telenet.be>
+
+	setlocale: add "sv" to Windows language table
+	* lib/setlocale.c (language_table) [W32]: Add "sv".
+	Reported in <https://savannah.gnu.org/bugs/?44588>.
+
+2016-03-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	sys_select: port to new Cygwin
+	Problem reported by Ken Brown in:
+	https://lists.gnu.org/archive/html/bug-gnulib/2016-03/msg00054.html
+	* lib/sys_select.in.h [__CYGWIN__]: Avoid "unknown type name"
+	diagnostics.
+
+2016-03-17  Jim Meyering  <meyering@fb.com>
+
+	test-userspec.c: do not trigger gcc's new -Wmisleading-indentation
+	* tests/test-userspec.c (main): Remove unnecessary braces and fix
+	misleading indentation. Here is the diagnostic gcc-6.0-to-be issued:
+	  test-userspec.c:176:9: error: statement is indented as if it were \
+            guarded by... [-Werror=misleading-indentation]
+	           {
+	           ^
+	  test-userspec.c:173:7: note: ...this 'if' clause, but it is not
+	         if (!diag && !T[i].result)
+	         ^~
+
+2016-03-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	time_rz: port to clang -Wunused-const-variable
+	* lib/time_rz.c (TZ): Remove.  All uses removed.
+
+	std-gnu11: improve clang support
+	* m4/std-gnu11.m4: Sync with autoconf, incorporating:
+	2016-03-15 Also try clang
+	2016-03-15 Port C11 and C++11 testing to clang
+
+	select: port more to Intel 2016.1.150 compiler
+	Problem reported by Balázs Hajgató in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-03/msg00036.html
+	* m4/select.m4 (gl_FUNC_SELECT): Require AC_C_RESTRICT.
+
+2016-03-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	select: try to port to 2016.1.150 compiler
+	Problem reported by Balázs Hajgató in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-03/msg00026.html
+	* lib/sys_select.in.h (select): Use 'restrict' on arguments where
+	POSIX specifies 'restrict'.
+
+2016-03-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	localename-tests: memory allocation fixes
+	* tests/test-localename.c (test_locale_name)
+	(test_locale_name_thread): Don't call freelocale on a locale
+	that was the base of a successful newlocale, as that
+	results in a double free.  Problem reported by Assaf Gordon.
+	(test_locale_name_thread): Free saved names after use, to pacify
+	gcc -fsanitize=address.
+
 2016-03-08  Paul Eggert  <eggert@cs.ucla.edu>
 
 	intprops: make .h file license match module
@@ -2236,7 +2556,7 @@
 
 	passfd: avoid valgrind uninitalised data warning
 	* lib/passfd.c (sendfd): Reset the msg_controllen of msghdr,
-	to include just the fd we've initialised, rather than including
+	to include just the fd we've initialized, rather than including
 	the extra space used for alignment.
 
 2015-02-23  Paul Eggert  <eggert@cs.ucla.edu>
