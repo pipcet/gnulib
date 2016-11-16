@@ -13,11 +13,14 @@ Depends-on:
 c-ctype
 stdbool
 gettime
+gettext-h
 intprops
 mktime
 setenv
+strftime
 unsetenv
 time
+timegm
 verify
 xalloc
 

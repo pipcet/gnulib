@@ -91,7 +91,7 @@ main (void)
     check_one ("&", "'&'");
 
     /* "'" would be interpreted as the start of a string.  */
-    check_one ("'foo'bar", "''\\''foo'\\''bar'"); /* or "\"'foo'bar\"" */
+    check_one ("'foo'bar", "\"'foo'bar\"");
 
     /* '(' at the beginning of argv[0] would introduce a subshell command.  */
     check_one ("(", "'('");

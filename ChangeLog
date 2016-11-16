@@ -1,3 +1,1489 @@
+2016-11-15  Pedro Alves  <palves@redhat.com>
+
+	sys_time: add gnulib::timeval for C++
+	* lib/sys_time.in.h [__cplusplus && defined GNULIB_NAMESPACE]:
+	Define "timeval" in the GNULIB_NAMESPACE namespace, and #undef any
+	timeval macro.
+
+2016-11-14  Pedro Alves  <palves@redhat.com>
+
+	snippet/c++defs: fix real-floating arg functions in C++ mode
+	Also, define isfinite, isinf, isnan, signbit in the gnulib
+	namespace instead of in the global namespace.
+	* build-aux/snippet/c++defs.h (_GL_BEGIN_NAMESPACE)
+	(_GL_END_NAMESPACE): New.
+	* lib/math.in.h (_GL_MATH_CXX_REAL_FLOATING_DECL_2): Use them.
+	(isfinite, isinf, isnan, signbit) [__cplusplus &&
+	GNULIB_NAMESPACE]: Define them in the GNULIB_NAMESPACE namespace
+	instead of in the global namespace.
+	* tests/test-math-c++.cc: Check that the isfinite, isinf, isnan,
+	signbit overloads exist in the GNULIB_NAMESPACE namespace, instead
+	of in the global namespace.
+
+2016-11-13  Jim Meyering  <meyering@fb.com>
+
+	strftime: don't use __THROW
+	Each use of __THROW would provoke this from gcc-7-to-be:
+
+	  lib/strftime.c:371:1: warning: '__leaf__' attribute has no effect \
+	    on unit local functions [-Wattributes]
+	  static int iso_week_days (int, int) __THROW;
+	  ^~~~~~
+	* lib/strftime.c (__THROW): Don't define.
+	Remove each use of __THROW.
+	* lib/strftime.c (memcpy_lowcase, memcpy_uppcase): Remove __THROW.
+	(tm_diff, iso_week_days, __strftime_internal): Likewise.
+
+2016-11-14  Paul Eggert  <eggert@union>
+
+	obstack: port to gcc -fcheck-pointer-bounds
+	Problem found by 'make check' failure on bleeding-edge coreutils
+	on an MPX-enabled CPU (Intel Core i3-7100U) running GCC (Ubuntu
+	6.2.0-5ubuntu12), configured via "./configure
+	--enable-gcc-warnings CFLAGS='-mmpx -fcheck-pointer-bounds -g3
+	-O2' LDFLAGS='-static-libmpx -static-libmpxwrappers'".
+	* lib/obstack.h (__FLEXIBLE_ARRAY_MEMBER):
+	New macro, copied from fts_.h.
+	(struct _obstack_chunk.contents): Use it.
+
+2016-11-14  Eric Blake  <eblake@redhat.com>
+
+	strerror_r-posix: Another fix, for HAVE_DECL_STRERROR_R on mingw.
+	* m4/strerror_r.m4 (gl_FUNC_STRERROR_R, gl_FUNC_STRERROR_R_WORKS):
+	Avoid _ONCE variants, which may supply a conflicting AC_DEFINE().
+
+2016-11-14  Pádraig Brady  <P@draigBrady.com>
+
+	strptime: fix compile error in recent change
+	* lib/strptime.c (__strptime_internal): Fix ported code.
+
+2016-11-11  Bruno Haible  <bruno@clisp.org>
+
+	gnulib-tool: Support for the dual "LGPLv3+ or GPLv2" license.
+	* gnulib-tool (--lgpl): Accept value 3orGPLv2.
+	(func_import): Extend determination of license_incompatibilities.
+	(func_create_testdir): Extend table of license compatibility. Handle
+	also the licenses GPLv3+, GPL, LGPLv3+.
+
+2016-11-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	strftime: tune %q
+	* lib/strftime.c (__strftime_internal): Assume tp->tm_mon is in range.
+
+	Merge strftime.c changes from glibc
+	This incorporates:
+	2007-10-16 [BZ #5184] Add tzset_called argument
+	2008-06-13 [BZ #6612] pass reference to tzset_called around
+	2009-10-30 Implement Burmese language locale for Myanmar
+	2010-01-09 Add support for XPG7 testing
+	2015-09-26 [BZ #18985] out of range data to strftime() causes a segfault
+	2015-10-20 Convert miscellaneous function definitions to prototype style
+	* lib/strftime.c: Copy glibc license, since gnulib-tool rewrites
+	it anyway and this lessens the difference between gnulib and glibc.
+	(USE_IN_EXTENDED_LOCALE_MODEL) [_LIBC]: Define.
+	(__THROW): Define if standard headers do not.
+	(LOCALE_PARAM): Rename from LOCALE_PARAM_PROTO.  All uses changed.
+	(memcpy_locase, memcpy_uppcase, tm_diff, __strftime_internal):
+	Declare with __THROW.
+	(__strftime_internal): Rename from strftime_case_. Add arg for
+	whether tzset is called.  All uses changed.  Call tzset at most
+	once.  Allow %OC, for Burmese.
+	(a_wkday, f_wkday, a_month, f_month) [_NL_CURRENT]:
+	Don't assume values are in range.
+
+2016-11-12  Eric Blake  <eblake@redhat.com>
+
+	strerror_r-posix: Fix override of AC_FUNC_STRERROR_R
+	* m4/strerror_r.m4 (AC_FUNC_STRERROR_R): New override.
+	(gl_FUNC_STRERROR_R): Don't reuse AC_DEFINE() with a potentially
+	different value.
+
+2016-11-09  Frediano Ziglio  <fziglio@redhat.com>
+
+	manywarnings: fix -Wno-missing-field-initializers detection
+	* m4/manywarnings.m4: Fix -Wno-missing-field-initializers detection
+	to be independent of -Wunused-variable.  I.E. ensure the latter
+	warning doesn't occur so that detection of the former is accurate.
+
+2016-11-05  Pádraig Brady  <pbrady@fb.com>
+
+	strftime,strptime: support %q to represent the quarter
+	* lib/strftime.c (strftime_case_): Add %q case.
+	* lib/strptime.c (__strptime_internal): Likewise.
+	* tests/test-strftime.c (quarter_test): A new test case.
+
+2016-11-03  Eric Blake  <eblake@redhat.com>
+
+	bootstrap: Fix get_version() for AIX 5.3
+	* build-aux/bootstrap (get_version): Factor out sed script, since
+	indented comments choke AIX 5.3 sed.
+	Reported-by: Michael Felt <aixtools@gmail.com>
+
+2016-11-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops: port to older XL C
+	Problem reported by Alexander Samoilov in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-10/msg00166.html
+	http://savannah.nongnu.org/bugs/?49448
+	* lib/intprops.h (_GL_HAVE___TYPEOF__) [__IBM__TYPEOF__]:
+	Define to 1 only for XL C 12.1 or later, since this bug
+	occurs in XL C for AIX 6.0 but not in 12.1.
+
+2016-11-02  Pádraig Brady  <P@draigBrady.com>
+
+	backupfile: initialize default suffix within the implementation
+	* lib/backupfile.c (find_backup_file_name): Initialize the
+	global variable here, to simplify usage, and to only call
+	getenv() when needed.
+
+2016-11-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	futimens: remove FIXME for old Linux kernels
+	* m4/futimens.m4 (gl_FUNC_FUTIMENS): Belatedy do a "simplify
+	this in 2012" FIXME, like that for utimensat.
+
+	utimensat: remove FIXME for old Linux kernels
+	* lib/utimensat.c (rpl_utimensat): Update FIXME comment.
+	* m4/utimensat.m4 (gl_FUNC_UTIMENSAT): Belatedy do a "simplify
+	this in 2012" FIXME, by assuming the file system bug is absent
+	unless demonstrated to be present.  We no longer need to worry
+	about Linux kernel 2.6.32 when building with newer kernels.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	qsort_r: Fix macrology for platforms that lack the function.
+	* m4/stdlib_h.m4 (gl_STDLIB_H): Check for qsort_r.
+	(gl_STDLIB_H_DEFAULTS): Initialize HAVE_QSORT_R.
+	* modules/stdlib (Makefile.am): Substitute HAVE_QSORT_R.
+	* lib/stdlib.in.h (qsort_r): Provide declaration if the function does
+	not exist.
+	* m4/qsort_r.m4 (gl_FUNC_QSORT_R): Use AC_CHECK_FUNCS to test whether
+	the function exists.
+	* modules/qsort_r: Add comments.
+
+2016-10-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	sys_types: fix Texinfo typos
+	* doc/glibc-functions/gnu_dev_major.texi:
+	* doc/glibc-functions/gnu_dev_makedev.texi:
+	* doc/glibc-functions/gnu_dev_minor.texi: Fix typos.
+
+2016-10-26  John David Anglin  <dave.anglin@bell.net>
+
+	getprogname: port to HP-UX
+	See Bug#24805.
+	* lib/getprogname.c (getprogname) [__hpux]: Port.
+	* tests/test-getprogname.c (STREQ) [__hpux]:
+	Special-case for HP-UX limitations on program name length.
+
+2016-10-20  Bruno Haible  <bruno@clisp.org>
+
+	Update doc about target platforms.
+	* doc/gnulib-intro.texi (Target Platforms): Update list.
+
+2016-10-15  Bruno Haible  <bruno@clisp.org>
+
+	opendir, readdir, closedir: Relicense under LGPLv2+.
+	* modules/opendir (License): Change to LGPLv2+.
+	* modules/readdir (License): Likewise.
+	* modules/closedir (License): Likewise.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	Fix conflict between strerror_r-posix module and AC_FUNC_STRERROR_R.
+	* m4/strerror_r.m4 (gl_FUNC_STRERROR_R): Override the values set by the
+	AC_FUNC_STRERROR_R macro. Define HAVE_DECL_STRERROR_R_ORIG.
+	* lib/strerror_r.c: Use HAVE_DECL_STRERROR_R_ORIG instead of
+	HAVE_DECL_STRERROR_R.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	Make the 'argp' module work without the 'error' module.
+	* m4/argp.m4 (gl_ARGP): Require AC_FUNC_STRERROR_R.
+
+2016-10-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	diffseq: restore TOO_EXPENSIVE heuristic
+	* lib/diffseq.h: Problem with diffutils reported by Andreas Schwab
+	(Bug#24715).  The simplest solution is to restore the
+	TOO_EXPENSIVE heuristic that I added to GNU diff in 1993, while
+	using a higher threshold to avoid Bug#16848 on smaller files.
+	* lib/diffseq.h (struct context): Restore member too_expensive.
+	(struct partition): Restore members lo_minimal, hi_minimal.
+	(diag, compareseq): Restore arg find_minimal.  All uses changed.
+	(diag): Restore the TOO_EXPENSIVE heuristic that I added back in
+	1993 to make 'diff' run faster (but not as well) on large inputs,
+	but use a threshold of 4096 instead of the old 256.
+	* lib/fstrcmp.c (strcmp_bounded):
+	* lib/git-merge-changelog.c (compute_differences):
+	Adjust to diffseq.h changes.
+
+2016-10-22  Bruno Haible  <bruno@clisp.org>
+
+	iconv: Avoid compilation error when bootstrapping GNU libiconv.
+	* m4/iconv.m4 (AM_ICONV): When the system does not have an iconv()
+	declaration yet, define ICONV_CONST to empty.
+
+2016-10-15  Bruno Haible  <bruno@clisp.org>
+
+	Avoid gnulib-tool warnings about the dependencies of 'parse-datetime'.
+	* gnulib-tool (func_get_license): Special-case the 'parse-datetime'
+	module.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	system-quote tests: Avoid compiler warning on AIX.
+	* tests/test-system-quote-child.c (fopen): Redefine like the system's
+	<stdio.h> does.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	Fix some "gcc -Wall" warnings.
+	* tests/test-ffsl.c (main): Use variable x, not i.
+	* tests/test-posix_spawn3.c (parent_main): Consider the return value of
+	freopen.
+	* tests/test-sethostname1.c (main): Explicitly ignore the return value
+	of sethostname.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	gnulib-tool: Make --create-testdir on all modules work again.
+	* gnulib-tool (func_create_testdir): Don't include the
+	non-recursive-gnulib-prefix-hack module.
+
+2016-10-21  Daiki Ueno  <ueno@gnu.org>
+
+	libunistring: change the maintainer to 'all'
+	* modules/gen-uni-tables, modules/libunistring:
+	* modules/ucs4-utf16, modules/ucs4-utf8, modules/unicodeio:
+	* modules/unitypes, modules/utf16-ucs4, modules/utf16-ucs4-unsafe:
+	* modules/utf8-ucs4, modules/utf8-ucs4-unsafe:
+	* modules/unicase/*, modules/uniconv/*, modules/unictype/*:
+	* modules/unilbrk/*, modules/uniname/*, modules/uninorm/*:
+	* modules/unistdio/*, modules/unistr/*, modules/uniwbrk/*:
+	* modules/uniwidth/*: Change the maintainer to 'all'.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	Simplify "configure: checking ..." messages.
+	* m4/fsusage.m4 (gl_FILE_SYSTEM_USAGE): Use AC_MSG_CHECKING instead of
+	AC_MSG_NOTICE.
+	* m4/getaddrinfo.m4 (gl_GETADDRINFO): Likewise.
+
+2016-10-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	quotearg-tests: pacify gcc -Wall
+	Problem reported by Bruno Haible in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-10/msg00066.html
+	* tests/test-quotearg-simple.c (use_quote_double_quotes): Move here ...
+	* tests/test-quotearg.h: ... from here.
+
+2016-10-20  Pádraig Brady  <P@draigBrady.com>
+
+	canonicalize-lgpl: fix for missing SIZE_MAX on older systems
+	* lib/canonicalize-lgpl.c [SIZE_MAX]: Define if needed.
+	Needed on Centos <= 4.
+
+2016-10-20  Jim Meyering  <meyering@fb.com>
+
+	printf.m4: fix a bug in detecting printf %j support
+	* m4/printf.m4 (gl_PRINTF_SIZES_C99): Fail any system for which
+	uintmax_t is defined in neither stdint.h nor inttypes.h.
+	Before, this macro might have mistakenly set
+	gl_cv_func_printf_sizes_c99=yes on such a system.
+	Spotted by Zev Weiss.
+
+2016-10-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	sched: substitute HAVE_SYS_CDEFS_H too
+	Problem reported by Tom G. Christensen in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-10/msg00084.html
+	* m4/sched_h.m4 (gl_SCHED_H): Set and substitute HAVE_SYS_CDEFS_H.
+	* modules/sched (Depends-on): Substitute HAVE_SYS_CDEFS_H.
+
+2016-10-19  Pádraig Brady  <P@draigBrady.com>
+
+	quotearg: never write beyond the returned length
+	* lib/quotearg.c (quotearg_buffer_restyled): Switch to a read-only
+	scan of the string when we initially encounter a single quote when
+	shell quoting, so that if we then switch to a more concise quoting method
+	we will not have written beyond that returned length.
+	This is significant for sh-quote, which has separate routines
+	to determine the length and do the actual quoting.
+	* tests/test-quotearg.h: Reinstate the buffer bounds checking
+	now that we never write more than the returned length.
+
+2016-10-18  Bruno Haible  <bruno@clisp.org>
+
+	getprogname tests: Avoid failure in packages that use libtool.
+	* tests/test-getprogname.c (main): Strip "lt-" prefix.
+	Based on a patch by Jim Meyering.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	getprogname: Fix test failure on Cygwin. Comments.
+	* lib/getprogname.h: Add comments.
+	* lib/getprogname.c: Add comments. Fix #elif indentation.
+	* tests/test-getprogname.c (main): On Cygwin, expect a result without
+	".exe" suffix.
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	Make sure the libunistring detection rejects older versions with a
+	known bug.
+	* modules/unistr/u8-strtok (configure.ac): Bump required version.
+	* modules/unistr/u16-strtok (configure.ac): Likewise.
+	* modules/unistr/u32-strtok (configure.ac): Likewise.
+
+2016-10-18  Bruno Haible  <bruno@clisp.org>
+
+	sh-quote, system-quote: revert regression of unit test.
+	* tests/test-sh-quote.c (check_one): Do detect buffer overruns.
+	* tests/test-system-quote-main.c (check_one): Likewise.
+
+2016-10-16  Pádraig Brady  <P@draigBrady.com>
+
+	quotearg: fix stale tests
+	* tests/test-quotearg.c [locale_results]: Add the missing str7
+	entries to the expected results.
+	* tests/test-system-quote-main.c (check_one): Don't enforce that we
+	don't write beyond the returned length, since that's no longer the
+	case if we switch to a more concise quoting style.
+	* tests/test-sh-quote.c (check_one): Likewise.
+	(main): Adjust for the new more concise quoting style.
+	Reported by Bruno Haible.
+
+2016-10-16  Jim Meyering  <meyering@fb.com>
+
+	non-recursive-gnulib-prefix-hack: fix inconsequential typo
+	* m4/non-recursive-gnulib-prefix-hack.m4: Change a hard-coded "lib"
+	to "$1".  This macro is always invoked with $1 == lib.
+	Spotted by Bruno Haible
+
+2016-10-16  Bruno Haible  <bruno@clisp.org>
+
+	Fix a test crash.
+	* tests/test-duplocale.c (main): Skip the test if the 'newlocale' call
+	fails.
+
+2016-10-16  Pádraig Brady  <P@draigBrady.com>
+
+	test-limits-h: suppress -Woverlength-strings
+	* tests/test-limits-h.c [__GNUC__]: Ignore -Woverlength-strings.
+
+2016-10-15  Bruno Haible  <bruno@clisp.org>
+
+	gettime, timespec, utimens: Relicense under LGPL.
+	* modules/gettime (License): Change to LGPL.
+	* modules/timespec (License): Likewise.
+	* modules/utimens (License): Likewise.
+
+2016-10-14  Bruno Haible  <bruno@clisp.org>
+            Pádraig Brady  <P@draigBrady.com>
+
+	canonicalize-lgpl: Support the case path_max > INT_MAX.
+	* lib/canonicalize-lgpl.c (__realpath): Declare n as ssize_t, not int.
+	Fix overflow check, for platforms where 'size_t' is larger than 'long'.
+
+2016-10-13  Jim Meyering  <meyering@fb.com>
+
+	getprogname: IBM z/OS: avoid NULL-dereference
+	* lib/getprogname.c (getprogname) [__MVS__]: Don't dereference NULL
+	upon strdup failure.
+
+2016-10-12  Jim Meyering  <meyering@fb.com>
+
+	test-stdint: use _GL_VERIFY rather than "verify" for some tests
+	* tests/test-stdint.c (verify_width): Implement with _GL_VERIFY
+	and an abbreviated diagnostic rather than verify with the full one,
+	because the full-length strings would evoke warnings from gcc with
+	-Woverlength-strings.
+
+2016-10-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	stdint: port SIZE_MAX to glibc s390
+	Problem reported by Eric Blake in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-10/msg00031.html
+	* doc/posix-headers/stdint.texi (stdint.h): Document the fix.
+	* m4/stdint.m4 (gl_STDINT_H): Check that SIZE_MAX has the
+	correct type, if possible.
+
+2016-10-13  Daniel Richard G.  <skunk@iSKUNK.ORG>
+
+	getprogname: port to IBM z/OS
+	* lib/getprogname.c (getprogname): Use w_getpsent() to get the name.
+
+2016-10-11  Jim Meyering  <meyering@fb.com>
+
+	maint: remove stray space after "." in AC_DEFINE comment.
+	* m4/st_dm_mode.m4 (AC_STRUCT_ST_DM_MODE): Remove space-after-".".
+	* m4/utimes.m4 (gl_FUNC_UTIMES): Likewise.
+
+2016-10-05  Jim Meyering  <meyering@fb.com>
+
+	long-options: avoid new GCC 7 warning from -Wimplicit-fallthrough
+	* lib/long-options.c (parse_long_options): Add a break statement
+	to avoid this new warning/failure:
+	$ CFLAGS='-O -Werror=implicit-fallthrough' ./gnulib-tool \
+	  --create-testdir --dir=/t/x --with-tests --test long-options
+	../../gllib/long-options.c: In function 'parse_long_options':
+	../../gllib/long-options.c:66:12: error: this statement may \
+	  fall through [-Werror=implicit-fallthrough]
+	           (*usage_func) (EXIT_SUCCESS);
+	           ~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2016-10-05  Jim Meyering  <meyering@fb.com>
+
+	utimecmp: avoid new GCC 7 warning from -Wbool-operation
+	Testing this module would fail when using GCC 7 like this:
+	$ CFLAGS='-O -Werror=bool-operation' ./gnulib-tool --create-testdir \
+	  --dir=/tmp/x --with-tests --test utimecmp
+	../../gllib/utimecmp.c: In function ‘utimecmp’:
+	../../gllib/utimecmp.c:291:36: error: ‘~’ on a boolean expression \
+	  [-Werror=bool-operation]
+	                 time_t s = src_s & ~ (res == 2 * BILLION);
+	                                    ^
+	../../gllib/utimecmp.c:370:16: error: ‘~’ on a boolean expression \
+	  [-Werror=bool-operation]
+	       src_s &= ~ (res == 2 * BILLION);
+	                ^
+	* lib/utimecmp.c (utimecmp): Do not apply "~" to a boolean.
+	Instead, make it explicit that we intend to apply it to 0 or 1.
+
+2016-10-10  Norihiro Tanaka  <noritnk@kcn.ne.jp>
+
+	dfa: save memory for states
+	* src/dfa (dfaexec_main): Beginning of dfa execution, release caches of
+	states if dfa has a lot of caches.
+
+2016-10-10  Eli Zaretskii  <eliz@gnu.org>
+
+	wchar, wctype-h: fix for MinGW 3.22.2
+	* lib/wchar.in.h [__MINGW32__]: Add one more condition for
+	special invocation, to fix issues with MinGW 3.22.2 wchar.h
+	when included from <string.h>.
+	* lib/wctype.in.h [__MINGW32__]: Add special invocation
+	convention for MinGW 3.22.2, to solve issues with their
+	wctype.h when included from <ctype.h>.
+
+2016-10-05  Jim Meyering  <meyering@fb.com>
+
+	long-options: avoid new GCC 7 warning from -Wimplicit-fallthrough
+	* lib/long-options.c (parse_long_options): Add a break statement
+	to avoid this new warning/failure:
+	$ CFLAGS='-O -Werror=implicit-fallthrough' ./gnulib-tool \
+	  --create-testdir --dir=/t/x --with-tests --test long-options
+	../../gllib/long-options.c: In function ‘parse_long_options’:
+	../../gllib/long-options.c:66:12: error: this statement may \
+	  fall through [-Werror=implicit-fallthrough]
+	           (*usage_func) (EXIT_SUCCESS);
+	           ~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	utimecmp: avoid new GCC 7 warning from -Wbool-operation
+	Testing this module would fail when using GCC 7 like this:
+	$ CFLAGS='-O -Werror=bool-operation' ./gnulib-tool --create-testdir \
+	  --dir=/tmp/x --with-tests --test utimecmp
+	../../gllib/utimecmp.c: In function ‘utimecmp’:
+	../../gllib/utimecmp.c:291:36: error: ‘~’ on a boolean expression \
+	  [-Werror=bool-operation]
+	                 time_t s = src_s & ~ (res == 2 * BILLION);
+	                                    ^
+	../../gllib/utimecmp.c:370:16: error: ‘~’ on a boolean expression \
+	  [-Werror=bool-operation]
+	       src_s &= ~ (res == 2 * BILLION);
+	                ^
+	* lib/utimecmp.c (utimecmp): Do not apply "~" to a boolean.
+	Instead, make it explicit that we intend to apply it to 0 or 1.
+
+2016-10-03  Pádraig Brady  <P@draigBrady.com>
+
+	quotearg: minimize shell quoting using double quotes
+	* lib/quotearg.c (quotearg_buffer_restyled): If an ASCII single
+	quote in encountered then use double quotes (c style quoting)
+	when possible, as it simplifies the quoting.
+	* tests/test-quotearg-simple.c: Add test cases.
+	* tests/test-quotearg.h (use_quotearg_buffer): Adjust to account
+	for the fact we now may write beyond the returned length.
+
+2016-10-02  Jim Meyering  <meyering@fb.com>
+
+	vasnprintf.c: avoid spurious warning from GCC 7
+	The presence of cpp directives renders this "FALLTHROUGH" comment
+	ineffective, so does not suppress the -Wimplicit-fallthrough warning
+	from GCC 7 built from git on 2016-10-02.
+	* lib/vasnprintf.c (VASNPRINTF): Move comment down past two cpp
+	directives, so that it takes effect once again.  This is clearly
+	not a proper change, and I will revert it once this bug is fixed:
+	https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77817
+
+2016-10-01  Jim Meyering  <meyering@fb.com>
+
+	getprogname: correct the test for a __progname variable
+	* m4/getprogname.m4 (gl_FUNC_GETPROGNAME): Use AC_CACHE_CHECK
+	and AC_LINK_IFELSE to check for a global __progname.  If found,
+	define HAVE_VAR___PROGNAME.
+	* lib/getprogname.c (getprogname): Reflect the new name of the
+	feature- checked preprocessor symbol:
+	s/HAVE_DECL___PROGNAME/HAVE_VAR___PROGNAME/
+
+2016-09-28  Jim Meyering  <meyering@fb.com>
+
+	u8-uctomb-aux.c: build: placate GCC 7's new -Wimplicit-fallthrough
+	* lib/unistr/u8-uctomb-aux.c (u8_uctomb_aux): Mark each end of
+	fall-through case with a /* fallthrough */ comment.
+
+	dfa: build: avoid warning from GCC 7's new -Wimplicit-fallthrough
+	* lib/dfa.c (dfassbuild): Mark the end of this case with a
+	/* fallthrough */ comment.
+
+	getprogname: avoid __progname vs program_invocation_short_name pitfall
+	I.e., don't let the OpenBSD 5.1 fix induce failure when using newer
+	glibc.  Would have caused failure with Fedora 25's glibc-2.24-3, but
+	not with Fedora 24's glibc-2.23.1-10.
+	* lib/getprogname.c (__progname): Move this declaration down...
+	(getprogname): ... into the #elif block where used, and make it
+	explicitly "extern".
+
+	getprogname: port to OpenBSD 5.1
+	* lib/getprogname.c (__progname) [HAVE_DECL___PROGNAME]: Declare.
+	(getprogname) [HAVE_DECL___PROGNAME]: Return __progname or "?".
+	* modules/getprogname (configure.ac): Move most of this code...
+	* m4/getprogname.m4 (gl_FUNC_GETPROGNAME): ... to this function,
+	increment serial number, and add a test for __progname.
+	https://bugs.gnu.org/24562
+	Reported by Nelson H. F. Beebe.
+
+2016-09-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	sched: port to GCC 6.2.1 on macOS Sierra
+	Problem reported by Denis Davydov in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-09/msg00056.html
+	* lib/sched.in.h [HAVE_SYS_CDEFS_H]:
+	Include <sys/cdefs.h> before <sched.h>.
+	* m4/nproc.m4 (gl_PREREQ_NPROC): Include errno.h before sched.h,
+	so that we needn’t worry about the sched.h include bug here.
+	* m4/sched_h.m4 (gl_SCHED_H): Check for sys/cdefs.h,
+	and include it before <sched.h> if it exists, when
+	checking for <sched.h>.
+
+	tests/init.sh: port Alpine fix to AIX 7.1
+	* tests/init.sh (compare_): When attempting to use diff -U3,
+	prefer diff -u to -U3 to -c to plain diff.  Do not insist on
+	diff -u not outputting a space after leading '+', as the users
+	of 'compare' should not be that picky about its output format.
+	In the AIX 7.1 case, return with diff exit status (or with 2 if
+	trouble), instead of some random nonzero exit status.
+	* tests/test-init.sh (test_compare): Remove space after leading
+	'+', so that AIX 7.1 'diff' passes the test.
+
+2016-09-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	nl_langinfo: pacify GCC
+	* lib/nl_langinfo.c (ctype_codeset): Remove unused local.
+	(rpl_nl_langinfo): Cast string literals to char *, to pacify GCC.
+
+	stdint: also set GL_GENERATE_LIMITS_H
+	Problem reported by Jim Meyering in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-09/msg00052.html
+	* m4/stdint.m4 (gl_STDINT_H): Also redo the AM_CONDITIONAL.
+
+	limits-h, stdint: Don't assume extensions, fix typo
+	* m4/limits-h.m4 (gl_LIMITS_H):
+	* m4/stdint.m4 (gl_STDINT_H):
+	Don't assume AC_USE_SYSTEM_EXTENSIONS.
+	* m4/stdint.m4 (gl_STDINT_H): Fix typo in setting of LIMITS_H,
+	reported by Jim Meyering in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-09/msg00050.html
+
+2016-09-21  Jim Meyering  <meyering@fb.com>
+
+	getprogname: port to AIX
+	* lib/getprogname.c (getprogname) [_AIX]: Use getpid, getprocs64
+	and strdup to obtain a short program name string.  Using code from
+	Bruno Haible and an idea from Bastien ROUCARIÈS, in
+	https://lists.gnu.org/archive/html/bug-gnulib/2010-12/msg00249.html
+	Assaf Gordon reported that this new file would fail to compile on
+	AIX-7.1 32bit.
+
+2016-09-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	extensions: fix typo in comment
+	* m4/extensions.m4: Sync from Autoconf master.
+
+	stdint: support new _WIDTH macros
+	* doc/posix-headers/stdint.texi: Document this.
+	* lib/stdint.in.h: Add support for INTMAX_WIDTH. etc.
+	* m4/stdint.m4 (gl_STDINT_H): Require gl_LIMITS_H.  Check for
+	support for INTMAX_WIDTH, etc. as well as for support for just C99.
+	* modules/stdint (Depends-on): Add limits-h.
+	(Makefile.am): Substitute HAVE_C99_STDINT_H.
+	* modules/stdint-tests (Depends-on): Add extensions, so that
+	INTMAX_MAX etc. are defined.
+	* tests/test-stdint.c: Verify the new macros.
+
+	limits-h: new module
+	This adds ISO/IEC TS 18661-1:2014 support to limits.h.
+	* MODULES.html.sh: Add limits-h,and move size_max to stdint section.
+	* doc/posix-headers/limits.texi: Document new module.
+	* lib/limits.in.h, m4/limits-h.m4, modules/limits-h:
+	* modules/limit-h-tests, tests/test-limits-h.c: New files.
+
+	stdio: don't redefine __USE_MINGW_ANSI_STDIO
+	* m4/stdio_h.m4 (gl_STDIO_H): Don't define __USE_MINGW_ANSI_STDIO
+	if it is already defined.  Apparently GNU Emacs relies on this.  See:
+	http://lists.gnu.org/archive/html/emacs-devel/2016-09/msg00416.html
+
+2016-09-15  Eric Blake  <eblake@redhat.com>
+
+	sys_types: avoid glibc 2.25 warnings about major()
+	* m4/sys_types_h.m4 (AC_HEADER_MAJOR): Replace broken version in
+	older autoconf.
+	* doc/posix-headers/sys_types.texi (sys/types.h): Document fix.
+	* doc/glibc-functions/gnu_dev_major.texi (gnu_dev_major): Likewise.
+	* doc/glibc-functions/gnu_dev_makedev.texi (gnu_dev_makedev): Likewise.
+	* doc/glibc-functions/gnu_dev_minor.texi (gnu_dev_minor): Likewise.
+
+	mountlist: include sysmacros.h for glibc
+	* m4/mountlist.m4 (gl_PREREQ_MOUTLIST_EXTRA): Include
+	AC_HEADER_MAJOR.
+	* lib/mountlist.c (includes): Use correct headers.
+
+2016-09-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	extensions: port to more ISO C TSes
+	* m4/extensions.m4 (AC_USE_SYSTEM_EXTENSIONS): Sync from Autoconf
+	master, to add support for more recent ISO C TRs and TSes.
+
+2016-09-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops: new macro TYPE_WIDTH
+	* lib/intprops.h (TYPE_WIDTH): New macro.
+	(TYPE_MAXIMUM, _GL_SIGNED_INT_MAXIMUM, INT_STRLEN_BOUND):
+	* lib/ftoastr.h (_GL_FLOAT_DIG_BITS_BOUND):
+	* lib/parse-datetime.y (parse_datetime2):
+	Use it.
+
+	extensions: port to recent ISO C TRs
+	* m4/extensions.m4 (AC_USE_SYSTEM_EXTENSIONS):
+	Sync from Autoconf master, to add support for recent ISO C TRs.
+	* m4/stdio_h.m4 (gl_STDIO_H): Define __USE_MINGW_ANSI_STDIO here,
+	since AC_USE_SYSTEM_EXTENSIONS no longer does that as
+	the MinGW option is not an extension.
+
+2016-09-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: port to Solaris 9
+	Problems reported by Tom G. Christensen in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-09/msg00031.html
+	* modules/dfa (Depends-on): Add isblank.
+	* modules/dfa-tests (dfa_match_aux_LDADD):
+	Rename from test_stat_LDADD, to fix typo.
+	* tests/dfa-match.sh: Don't require 'timeout'; use it if available.
+
+2016-09-10  Jim Meyering  <meyering@fb.com>
+
+	strverscmp: avoid link failure on OS X
+	* lib/strverscmp.c [!weak_alias]: Define __strverscmp to strverscmp.
+	Reported by Assaf Gordon in https://bugs.gnu.org/24256#26
+
+2016-08-16  Jim Meyering  <meyering@fb.com>
+
+	dfa: new module, importing grep's DFA matcher
+	Since grep's DFA matcher is now being used by two gnulib-enabled
+	projects, grep and sed, it makes sense to version-control its
+	sources and unit tests in one place: here.
+	* modules/dfa: New module.
+	* modules/dfa-tests: New file.
+	* lib/dfa.c: New file, from grep.
+	* lib/dfa.h: Likewise.
+	* lib/localeinfo.c: Likewise.
+	* lib/localeinfo.h: Likewise.
+	* tests/dfa-match-aux.c: Likewise.
+	* tests/dfa-invalid-char-class.sh: Likewise.
+	* tests/dfa-match.sh: Likewise, with minor changes.
+	* MODULES.html.sh (Misc): Add "dfa" to this list.
+
+2016-09-09  Jim Meyering  <meyering@fb.com>
+
+	getprogname-tests: don't depend on assert-h
+	* modules/getprogname-tests (Depends-on): Remove assert-h.
+	It was not needed, and in fact would cause build failure for
+	coreutils on some systems.  Reported by Assaf Gordon in https:
+	//lists.gnu.org/archive/html/coreutils/2016-09/msg00016.html
+
+2016-09-07  Jim Meyering  <meyering@fb.com>
+
+	getprogname-tests: work also when EXEEXT is nonempty
+	* modules/getprogname-tests (Makefile.am): Define EXEEXT.
+	* tests/test-getprogname.c (main): Use it.
+	Suggested by Gisle Vanem.
+
+2016-09-07  Gisle Vanem  <gvanem@yahoo.no>
+
+	getprogname: fix errors in previous change
+	* lib/getprogname.c (getprogname) [HAVE_GETEXECNAME]:
+	s/program_invocation_name/base/
+	[HAVE_DECL___ARGV]: Handle NULL __argv or __argv[0].
+
+2016-09-08  Pádraig Brady  <P@draigBrady.com>
+
+	parse-datetime: restrict debug output to input string
+	* lib/parse-datetime.y (parse_datetime2): If we parse
+	all of the input but determine it's invalid, ensure
+	we don't output the now invalid input pointer.
+	This issue was seen with `date -d 'now +1'`.
+
+2016-09-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	flexmember: new macro FLEXALIGNOF
+	* lib/flexmember.h: Include <stddef.h>, for offsetof.
+	(FLEXALIGNOF): Rename from _GL_XALLOC_ALIGNOF, as Emacs can use
+	this macro.  Update comments.
+
+2016-09-07  Jim Meyering  <meyering@fb.com>
+
+	getprogname: port to systems with __argv (mingw, msvc)
+	* lib/getprogname.c (getprogname): Include "dirname.h" and use
+	last_component: more general than open coding it with hard-coded "/".
+	* lib/getprogname.h (getprogname): Prefer "char const *" consistently.
+	* modules/getprogname (Depends-on): Add dirname-lgpl.
+	(configure.ac): Check for __argv in <stdlib.h>.
+	* modules/getprogname-tests: New file.
+	* tests/test-getprogname.c: New file.
+	Suggested by Gisle Vanem in
+	https://lists.gnu.org/archive/html/bug-gnulib/2016-09/msg00014.html
+
+2016-09-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	flexmember: port better to GCC + valgrind
+	With a char[] flexible array member in a struct with nontrivial
+	alignment, GCC-generated code can access past the end of the
+	array, because GCC assumes there are padding bytes to get the
+	struct aligned.  So the common idiom of malloc (offsetof (struct
+	s, m), n) does not properly allocate an n-byte trailing member, as
+	malloc’s argument should be the next multiple of alignof (struct s).
+	See GCC Bug#66661: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66661
+	Although C11 apparently permits this GCC optimization (i.e., there
+	was a bug in Gnulib not in GCC), possibly this is a defect in C11.
+	See the thread containing:
+	https://gcc.gnu.org/ml/gcc-patches/2016-09/msg00317.html
+	* lib/flexmember.h: New file.
+	* lib/fnmatch.c, lib/fts.c, lib/glob.c, lib/idcache.c:
+	* lib/localename.c, lib/time_rz.c:
+	Include flexmember.h.
+	* lib/fnmatch_loop.c (struct patternlist):
+	* lib/localename.c (struct hash_node):
+	Use FLEXIBLE_ARRAY_MEMBER.
+	* lib/fnmatch_loop.c (EXT):
+	* lib/fts.c (fts_alloc):
+	* lib/glob.c (glob_in_dir):
+	* lib/idcache.c (getuser, getuidbyname, getgroup, getgidbyname):
+	* lib/localename.c (gl_lock_define_initialized):
+	* lib/time_rz.c (tzalloc):
+	Use FLEXSIZEOF instead of offsetof.
+	* m4/flexmember.m4 (AC_C_FLEXIBLE_ARRAY_MEMBER):
+	Check that the size of the struct can be taken.
+	* modules/flexmember (Files): Add lib/flexmember.h.
+	* modules/fnmatch, modules/glob, modules/localename (Depends-on):
+	Add flexmember.
+
+2016-09-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	getprogname: port to Solaris 10
+	* lib/getprogname.c: Include stdlib.h, for getexecname decl.
+	(getprogname) [HAVE_GETEXECNAME]: Use that, for Solaris 10.
+	* m4/getprogname.m4 (gl_FUNC_GETPROGNAME): Check for getexecname.
+
+	stdalign: correct mistake in alignof doc
+	Problem reported by Joseph Myers in:
+	https://gcc.gnu.org/ml/gcc-patches/2016-09/msg00340.html
+	* doc/posix-headers/stdalign.texi: Do not imply that C11 prohibits
+	alignof(S) where S is a structure containing a flexible array
+	member.  The Gnulib substitute does not support this, but C11 does.
+
+2016-08-18  Pino Toscano  <ptoscano@redhat.com>
+
+	main.mk: remove sc_program_name, since there is no more need to
+	use set_program_name in tools (getprogname is enough for most
+	of the cases).
+	* cfg.mk (local-checks-to-skip): Remove sc_program_name.
+	* top/maint.mk (sc_program_name): Remove.
+
+2016-08-18  Pino Toscano  <ptoscano@redhat.com>
+
+	Port tests away from progname, since modules that need the
+	program name already depend on getprogname.
+	* modules/acl-tests (Depends-on): Remove progname.
+	* modules/argmatch (Depends-on): Likewise.
+	* modules/argmatch-tests (Depends-on): Likewise.
+	* modules/argp-tests (Depends-on): Likewise.
+	* modules/argp-version-etc-tests (Depends-on): Likewise.
+	* modules/array-list-tests (Depends-on): Likewise.
+	* modules/array-oset-tests (Depends-on): Likewise.
+	* modules/avltree-list-tests (Depends-on): Likewise.
+	* modules/avltree-oset-tests (Depends-on): Likewise.
+	* modules/avltreehash-list-tests (Depends-on): Likewise.
+	* modules/carray-list-tests (Depends-on): Likewise.
+	* modules/copy-file-tests (Depends-on): Likewise.
+	* modules/exclude-tests (Depends-on): Likewise.
+	* modules/fchownat-tests (Depends-on): Likewise.
+	* modules/fdopendir-tests (Depends-on): Likewise.
+	* modules/filenamecat-tests (Depends-on): Likewise.
+	* modules/fstatat-tests (Depends-on): Likewise.
+	* modules/fstrcmp-tests (Depends-on): Likewise.
+	* modules/linked-list-tests (Depends-on): Likewise.
+	* modules/linkedhash-list-tests (Depends-on): Likewise.
+	* modules/mkdirat-tests (Depends-on): Likewise.
+	* modules/nonblocking-pipe-tests (Depends-on): Likewise.
+	* modules/nonblocking-socket-tests (Depends-on): Likewise.
+	* modules/obstack-printf-tests (Depends-on): Likewise.
+	* modules/openat-tests (Depends-on): Likewise.
+	* modules/parse-datetime-tests (Depends-on): Likewise.
+	* modules/pipe-filter-gi-tests (Depends-on): Likewise.
+	* modules/pipe-filter-ii-tests (Depends-on): Likewise.
+	* modules/quotearg-simple-tests (Depends-on): Likewise.
+	* modules/quotearg-tests (Depends-on): Likewise.
+	* modules/rbtree-list-tests (Depends-on): Likewise.
+	* modules/rbtree-oset-tests (Depends-on): Likewise.
+	* modules/rbtreehash-list-tests (Depends-on): Likewise.
+	* modules/spawn-pipe-tests (Depends-on): Likewise.
+	* modules/system-quote-tests (Depends-on): Likewise.
+	* modules/uniname/uniname-tests (Depends-on): Likewise.
+	* modules/uninorm/nfc-tests (Depends-on): Likewise.
+	* modules/uninorm/nfd-tests (Depends-on): Likewise.
+	* modules/uninorm/nfkc-tests (Depends-on): Likewise.
+	* modules/uninorm/nfkd-tests (Depends-on): Likewise.
+	* modules/unistdio/u16-vsnprintf-tests (Depends-on): Likewise.
+	* modules/unistdio/u16-vsprintf-tests (Depends-on): Likewise.
+	* modules/unistdio/u32-vsnprintf-tests (Depends-on): Likewise.
+	* modules/unistdio/u32-vsprintf-tests (Depends-on): Likewise.
+	* modules/unistdio/u8-vsnprintf-tests (Depends-on): Likewise.
+	* modules/unistdio/u8-vsprintf-tests (Depends-on): Likewise.
+	* modules/unistdio/ulc-vsnprintf-tests (Depends-on): Likewise.
+	* modules/unistdio/ulc-vsprintf-tests (Depends-on): Likewise.
+	* modules/unlinkat-tests (Depends-on): Likewise.
+	* modules/version-etc-tests (Depends-on): Likewise.
+	* modules/xalloc-die-tests (Depends-on): Likewise.
+	* modules/xmemdup0-tests (Depends-on): Likewise.
+	* modules/xprintf-posix-tests (Depends-on): Likewise.
+	* modules/xvasprintf-tests (Depends-on): Likewise.
+	* tests/test-argmatch.c: Do not include progname.h.
+	(main) Stop calling set_program_name.
+	* tests/test-argp-version-etc.c: Likewise.
+	* tests/test-argp.c: Likewise.
+	* tests/test-argv-iter.c: Likewise.
+	* tests/test-array_list.c: Likewise.
+	* tests/test-array_oset.c: Likewise.
+	* tests/test-avltree_list.c: Likewise.
+	* tests/test-avltree_oset.c: Likewise.
+	* tests/test-avltreehash_list.c: Likewise.
+	* tests/test-carray_list.c: Likewise.
+	* tests/test-copy-acl.c: Likewise.
+	* tests/test-copy-file.c: Likewise.
+	* tests/test-exclude.c: Likewise.
+	* tests/test-fchownat.c: Likewise.
+	* tests/test-fdopendir.c: Likewise.
+	* tests/test-filenamecat.c: Likewise.
+	* tests/test-fstatat.c: Likewise.
+	* tests/test-fstrcmp.c: Likewise.
+	* tests/test-linked_list.c: Likewise.
+	* tests/test-linkedhash_list.c: Likewise.
+	* tests/test-mkdirat.c: Likewise.
+	* tests/test-nonblocking-pipe-main.c: Likewise.
+	* tests/test-nonblocking-socket-main.c: Likewise.
+	* tests/test-obstack-printf.c: Likewise.
+	* tests/test-openat.c: Likewise.
+	* tests/test-parse-datetime.c: Likewise.
+	* tests/test-pipe-filter-gi1.c: Likewise.
+	* tests/test-pipe-filter-gi2-main.c: Likewise.
+	* tests/test-pipe-filter-ii1.c: Likewise.
+	* tests/test-pipe-filter-ii2-main.c: Likewise.
+	* tests/test-quotearg-simple.c: Likewise.
+	* tests/test-quotearg.c: Likewise.
+	* tests/test-rbtree_list.c: Likewise.
+	* tests/test-rbtree_oset.c: Likewise.
+	* tests/test-rbtreehash_list.c: Likewise.
+	* tests/test-sameacls.c: Likewise.
+	* tests/test-set-mode-acl.c: Likewise.
+	* tests/test-spawn-pipe-main.c: Likewise.
+	* tests/test-system-quote-main.c: Likewise.
+	* tests/test-unlinkat.c: Likewise.
+	* tests/test-version-etc.c: Likewise.
+	* tests/test-xalloc-die.c: Likewise.
+	* tests/test-xfprintf-posix.c: Likewise.
+	* tests/test-xmemdup0.c: Likewise.
+	* tests/test-xprintf-posix.c: Likewise.
+	* tests/test-xvasprintf.c: Likewise.
+	* tests/uniname/test-uninames.c: Likewise.
+	* tests/uninorm/test-u32-nfc-big.c: Likewise.
+	* tests/uninorm/test-u32-nfd-big.c: Likewise.
+	* tests/uninorm/test-u32-nfkc-big.c: Likewise.
+	* tests/uninorm/test-u32-nfkd-big.c: Likewise.
+	* tests/unistdio/test-u16-vsnprintf1.c: Likewise.
+	* tests/unistdio/test-u16-vsprintf1.c: Likewise.
+	* tests/unistdio/test-u32-vsnprintf1.c: Likewise.
+	* tests/unistdio/test-u32-vsprintf1.c: Likewise.
+	* tests/unistdio/test-u8-vsnprintf1.c: Likewise.
+	* tests/unistdio/test-u8-vsprintf1.c: Likewise.
+	* tests/unistdio/test-ulc-vsnprintf1.c: Likewise.
+	* tests/unistdio/test-ulc-vsprintf1.c: Likewise.
+	* tests/test-c-stack.c: (program_name): Do not define.
+	(main): Do not set program_name.
+	* tests/test-closein.c: Likewise.
+	* tests/test-xstrtol.c: Likewise.
+	* tests/test-yesno.c: Likewise.
+
+2016-08-18  Pino Toscano  <ptoscano@redhat.com>
+
+	Port modules to use getprogname explicitly, instead of requiring
+	progname to be used (or program_name to be provided).
+	* lib/argmatch.c: Do not include progname.h.
+	[TEST] (program_name): Do not define.
+	[TEST] (main): Call getprogname instead of using program_name.
+	* lib/c-stack.c: Do not include progname.h.
+	(program_name): Do not define.
+	(die): Call getprogname instead of using program_name.
+	* lib/chdir-long.c: Do not include progname.h.
+	[TEST_CHDIR] (main): Do not set program_name.
+	* lib/error.c [!_LIBC]: Include progname.h.
+	[!_LIBC] (program_name): Define using getprogname.
+	* lib/euidaccess.c: Do not include progname.h.
+	[TEST] (main): Do not set program_name.
+	* lib/git-merge-changelog.c: Include getprogname.h instead of
+	progname.h.
+	(usage): Call getprogname instead of using program_name.
+	(main): Likewise.  Stop calling set_program_name.
+	* lib/group-member.c: Do not include progname.h.
+	[TEST] (main): Do not set program_name.
+	* modules/argmatch (Depends-on): Add getprogname.
+	* modules/c-stack (Depends-on): Likewise.
+	* modules/error (Depends-on): Likewise.
+	* modules/git-merge-changelog (Depends-on): Likewise.
+	Also remove progname.
+
+2016-09-05  Pino Toscano  <ptoscano@redhat.com>
+
+	* NEWS: Document the deprecation of the 'progname' module.
+
+2016-08-18  Pino Toscano  <ptoscano@redhat.com>
+
+	getprogname: new module
+	This provides a LGPL module for getting the name of the current
+	program, using the same API found on *BSD systems.
+	* lib/getprogname.c, lib/getprogname.h, m4/getprogname.m4:
+	* modules/getprogname: New files.
+	* MODULES.html.sh (Misc): Add getprogname.
+
+2016-09-02  Jim Meyering  <meyering@fb.com>
+
+	manywarnings: add -fno-common
+	* m4/manywarnings.m4 (gl_MANYWARN_ALL_GCC): Add -fno-common
+	to the list.  Quoting the manual, "Compiling with -fno-common is
+	useful on targets for which it provides better performance, or if
+	you wish to verify that the program will work on other systems that
+	always treat uninitialized variable declarations this way [putting
+	it in the data section]."  If diffutils had been using this sooner,
+	it would have prevented this duplicate declaration issue:
+	http://git.sv.gnu.org/cgit/diffutils.git/commit/?id=v3.4-10-gc2dc91f
+
+2016-08-31  Simon Josefsson  <simon@josefsson.org>
+
+	parse-datetime: Fix typo.
+	* lib/parse-datetime.y (parse_datetime2): Fix typo.
+
+2016-08-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops: tune INT_NEGATE_OVERFLOW for GCC 5 and 6
+	* lib/intprops.h (INT_NEGATE_OVERFLOW): Tune for platforms like
+	GCC 5 and 6 that have __builtin_sub_overflow but not
+	__builtin_sub_overflow_p.  With the recent changes, these
+	platforms are a tiny bit faster with the INT_NEGATE_RANGE_OVERFLOW
+	implementation than with INT_SUBTRACT_OVERFLOW implementation,
+	since the former needs just one runtime comparison whereas the
+	latter needs two.
+
+	strverscmp: sync with glibc
+	Although this doesn't exactly synchronize with glibc
+	byte-for-byte, it makes the code behave the same as glibc.
+	* lib/strverscmp.c (S_I, S_F, S_Z): Now masks, not powers of 2.
+	(ISDIGIT): Remove, as glibc is sticking with isdigit, and the
+	difference shouldn't matter in practical use.  All uses changed
+	back to isdigit.
+	(__strverscmp, strverscmp): Use new glibc method for weak aliases.
+	(next_state): Now unsigned char array; redo elements.
+	(result_type): Now signed char array; redo elements.
+	(__strverscmp): Fix glibc bug 9913 by using new states.
+	* tests/test-strverscmp.c (main): Test glibc bug 9913.
+
+2016-08-29  Jim Meyering  <meyering@fb.com>
+
+	xalloc-oversized.h: port __builtin_mul_overflow change to GCC 6.2.0
+	* lib/xalloc-oversized.h: Port this change to GCC 6.2.0, too,
+	similarly to how it was done to intprops.h.
+
+2016-08-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops.h: port recent changes to GCC 6.2.0
+	* lib/intprops.h (__has_builtin): Move earlier.
+	(_GL_HAS_BUILTIN_OVERFLOW): Rename from
+	_GL_HAS_BUILTIN_OVERFLOW_WITH_NULL and don't worry about whether
+	the last argument can be null.  All uses changed.
+	(_GL_HAS_BUILTIN_OVERFLOW_P): Also test __has_builtin.
+	(_GL_ADD_OVERFLOW, _GL_SUBTRACT_OVERFLOW, _GL_MULTIPLY_OVERFLOW):
+	Don't try to use 3rd arg null, as this doesn't work on GCC 6.2.0
+	and it's not clear which GCC versions it works for.
+	(_GL_INT_OP_WRAPV): Use _GL_HAS_BUILTIN_OVERFLOW instead of
+	its definiens.
+
+	intprops.h: use __typeof__ with GCC 7
+	* lib/intprops.h (_GL_ADD_OVERFLOW, _GL_SUBTRACT_OVERFLOW)
+	(_GL_MULTIPLY_OVERFLOW): Use __typeof__ as in the GCC manual.
+	This avoids computing the expression's value (which might overflow!).
+
+2016-08-29  Jim Meyering  <meyering@fb.com>
+
+	intprops.h, xalloc-oversized.h: work with gcc 7
+	In gcc 6, __builtin_add_overflow, __builtin_sub_overflow and
+	__builtin_mul_overflow each accept a NULL pointer as the third
+	argument.  However in gcc 7, that is no longer accepted.
+	Instead, one must use the "_p"-suffixed names, with which, the
+	third parameter is no longer a pointer.
+	* lib/intprops.h (_GL_HAS_BUILTIN_OVERFLOW_WITH_NULL): Correct
+	the definition: not true for gcc 7 and subsequent.
+	(_GL_HAS_BUILTIN_OVERFLOW_P): Define.
+	(_GL_ADD_OVERFLOW, _GL_SUBTRACT_OVERFLOW, _GL_MULTIPLY_OVERFLOW):
+	Provide new definitions for gcc 7 and subsequent.
+	* lib/xalloc-oversized.h (xalloc_oversized): Provide a definition
+	that works with gcc-7.
+
+	intprops.h: fix missing-backslash problems
+	* lib/intprops.h (_GL_ADD_OVERFLOW): Add backslash.
+	(_GL_SUBTRACT_OVERFLOW,_GL_MULTIPLY_OVERFLOW): Likewise.
+
+2016-08-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops: fix paren typo on old platforms
+	Problem reported by John E. Malmberg in: https://bugs.gnu.org/24300#13
+	* lib/intprops.h (_GL_INT_OP_WRAPV_LONGISH)
+	[__GNUC__ < 5 && !__has_builtin (__builtin_add_overflow)
+	&& (__STDC_VERSION__ < 201112 || _GL__GENERIC_BOGUS)
+	&& !defined LLONG_MAX]:
+	Remove stray paren.
+
+	intprops: port to OpenVMS
+	Problem reported by John E. Malmberg in: https://bugs.gnu.org/24300
+	* doc/posix-headers/limits.texi: Document the problem.
+	* lib/intprops.h (LLONG_MAX, LLONG_MIN) [__INT64_MAX]:
+	Define if not already defined.
+
+2016-08-19  Assaf Gordon  <assafgordon@gmail.com>
+
+	parse-datetime: improve debug implementation
+	Follow-up to commit 12ad79069 ("add optional debug printing").
+	Improve parse-datetime's debug implementation: remove macros,
+	replace global debug flag variable with a function parameter,
+	use nstrftime for formatting.
+	See: https://lists.gnu.org/archive/html/bug-gnulib/2016-08/msg00021.html
+	* lib/parse-datetime.h: (parse_datetime_debug): Remove global extern.
+	(parse_datetime2): New function, accepts 'flags' parameter, supporting
+	debug flag. Existing interface 'parse_datetime' left unmodified.
+	* lib/parse-datetime.c: (parse_datetime_debug): Remove global variable.
+	(struct parser_control): add 'parse_datetime_debug' member variable.
+	(parse_datetime): Call new function 'parse_datetime2' without debug.
+	(parse_datetime2): Adapted from previous 'parse_datetime', initialize
+	pc.parse_datetime_debug variable as needed.
+	(to_year): Accept new flags parameter, instead of using global variable.
+	(debug_print_current_time,debug_print_relative_time,debug_mktime_not_ok):
+	use struct 'debug' variable instead of global variable.
+	(DEBUG,DEBUG_PRINT_CURRENT_TIME,DEBUG_PRINT_RELATIVE_TIME,
+	DEBUG_MKTIME_NOT_OK,PROGRESS,PROGRESS0): Remove macros. Call
+	correspnding functions directly instead of using macros.
+	* modules/parse-datetime: Add gnulib's strftime module.
+
+2016-08-19  Daniel Richard G.  <skunk@iSKUNK.ORG>
+
+	c-strcase-tests: port to EBCDIC
+	* tests/test-c-strncasecmp.c: Allow two c_strncasecmp calls
+	which assume ASCII encoding semantics to run only in ASCII
+	mode, as they fail in EBCDIC.
+
+	sigpipe-tests: fix typo
+	* tests/test-sigpipe.sh: C, not B.
+
+2016-08-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	canonicalize-lgpl: fix errno after malloca fails
+	This fixes a typo I recently introduced.  Suggested by Bruno Haible in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-08/msg00039.html
+	* lib/canonicalize-lgpl.c (__realpath):
+	Don't assume malloca sets errno on failure.
+
+2016-08-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	strtod: port errno handling to z/OS
+	* lib/strtod.c (strtod): Save and restore errno more reliably.
+
+2016-08-17  Daniel Richard G.  <skunk@iSKUNK.ORG>
+
+	strtod: port to z/OS
+	* lib/strtod.c (strtod): Address a couple quirks in the z/OS
+	implementation.
+
+2016-08-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	strtod: port to z/OS
+	* lib/strtod.c (strtod): Address a couple quirks in the z/OS
+	implementation.
+
+	regex, string: rename to avoid '__string'
+	* lib/regex.h, lib/string.in.h: Do not use the identifier
+	'__string', as it is effectively reserved by string.h on z/OS.
+
+	c-strcase-tests, wcwidth-tests: depend on c-ctype
+	* modules/c-strcase-tests, modules/wcwidth-tests (Depends-on):
+	Add c-ctype.
+
+2016-08-17  Daniel Richard G.  <skunk@iSKUNK.ORG>
+
+	thread: port to z/OS
+	* lib/glthread/thread.c, lib/glthread/thread.h:
+	Rudimentary gl_thread support for z/OS.
+
+	maint: port tests to z/OS errno behavior
+	* tests/test-nonblocking-reader.h:
+	* tests/test-nonblocking-writer.h:
+	Accommodate z/OS errno code preferences. (I believe this should
+	still be within spec; IBM is good at following the letter if not
+	the spirit of such things.)
+
+	maint: preprocessor changes to support z/OS
+	* lib/alloca.in.h, lib/fnmatch.c, lib/get-rusage-as.c:
+	* lib/glob.c, lib/math.in.h, lib/ptsname_r.c:
+	* tests/infinity.h, tests/nan.h, tests/test-canonicalize-lgpl.c:
+	* tests/test-nonblocking-pipe.h:
+
+	fclose, strstr-simple, wchar: port to z/OS
+	* m4/fclose.m4, m4/strstr.m4, m4/wchar_h.m4:
+	Changes to the Autoconf M4 code to support z/OS.  Note that
+	fclose() is broken in a different way on z/OS than it is on other
+	systems, thus the special-case in fclose.m4.
+
+	iconv_open-utf-tests, iconv-tests: port to EBCDIC
+	* tests/test-iconv-utf.c, tests/test-iconv.c:
+	Added appropriately conditional #pragmas so that the test strings
+	in test-iconv-utf.c are correctly interpreted in ASCII instead of
+	EBCDIC (i.e. 'J' == 0x4A and not 0xD1). This issue could be
+	addressed in a more portable way by simply rewriting all the ASCII
+	literal characters as octal escapes, but then you would lose the
+	partial readability that the strings have now. Also, iconv_open()
+	on z/OS does not recognize "ISO-8859-1", but "ISO8859-1" works.
+
+	c-strcase-tests, wcwidth-tests: port to EBCDIC
+	* tests/test-c-strcasecmp.c: Include c-ctype.h.
+	(main) [!C_CTYPE_ASCII]: Skip tests that assume ASCII.
+	* tests/test-wcwidth.c: Likewise.
+
+2016-08-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	stdbool: don't require _Bool for C++
+	Problem reported by David Seifert in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-06/msg00005.html
+	* NEWS, doc/posix-headers/stdbool.texi (stdbool.h): Document this.
+	* m4/stdbool.m4 (AC_CHECK_HEADER_STDBOOL): Make the check
+	more-forgiving for C++, in that it requires only 'bool'.  Be a bit
+	stricter about checking that bool and _Bool are compatible in C.
+
+2016-08-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	getdelim: remove dependency on realloc-posix
+	* lib/canonicalize-lgpl.c (alloc_failed)
+	[!FUNC_REALPATH_WORKS || defined _LIBC]: New function,
+	(__realpath) [!FUNC_REALPATH_WORKS || defined _LIBC]: Use it.
+	Use __set_errno where needed, for consistency.
+	* lib/getdelim.c (alloc_failed): New function.
+	(getdelim): Use it.
+
+2016-08-09  Assaf Gordon  <assafgordon@gmail.com>
+
+	parse-datetime: add optional debug printing
+	Print parsing information, warnings, and errors to stderr.
+	* lib/parse-datetime.h (parse_datetimte_debug): New global variable.
+	* lib/parse-datetime.y:
+	(DEBUG_*):  Macros calling debug functions if debugging is enabled.
+	(PROGRESS*): Same as DEBUG, for progress reporting.
+	(dbg_printf): Print message to stderr, with 'date' prefix.
+	(struct parser_control): Add 'debug_*_seen' variables.
+	(str_days): Converts day ordinal/number to string (e.g. 'last wed').
+	(debug_print_current_time, debug_print_relateive_time): Prints the
+	current/relative date/time value of parser_control.
+	(YACC parser syntax): Print parsed parts with DEBUG_* macros.
+	(to_year): Warn about 2-digit year parsing.
+	(yylex):   Warn about unrecognized words.
+	(get_effective_timezone): Returns current timezone in minutes.
+	(debug_strf{time,date,datetime}): Convert 'struct tm' to string as
+	clearly and unambigiously as possible.
+	(debug_mktime_not_ok): Print detailed information about failed
+	date/time values.
+	(parse_datetime): Add DEBUG messages for failures, warnings. Add
+	PROGRESS messages for status messages.
+	* modules/parse-datetime: Add 'timegm', 'gettext-h' dependencies.
+
+2016-08-06  Jim Meyering  <meyering@fb.com>
+
+	tests/init.sh: exclude dash with bad "local" semantics
+	* tests/init.sh (gl_shell_test_script_): Add a function to
+	eliminate a shell like "dash" (unlike bash, zsh) that has
+	surprising/risky "local var='...'" semantics.  Inspired by
+	the problem and discussion in https://bugs.gnu.org/24116#11.
+
+2016-08-02  Ján Tomko  <jtomko@redhat.com>
+
+	maint.mk: expand the prohibit_doubled_word regex
+	This check has a static list of words that are checked for
+	repetitions.  Expand it before running the perl script to
+	avoid using expensive captures.  This decreases the cost
+	for libvirt from 1.66s to 0.66s.
+	* top/maint.mk (prohibit_doubled_word_expanded_): Define.
+	(sc_prohibit_doubled_word): Use it.
+
+2016-07-26  Ján Tomko  <jtomko@redhat.com>
+
+	useless-if-before-free: skip non-matching lines early
+	* build-aux/useless-if-before-free: First match each line with the
+	simple/quick /\bif\b/ and reject if there is no match. This often
+	saves the cost of the much more involved regular expression.
+	For libvirt, this decreases the cost from 1.44s to 1.02s.
+
+2016-07-26  Ján Tomko  <jtomko@redhat.com>
+
+	maint.mk: speed up sc_po_check
+	sc_po_check would skip files based on their names, or on the
+	existence of files with derived names. Rewrite it to use perl
+	instead of shell to make the check faster.
+	* top/maint.mk (perl_translatable_files_list_): Define.
+	(sc_po_check): Use it.
+
+2016-07-30  Ján Tomko  <jtomko@redhat.com>
+
+	maint.mk: speed up require_config_h_first
+	Instead of spawning three processes per file,
+	rewrite the check in perl and run it once for all the files.
+	* top/maint.mk (perl_config_h_first_): Define.
+	(sc_require_config_h_first): Use it in place of shell code.
+
+2016-07-26  Ján Tomko  <jtomko@redhat.com>
+
+	maint.mk: speed up sc_po_check
+	sc_po_check would skip files based on their names, or on the
+	existence of files with derived names. Rewrite it to use perl
+	instead of shell to make the check faster.
+	* top/maint.mk (perl_translatable_files_list_): Define.
+	(sc_po_check): Use it.
+
+2016-07-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	obstack: pacify GCC 6 with -Wnull-dereference
+	Problem reported by Assaf Gordon in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-07/msg00028.html
+	* lib/obstack.c, lib/obstack.h (obstack_alloc_failed_handler):
+	Declare with __attribute_noreturn__.
+	* lib/obstack.h (__attribute_noreturn__): New macro.
+
+2016-07-13  Eric Blake  <eblake@redhat.com>
+
+	doc: mention glibc, OS X, Cygwin [S]SIZE_MAX buglet
+	* doc/posix-headers/stdint.texi (stdint.h): Document the bugs.
+	* doc/posix-headers/limits.texi (limits.h): Document the bugs.
+
+2016-07-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	doc: mention glibc SSIZE_MAX buglet
+	* doc/posix-headers/limits.texi (limits.h): Document the bug.
+
+2016-07-04  Martin Kletzander  <mkletzan@redhat.com>
+
+	printf-posix: Fix mingw build
+	Commit 54615b95ff238e235e806855efc46a9abad09f2e changed the regular
+	expression for detecting C symbol prefixes but forgot to qoute square
+	brackets in the command line arguments for grep.  That way when
+	building with mingw the condition was false although it ought to be
+	true instead.  In particular scenarios this led to the following
+	compile error:
+
+	    Cannot export rpl_printf: symbol not found
+	    Cannot export rpl_scanf: symbol not found
+	    collect2: error: ld returned 1 exit status
+
+	Fix this by properly quoting square brackets.
+
+2016-07-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	mktime: call tzset as per POSIX
+	Problem reported by Ludovic Courtès in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-06/msg00068.html
+	* lib/mktime.c (mktime) [!_LIBC && HAVE_TZSET]: Call tzset.
+	* m4/mktime.m4 (gl_FUNC_MKTIME): Check for tzset.
+
+2016-06-26  Pádraig Brady  <P@draigBrady.com>
+
+	fts: handle readdir() errors
+	* lib/fts.c (fts_build): readdir(3) returns NULL when finished,
+	but also upon error when it will also set errno.  Therefore
+	flag the error case from readdir().  We treat the case where
+	no items are read the same as if the dir can't be accessed,
+	i.e. by setting fts_errno to FTS_DNR.
+
+2016-06-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops: port better to GCC 7
+	GCC 7 __builtin_add_overflow supports a new usage form, where the
+	last argument is a null pointer, and which merely returns 1 if an
+	overflow would occur.  This is a constant expression if all
+	arguments are constants, and should generate faster code when code
+	needs to be generated.
+	* lib/intprops.h (_GL_HAS_BUILTIN_OVERFLOW_WITH_NULL): New macro.
+	(_GL_ADD_OVERFLOW, _GL_SUBTRACT_OVERFLOW, _GL_MULTIPLY_OVERFLOW):
+	Use builtin operations if available.
+	(INT_NEGATE_OVERFLOW): Prefer INT_SUBTRACT_OVERFLOW if builtin
+	operations are available, as it's almost surely faster.
+
+2016-06-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops-test: port to GCC 6
+	* tests/test-intprops.c: Ignore -Woverflow if any GCC version,
+	since the bug is not fixed in GCC 6.1.
+
+2016-06-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	xalloc-oversized: port to GCC 7; fewer warnings
+	GCC 7 will have a better way to deal with integer overflow.
+	Plus, fix a warnings problem reported by Tim Ruehsen in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-06/msg00022.html
+	* lib/xalloc-oversized.h (__xalloc_oversized): New macro.
+	(xalloc_oversized): Use plain __builtin_mul_overflow if GCC 7 or later.
+	For GCC 5, use __xalloc_oversized if both args are constants,
+	or if pedantic.
+
+2016-06-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	regex: port to Sun C
+	Reported by Daiki Ueno.
+	* lib/regcomp.c (regcomp, regerror): Use _Restrict_, not
+	__restrict, in prototype.  This fixes a problem I introduced in
+	the 2016-02-19 merge from glibc.
+
+2016-05-31  Paul Eggert  <eggert@cs.ucla.edu>
+
+	stdbool: Restore __bool_true_false_are_defined check
+	* m4/stdbool.m4 (AC_CHECK_HEADER_STDBOOL):
+	__bool_true_false_are_defined is still defined, even with C++11.
+
+2016-05-31  David Seifert <soap@gentoo.org>  (tiny change)
+
+	stdbool: Port AC_CHECK_HEADER_STDBOOL to C++11
+	* m4/stdbool.m4 (AC_CHECK_HEADER_STDBOOL): Port to C++11.
+
+2016-05-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Use GCC_LINT, not lint
+	FreeBSD and Cygwin #define _Noreturn to empty if 'lint' is defined.
+	Problem reported by Ken Brown in: http://bugs.gnu.org/23640
+	* doc/posix-headers/stdnoreturn.texi (stdnoreturn.h):
+	Document problem with lint and _Noreturn.
+	* lib/diffseq.h (IF_LINT, IF_LINT2):
+	* lib/fts.c (sccsid):
+	* lib/getndelim2.c (IF_LINT):
+	* lib/gl_anylinked_list2.h (gl_linked_iterator)
+	(gl_linked_iterator_from_to):
+	* lib/gl_anytree_list2.h (gl_tree_iterator)
+	(gl_tree_iterator_from_to):
+	* lib/gl_anytree_oset.h (gl_tree_iterator):
+	* lib/gl_array_list.c (gl_array_iterator)
+	(gl_array_iterator_from_to):
+	* lib/gl_array_oset.c (gl_array_iterator):
+	* lib/gl_carray_list.c (gl_carray_iterator)
+	(gl_carray_iterator_from_to):
+	* lib/idcache.c:
+	* lib/inet_ntop.c (IF_LINT):
+	* lib/regcomp.c (build_charclass_op, create_tree):
+	* lib/regex_internal.c (re_acquire_state)
+	(re_acquire_state_context):
+	* lib/trigl.c (rcsid):
+	* lib/trim.c (IF_LINT):
+	* lib/vasnprintf.c (IF_LINT):
+	* lib/verify.h (assume):
+	Treat GCC_LINT like lint.
+
+2016-05-29  Bruno Haible  <bruno@clisp.org>
+
+	secure_getenv: Port to many more platforms.
+	* m4/secure_getenv.m4 (gl_PREREQ_SECURE_GETENV): Also check for get*id
+	functions.
+	* lib/secure_getenv.c (secure_getenv): Add alternate implementations
+	for non-BSD Unix platforms and for native Windows.
+	* doc/glibc-functions/secure_getenv.texi: Remove known issue.
+	Prompted by a request from Nikos Mavrogiannopoulos.
+
+2016-05-27  Eric Blake  <eblake@redhat.com>
+
+	canonicalize: Fix broken probe for realpath.
+	* m4/canonicalize.m4 (gl_FUNC_REALPATH_WORKS): Fix regression
+	in logic introduced in 54615b95.
+
+2016-05-26  Eric Blake  <eblake@redhat.com>
+
+	unsetenv: relax to LGPLv2+
+	* modules/unsetenv (License): Match setenv license.
+
+2016-05-20  Ludovic Courtès  <ludo@gnu.org>
+
+	gendocs.sh: Set default TOP_NODE_UP_URL in HTML output.
+	Suggested by Gavin Smith <gavinsmith0123@gmail.com>.
+	Reported by myglc2 <myglc2@gmail.com> in <http://bugs.gnu.org/22651>.
+	* build-aux/gendocs.sh (MANUAL_TITLE, PACKAGE, EMAIL)
+	(commonarg, dirargs, dirs, infoarg, generate_ascii)
+	(generate_html, generate_info, generate_tex, outdir)
+	(source_extra, split, srcfile, texarg): Move above 'version'.
+	(htmlarg): Likewise, and add "-c TOP_NODE_UP_URL=/manual".
+
+2016-05-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	manywarnings: update for GCC 6.1
+	* m4/manywarnings.m4 (gl_MANYWARN_ALL_GCC):
+	Add GCC 6.1 options that apply to C.
+	* build-aux/gcc-warning.spec: Add GCC 6.1 options that
+	do not apply to C, are obsolescent, etc.
+
+2016-05-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	glob: size_t overflow checks
+	* lib/glob.c (__has_builtin): New macro.
+	(size_add_wrapv, glob_use_alloca): New static functions.
+	(glob, glob_in_dir): Check for size_t overflow in several places,
+	and fix some size_t checks that were not quite right.
+
+	glob: don't assume INT_MAX < SIZE_MAX
+	* lib/glob.c (glob): Prefer SIZE_MAX to ~((size_t) 0), as the
+	latter is not portable to (probably theoretical) hosts where
+	SIZE_MAX <= INT_MAX.
+
+2016-05-09  Bruno Haible  <bruno@clisp.org>
+
+	Fix undefined behaviour in gettext.h.
+	* lib/gettext.h (dcpgettext_expr, dcnpgettext_expr): Avoid accessing a
+	pointer's value after the storage it points to has been freed.
+	Reported by Michael Pyne in https://savannah.gnu.org/bugs/?47847.
+	Spotted by Coverity.
+
+2016-05-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	git-version-gen: avoid undefined shift
+	Problem reported by Mosè Giordano in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-05/msg00012.html
+	* build-aux/git-version-gen: Avoid undefined behavior if invoked
+	with --prefix or --fallback but without a later argument.  While
+	we're at it, omit unnecessary quotes.
+
 2016-05-04  Paul Eggert  <eggert@cs.ucla.edu>
 
 	glob: merge glibc changes into lib/glob.c
