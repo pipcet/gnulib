@@ -1,5 +1,5 @@
 /* Iterate over previous character in UTF-32 string.
-   Copyright (C) 2002, 2006-2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006-2007, 2009-2017 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify it
@@ -27,9 +27,7 @@ u32_prev (ucs4_t *puc, const uint32_t *s, const uint32_t *start)
     {
       uint32_t c_1 = s[-1];
 
-#if CONFIG_UNICODE_SAFETY
       if (c_1 < 0xd800 || (c_1 >= 0xe000 && c_1 < 0x110000))
-#endif
         {
           *puc = c_1;
           return s - 1;

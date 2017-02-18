@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a linked list.
-   Copyright (C) 2006-2016 Free Software Foundation, Inc.
+   Copyright (C) 2006-2017 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@
    and we use 'volatile' assignments to prevent the compiler from reordering
    such assignments.  */
 #ifdef SIGNAL_SAFE_LIST
-# define ASYNCSAFE(type) *(volatile type *)&
+# define ASYNCSAFE(type) *(type volatile *)&
 #else
 # define ASYNCSAFE(type)
 #endif

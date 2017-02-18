@@ -1,5 +1,5 @@
 /* Test of binary mode I/O.
-   Copyright (C) 2005, 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2007-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -52,12 +52,6 @@ main (int argc, char *argv[])
     case '1':
       /* Test the set_binary_mode() function.  */
       set_binary_mode (1, O_BINARY);
-      fputs ("Hello\n", stdout);
-      break;
-
-    case '2':
-      /* Test the SET_BINARY macro.  */
-      SET_BINARY (1);
       fputs ("Hello\n", stdout);
       break;
 

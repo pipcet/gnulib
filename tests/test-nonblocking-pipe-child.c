@@ -1,6 +1,6 @@
 /* Child program invoked by test-nonblocking-pipe-main.
 
-   Copyright (C) 2011-2016 Free Software Foundation, Inc.
+   Copyright (C) 2011-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ main (int argc, char *argv[])
   /* STDIN_FILENO was created as binary in the parent process.  But since an
      fd's mode is stored in the process, not in the kernel, on native Windows
      we need to set it as binary in the child process again.  */
-  SET_BINARY (STDIN_FILENO);
+  set_binary_mode (STDIN_FILENO, O_BINARY);
 
   main_reader_loop (test, PIPE_DATA_BLOCK_SIZE, STDIN_FILENO);
 

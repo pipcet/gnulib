@@ -1,5 +1,5 @@
 /* Test of ftello() function.
-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ main (int argc, char **argv _GL_UNUSED)
     }
 
   /* mingw ftell is unreliable on text mode input.  */
-  SET_BINARY (0);
+  set_binary_mode (0, O_BINARY);
 
   /* Simple tests.  For each test, make sure ftell and ftello agree.  */
   ASSERT (ftell (stdin) == 0);

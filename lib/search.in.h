@@ -1,6 +1,6 @@
 /* A GNU-like <search.h>.
 
-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@
        <http://www.opengroup.org/susv3xsh/tsearch.html>
    for details.  */
 
-# if !@HAVE_TSEARCH@
+# if !@HAVE_TYPE_VISIT@
 #  if !GNULIB_defined_search_types
 typedef enum
 {

@@ -1,5 +1,5 @@
 /* Look at first character in UTF-32 string.
-   Copyright (C) 2002, 2006-2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006-2007, 2009-2017 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify it
@@ -25,15 +25,11 @@ u32_strmbtouc (ucs4_t *puc, const uint32_t *s)
 {
   uint32_t c = *s;
 
-#if CONFIG_UNICODE_SAFETY
   if (c < 0xd800 || (c >= 0xe000 && c < 0x110000))
-#endif
     {
       *puc = c;
       return (c != 0 ? 1 : 0);
     }
-#if CONFIG_UNICODE_SAFETY
   /* invalid multibyte character */
   return -1;
-#endif
 }

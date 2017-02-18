@@ -1,4 +1,4 @@
-/* Copyright (C) 1992, 1997-1998, 2009-2016 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1997-1998, 2009-2017 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify it
@@ -21,7 +21,17 @@
 #include <string.h>
 
 int
+#ifndef __KLIBC__
 alphasort (const struct dirent **a, const struct dirent **b)
 {
   return strcoll ((*a)->d_name, (*b)->d_name);
 }
+#else
+/* On OS/2 kLIBC, the compare function declaration of scandir() is different
+   from POSIX. See <http://trac.netlabs.org/libc/browser/branches/libc-0.6/src/emx/include/dirent.h#L141>.  */
+alphasort (const void *a, const void *b)
+{
+  return strcoll ((*(const struct dirent **)a)->d_name,
+                  (*(const struct dirent **)b)->d_name);
+}
+#endif

@@ -1,6 +1,6 @@
 /* Functions to compute MD4 message digest of files or memory blocks.
    according to the definition of MD4 in RFC 1320 from April 1992.
-   Copyright (C) 1995-1997, 1999-2003, 2005-2006, 2008-2016 Free Software
+   Copyright (C) 1995-1997, 1999-2003, 2005-2006, 2008-2017 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
@@ -237,7 +237,7 @@ md4_process_bytes (const void *buffer, size_t len, struct md4_ctx *ctx)
   /* Process available complete blocks.  */
   if (len >= 64)
     {
-#if !_STRING_ARCH_unaligned
+#if !(_STRING_ARCH_unaligned || _STRING_INLINE_unaligned)
 # define UNALIGNED_P(p) ((uintptr_t) (p) % alignof (uint32_t) != 0)
       if (UNALIGNED_P (buffer))
         while (len > 64)

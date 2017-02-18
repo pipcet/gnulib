@@ -1,5 +1,5 @@
 /* Conversion UTF-16 to UCS-4.
-   Copyright (C) 2001-2002, 2006-2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2006-2007, 2009-2017 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify it
@@ -27,15 +27,11 @@ u16_mbtouc_unsafe_aux (ucs4_t *puc, const uint16_t *s, size_t n)
 {
   uint16_t c = *s;
 
-#if CONFIG_UNICODE_SAFETY
   if (c < 0xdc00)
-#endif
     {
       if (n >= 2)
         {
-#if CONFIG_UNICODE_SAFETY
           if (s[1] >= 0xdc00 && s[1] < 0xe000)
-#endif
             {
               *puc = 0x10000 + ((c - 0xd800) << 10) + (s[1] - 0xdc00);
               return 2;

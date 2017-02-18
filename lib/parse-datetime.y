@@ -1,7 +1,7 @@
 %{
-/* Parse a string into an internal time stamp.
+/* Parse a string into an internal timestamp.
 
-   Copyright (C) 1999-2000, 2002-2016 Free Software Foundation, Inc.
+   Copyright (C) 1999-2000, 2002-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
    Modified by Paul Eggert <eggert@twinsun.com> in August 1999 to do
    the right thing about local DST.  Also modified by Paul Eggert
    <eggert@cs.ucla.edu> in February 2004 to support
-   nanosecond-resolution time stamps, and in October 2004 to support
+   nanosecond-resolution timestamps, and in October 2004 to support
    TZ strings in dates.  */
 
 /* FIXME: Check for arithmetic overflow in all cases, not just
@@ -68,7 +68,6 @@
 #include <string.h>
 
 #include "gettext.h"
-#include "xalloc.h"
 
 #define _(str) gettext (str)
 
@@ -229,6 +228,7 @@ typedef struct
   size_t dsts_seen;
   size_t times_seen;
   size_t zones_seen;
+  size_t year_seen;
 
   /* if true, print debugging output to stderr */
   bool parse_datetime_debug;
@@ -240,6 +240,7 @@ typedef struct
   size_t debug_dsts_seen;
   size_t debug_times_seen;
   size_t debug_zones_seen;
+  size_t debug_year_seen;
 
   /* true if the user specified explicit ordinal day value, */
   bool debug_ordinal_day_seen;
@@ -264,7 +265,10 @@ digits_to_date_time (parser_control *pc, textint text_int)
 {
   if (pc->dates_seen && ! pc->year.digits
       && ! pc->rels_seen && (pc->times_seen || 2 < text_int.digits))
-    pc->year = text_int;
+    {
+      pc->year_seen++;
+      pc->year = text_int;
+    }
   else
     {
       if (4 < text_int.digits)
@@ -414,6 +418,16 @@ debug_print_current_time (const char* item, parser_control *pc)
       space = 1;
     }
 
+  if (pc->year_seen != pc->debug_year_seen)
+    {
+      if (space)
+        fputc (' ',stderr);
+      fprintf (stderr, _("year: %04ld"), pc->year.value);
+
+      pc->debug_year_seen = pc->year_seen;
+      space = 1;
+    }
+
   if (pc->times_seen != pc->debug_times_seen)
     {
       if (space)
@@ -440,6 +454,20 @@ debug_print_current_time (const char* item, parser_control *pc)
       space = 1;
     }
 
+  /* local zone strings only change the DST settings,
+     not the timezone value. If seen, inform about the DST.
+     its value (0 or 1) will be printed in the next 'if' block */
+  if (pc->local_zones_seen != pc->debug_local_zones_seen)
+    {
+      if (space)
+        fputc (' ',stderr);
+      fputs ( (pc->dsts_seen == pc->debug_dsts_seen)?
+              _("DST unchanged"):_("DST changed:"),
+              stderr);
+      pc->debug_local_zones_seen = pc->local_zones_seen;
+      space = 1;
+    }
+
   if (pc->dsts_seen != pc->debug_dsts_seen)
     {
       if (space)
@@ -457,16 +485,6 @@ debug_print_current_time (const char* item, parser_control *pc)
       fprintf (stderr,_("TZ=%+03d:%02d"), (int)(pc->time_zone/60),
               abs ((int)pc->time_zone%60));
       pc->debug_zones_seen = pc->zones_seen;
-      space = 1;
-    }
-
-  if (pc->local_zones_seen != pc->debug_local_zones_seen)
-    {
-      if (space)
-        fputc (' ',stderr);
-      fprintf (stderr,_("Local-TZ=%+03d:%02d"), (int)(pc->time_zone/60),
-              abs ((int)pc->time_zone%60));
-      pc->debug_local_zones_seen = pc->local_zones_seen;
       space = 1;
     }
 
@@ -619,7 +637,7 @@ item:
       }
   | number
       {
-        debug_print_relative_time (_("number"), pc);
+        debug_print_current_time (_("number"), pc);
       }
   | hybrid
       {
@@ -685,6 +703,23 @@ zone_offset:
       }
   ;
 
+/* Local zone strings only affect DST setting,
+   and only take affect if the current TZ setting is relevant.
+
+   Example 1:
+   'EEST' is parsed as tLOCAL_ZONE, as it relates to the effective TZ:
+        TZ=Europe/Helsinki date -d '2016-12-30 EEST'
+
+   Example 2:
+   'EEST' is parsed as 'zone' (TZ=+03:00):
+         TZ=Asia/Tokyo ./src/date --debug -d '2011-06-11 EEST'
+
+   This is implemented by probing the next three calendar quarters
+   of the effective timezone and looking for DST changes -
+   if found, the timezone name (EEST) is inserted into
+   the lexical lookup table with type tLOCAL_ZONE.
+   (Search for 'quarter' comment in  'parse_datetime2').
+*/
 local_zone:
     tLOCAL_ZONE
       {
@@ -707,10 +742,14 @@ zone:
       { pc->time_zone = HOUR(7); }
   | tZONE relunit_snumber
       { pc->time_zone = $1;
-        apply_relative_time (pc, $2, 1); }
+        apply_relative_time (pc, $2, 1);
+        debug_print_relative_time (_("relative"), pc);
+      }
   | 'T' relunit_snumber
       { pc->time_zone = HOUR(7);
-        apply_relative_time (pc, $2, 1); }
+        apply_relative_time (pc, $2, 1);
+        debug_print_relative_time (_("relative"), pc);
+      }
   | tZONE tSNUMBER o_colon_minutes
       { pc->time_zone = $1 + time_zone_hhmm (pc, $2, $3); }
   | tDAYZONE
@@ -1026,8 +1065,8 @@ static table const relative_time_table[] =
 };
 
 /* The universal time zone table.  These labels can be used even for
-   time stamps that would not otherwise be valid, e.g., GMT time
-   stamps in London during summer.  */
+   timestamps that would not otherwise be valid, e.g., GMT timestamps
+   oin London during summer.  */
 static table const universal_time_zone_table[] =
 {
   { "GMT",      tZONE,     HOUR ( 0) }, /* Greenwich Mean */
@@ -1491,19 +1530,21 @@ yyerror (parser_control const *pc _GL_UNUSED,
   return 0;
 }
 
-/* If *TM0 is the old and *TM1 is the new value of a struct tm after
-   passing it to mktime, return true if it's OK that mktime returned T.
-   It's not OK if *TM0 has out-of-range members.  */
+/* In timezone TZ, if *TM0 is the old and *TM1 is the new value of a
+   struct tm after passing it to mktime_z, return true if it's OK that
+   mktime_z returned T.  It's not OK if *TM0 has out-of-range
+   members.  */
 
 static bool
-mktime_ok (struct tm const *tm0, struct tm const *tm1, time_t t)
+mktime_ok (timezone_t tz, struct tm const *tm0, struct tm const *tm1, time_t t)
 {
+  struct tm ltm;
   if (t == (time_t) -1)
     {
-      /* Guard against falsely reporting an error when parsing a time
-         stamp that happens to equal (time_t) -1, on a host that
-         supports such a time stamp.  */
-      tm1 = localtime (&t);
+      /* Guard against falsely reporting an error when parsing a
+         timestamp that happens to equal (time_t) -1, on a host that
+         supports such a timestamp.  */
+      tm1 = localtime_rz (tz, &t, &ltm);
       if (!tm1)
         return false;
     }
@@ -1523,22 +1564,6 @@ enum { TZBUFSIZE = 100 };
 /* A reasonable upper bound for the buffer used in debug print outs.
    see days_to_name(), debug_strftime() and debug_mktime_not_ok() */
 enum { DBGBUFSIZE = 100 };
-
-/* Return a copy of TZ, stored in TZBUF if it fits, and heap-allocated
-   otherwise.  */
-static char *
-get_tz (char tzbuf[TZBUFSIZE])
-{
-  char *tz = getenv ("TZ");
-  if (tz)
-    {
-      size_t tzsize = strlen (tz) + 1;
-      tz = (tzsize <= TZBUFSIZE
-            ? memcpy (tzbuf, tz, tzsize)
-            : xmemdup (tz, tzsize));
-    }
-  return tz;
-}
 
 /* debugging: format a 'struct tm' into a buffer, taking the parser's
    timezone information into account (if pc!=NULL). */
@@ -1575,9 +1600,14 @@ debug_strfdatetime (const struct tm *tm, const parser_control *pc,
      and there's enough space in the buffer - add timezone info */
   if (pc != NULL && ((n-m)>0))
     {
-      const long int tz = (pc->zones_seen || pc->local_zones_seen)
-                          ? pc->time_zone
-                          : pc->debug_default_input_timezone;
+      long int tz = (pc->zones_seen)
+                    ? pc->time_zone
+                    : pc->debug_default_input_timezone;
+
+      /* Account for DST if tLOCAL_ZONE was seen */
+      if (pc->local_zones_seen && !pc->zones_seen && pc->local_isdst==1)
+        tz += 60;
+
       snprintf (&buf[m],n-m," TZ=%+03d:%02d", (int)(tz/60), abs ((int)tz)%60);
     }
   return buf;
@@ -1663,48 +1693,54 @@ debug_mktime_not_ok (struct tm const *tm0, struct tm const *tm1,
 
 /* Returns the effective local timezone, in minutes. */
 static long int
-get_effective_timezone (void)
+get_effective_timezone (timezone_t tz)
 {
-  /* TODO: check for failures */
-  const time_t z = 0;
-  time_t lz ;
-  struct tm *ltm;
-  ltm = localtime (&z);
-  lz = timegm (ltm)/60;
-  return (long int)lz;
+  time_t z = 0;
+  struct tm tm;
+  if (! localtime_rz (tz, &z, &tm))
+    return 0;
+  return timegm (&tm) / 60;
 }
 
-/* The original interface: run with debug=false */
+/* The original interface: run with debug=false and the default timezone.   */
 bool
 parse_datetime (struct timespec *result, char const *p,
                 struct timespec const *now)
 {
-  return parse_datetime2 (result, p, now, 0);
+  char const *tzstring = getenv ("TZ");
+  timezone_t tz = tzalloc (tzstring);
+  if (!tz)
+    return false;
+  bool ok = parse_datetime2 (result, p, now, 0, tz, tzstring);
+  tzfree (tz);
+  return ok;
 }
 
 /* Parse a date/time string, storing the resulting time value into *RESULT.
    The string itself is pointed to by P.  Return true if successful.
    P can be an incomplete or relative time specification; if so, use
-   *NOW as the basis for the returned time.  */
+   *NOW as the basis for the returned time.  Default to timezone
+   TZDEFAULT, which corresponds to tzalloc (TZSTRING).  */
 bool
 parse_datetime2 (struct timespec *result, char const *p,
-                 struct timespec const *now, unsigned int flags)
+                 struct timespec const *now, unsigned int flags,
+                 timezone_t tzdefault, char const *tzstring)
 {
   time_t Start;
   long int Start_ns;
-  struct tm const *tmp;
+  struct tm tmp;
   struct tm tm;
   struct tm tm0;
   parser_control pc;
   struct timespec gettime_buffer;
   unsigned char c;
-  bool tz_was_altered = false;
-  char *tz0 = NULL;
-  char tz0buf[TZBUFSIZE];
+  timezone_t tz = tzdefault;
   bool ok = true;
   char dbg_ord[DBGBUFSIZE];
   char dbg_tm[DBGBUFSIZE];
   char const *input_sentinel = p + strlen (p);
+  char *tz1alloc = NULL;
+  char tz1buf[TZBUFSIZE];
 
   if (! now)
     {
@@ -1714,10 +1750,6 @@ parse_datetime2 (struct timespec *result, char const *p,
 
   Start = now->tv_sec;
   Start_ns = now->tv_nsec;
-
-  tmp = localtime (&now->tv_sec);
-  if (! tmp)
-    return false;
 
   while (c = *p, c_isspace (c))
     p++;
@@ -1737,22 +1769,25 @@ parse_datetime2 (struct timespec *result, char const *p,
           }
         else if (*s == '"')
           {
+            timezone_t tz1;
+            char *tz1string = tz1buf;
             char *z;
-            char *tz1;
-            char tz1buf[TZBUFSIZE];
-            bool large_tz = TZBUFSIZE < tzsize;
-            bool setenv_ok;
-            tz0 = get_tz (tz0buf);
-            z = tz1 = large_tz ? xmalloc (tzsize) : tz1buf;
+            if (TZBUFSIZE < tzsize)
+              {
+                tz1alloc = malloc (tzsize);
+                if (!tz1alloc)
+                  goto fail;
+                tz1string = tz1alloc;
+              }
+            z = tz1string;
             for (s = tzbase; *s != '"'; s++)
               *z++ = *(s += *s == '\\');
             *z = '\0';
-            setenv_ok = setenv ("TZ", tz1, 1) == 0;
-            if (large_tz)
-              free (tz1);
-            if (!setenv_ok)
+            tz1 = tzalloc (tz1string);
+            if (!tz1)
               goto fail;
-            tz_was_altered = true;
+            tz = tz1;
+            tzstring = tz1string;
 
             p = s + 1;
             while (c = *p, c_isspace (c))
@@ -1762,6 +1797,9 @@ parse_datetime2 (struct timespec *result, char const *p,
           }
     }
 
+  if (! localtime_rz (tz, &now->tv_sec, &tmp))
+    return false;
+
   /* As documented, be careful to treat the empty string just like
      a date string of "0".  Without this, an empty string would be
      declared invalid when parsed during a DST transition.  */
@@ -1769,16 +1807,16 @@ parse_datetime2 (struct timespec *result, char const *p,
     p = "0";
 
   pc.input = p;
-  pc.year.value = tmp->tm_year;
+  pc.year.value = tmp.tm_year;
   pc.year.value += TM_YEAR_BASE;
   pc.year.digits = 0;
-  pc.month = tmp->tm_mon + 1;
-  pc.day = tmp->tm_mday;
-  pc.hour = tmp->tm_hour;
-  pc.minutes = tmp->tm_min;
-  pc.seconds.tv_sec = tmp->tm_sec;
+  pc.month = tmp.tm_mon + 1;
+  pc.day = tmp.tm_mday;
+  pc.hour = tmp.tm_hour;
+  pc.minutes = tmp.tm_min;
+  pc.seconds.tv_sec = tmp.tm_sec;
   pc.seconds.tv_nsec = Start_ns;
-  tm.tm_isdst = tmp->tm_isdst;
+  tm.tm_isdst = tmp.tm_isdst;
 
   pc.meridian = MER24;
   pc.rel = RELATIVE_TIME_0;
@@ -1790,6 +1828,7 @@ parse_datetime2 (struct timespec *result, char const *p,
   pc.local_zones_seen = 0;
   pc.dsts_seen = 0;
   pc.zones_seen = 0;
+  pc.year_seen = 0;
   pc.parse_datetime_debug = (flags & PARSE_DATETIME_DEBUG)!=0;
   pc.debug_dates_seen = 0;
   pc.debug_days_seen = 0;
@@ -1797,13 +1836,14 @@ parse_datetime2 (struct timespec *result, char const *p,
   pc.debug_local_zones_seen = 0;
   pc.debug_dsts_seen = 0;
   pc.debug_zones_seen = 0;
+  pc.debug_year_seen = 0;
   pc.debug_ordinal_day_seen = false;
   pc.debug_default_input_timezone = 0;
 
 #if HAVE_STRUCT_TM_TM_ZONE
-  pc.local_time_zone_table[0].name = tmp->tm_zone;
+  pc.local_time_zone_table[0].name = tmp.tm_zone;
   pc.local_time_zone_table[0].type = tLOCAL_ZONE;
-  pc.local_time_zone_table[0].value = tmp->tm_isdst;
+  pc.local_time_zone_table[0].value = tmp.tm_isdst;
   pc.local_time_zone_table[1].name = NULL;
 
   /* Probe the names used in the next three calendar quarters, looking
@@ -1813,14 +1853,14 @@ parse_datetime2 (struct timespec *result, char const *p,
     for (quarter = 1; quarter <= 3; quarter++)
       {
         time_t probe = Start + quarter * (90 * 24 * 60 * 60);
-        struct tm const *probe_tm = localtime (&probe);
-        if (probe_tm && probe_tm->tm_zone
-            && probe_tm->tm_isdst != pc.local_time_zone_table[0].value)
+        struct tm probe_tm;
+        if (localtime_rz (tz, &probe, &probe_tm) && probe_tm.tm_zone
+            && probe_tm.tm_isdst != pc.local_time_zone_table[0].value)
           {
               {
-                pc.local_time_zone_table[1].name = probe_tm->tm_zone;
+                pc.local_time_zone_table[1].name = probe_tm.tm_zone;
                 pc.local_time_zone_table[1].type = tLOCAL_ZONE;
-                pc.local_time_zone_table[1].value = probe_tm->tm_isdst;
+                pc.local_time_zone_table[1].value = probe_tm.tm_isdst;
                 pc.local_time_zone_table[2].name = NULL;
               }
             break;
@@ -1858,7 +1898,7 @@ parse_datetime2 (struct timespec *result, char const *p,
       pc.local_time_zone_table[1].name = NULL;
     }
 
-  pc.debug_default_input_timezone = get_effective_timezone ();
+  pc.debug_default_input_timezone = get_effective_timezone (tz);
 
   if (yyparse (&pc) != 0)
     {
@@ -1878,48 +1918,59 @@ parse_datetime2 (struct timespec *result, char const *p,
   /* determine effective timezone source */
   if (pc.parse_datetime_debug)
     {
-      long int tz = pc.debug_default_input_timezone;
-      const char* tz_env;
-      const char* tz_src;
+      long int time_zone = pc.debug_default_input_timezone;
 
       if (pc.timespec_seen)
         {
-          tz = 0 ;
-          tz_src = _("'@timespec' - always UTC0");
+          time_zone = 0;
+          strncpy (dbg_tm, _("'@timespec' - always UTC0"), sizeof (dbg_tm)-1);
         }
-      else if (pc.local_zones_seen || pc.zones_seen)
+      else if (pc.zones_seen)
         {
-          tz = pc.time_zone;
-          tz_src = _("parsed date/time string");
+          time_zone = pc.time_zone;
+          strncpy (dbg_tm, _("parsed date/time string"), sizeof (dbg_tm)-1);
         }
-      else if ((tz_env = getenv("TZ")))
+      else if (tzstring)
         {
-          if (tz_was_altered)
+          if (tz != tzdefault)
             {
               snprintf (dbg_tm, sizeof(dbg_tm), _("TZ=\"%s\" in date string"),
-                        tz_env);
-              tz_src = dbg_tm;
+                        tzstring);
             }
-          else if (STREQ(tz_env,"UTC0"))
+          else if (STREQ (tzstring, "UTC0"))
             {
               /* Special case: using 'date -u' simply set TZ=UTC0 */
-              tz_src = _("TZ=UTC0 environment value or -u");
+              strncpy (dbg_tm, _("TZ=UTC0 environment value or -u"),
+                       sizeof (dbg_tm)-1);
             }
           else
             {
               snprintf (dbg_tm, sizeof(dbg_tm),
-                        _("TZ=\"%s\" environment value"), tz_env);
-              tz_src = dbg_tm;
+                        _("TZ=\"%s\" environment value"), tzstring);
             }
         }
       else
         {
-          tz_src = _("system default");
+          strncpy (dbg_tm, _("system default"), sizeof (dbg_tm)-1);
+        }
+
+      /* Ensure it's NUL terminated after strncpy */
+      dbg_tm[sizeof (dbg_tm)-1] = '\0';
+
+      /* Account for DST changes if tLOCAL_ZONE was seen.
+         local timezone only changes DST and is relative to the
+         default timezone.*/
+      if (pc.local_zones_seen && !pc.zones_seen && pc.local_isdst==1)
+        {
+          time_zone += 60;
+          strncat (dbg_tm, ", dst",
+                   sizeof (dbg_tm) - strlen (dbg_tm) - 1);
         }
 
       if (pc.parse_datetime_debug)
         dbg_printf (_("input timezone: %+03d:%02d (set from %s)\n"),
-                    (int)(tz/60), abs ((int)tz)%60, tz_src);
+                    (int) (time_zone / 60), abs ((int) (time_zone % 60)),
+                    dbg_tm);
 
     }
 
@@ -1976,7 +2027,7 @@ parse_datetime2 (struct timespec *result, char const *p,
             dbg_printf ("warning: using midnight as starting time: 00:00:00\n");
         }
 
-      /* Let mktime deduce tm_isdst if we have an absolute time stamp.  */
+      /* Let mktime deduce tm_isdst if we have an absolute timestamp.  */
       if (pc.dates_seen | pc.days_seen | pc.times_seen)
         tm.tm_isdst = -1;
 
@@ -1987,9 +2038,9 @@ parse_datetime2 (struct timespec *result, char const *p,
 
       tm0 = tm;
 
-      Start = mktime (&tm);
+      Start = mktime_z (tz, &tm);
 
-      if (! mktime_ok (&tm0, &tm, Start))
+      if (! mktime_ok (tz, &tm0, &tm, Start))
         {
           if (! pc.zones_seen)
             {
@@ -2013,27 +2064,27 @@ parse_datetime2 (struct timespec *result, char const *p,
               long int abs_time_zone = time_zone < 0 ? - time_zone : time_zone;
               long int abs_time_zone_hour = abs_time_zone / 60;
               int abs_time_zone_min = abs_time_zone % 60;
-              char tz1buf[sizeof "XXX+0:00" + TYPE_WIDTH (pc.time_zone) / 3];
-              if (!tz_was_altered)
-                tz0 = get_tz (tz0buf);
-              sprintf (tz1buf, "XXX%s%ld:%02d", &"-"[time_zone < 0],
+              char tz2buf[sizeof "XXX+0:00" + TYPE_WIDTH (pc.time_zone) / 3];
+              timezone_t tz2;
+              sprintf (tz2buf, "XXX%s%ld:%02d", &"-"[time_zone < 0],
                        abs_time_zone_hour, abs_time_zone_min);
-              if (setenv ("TZ", tz1buf, 1) != 0)
+              tz2 = tzalloc (tz2buf);
+              if (!tz2)
                 {
-                  /* TODO: was warn () + print errno? */
                   if (pc.parse_datetime_debug)
-                    dbg_printf (_("error: setenv('TZ','%s') failed\n"), tz1buf);
+                    dbg_printf (_("error: tzalloc (\"%s\") failed\n"), tz2buf);
 
                   goto fail;
                 }
-              tz_was_altered = true;
               tm = tm0;
-              Start = mktime (&tm);
-              if (! mktime_ok (&tm0, &tm, Start))
+              Start = mktime_z (tz2, &tm);
+              ok = mktime_ok (tz2, &tm0, &tm, Start);
+              tzfree (tz2);
+              if (! ok)
                 {
                   debug_mktime_not_ok (&tm0, &tm, &pc, pc.zones_seen);
 
-                  goto fail;
+                  goto done;
                 }
             }
         }
@@ -2045,7 +2096,7 @@ parse_datetime2 (struct timespec *result, char const *p,
                                 - (0 < pc.day_ordinal
                                    && tm.tm_wday != pc.day_number)));
           tm.tm_isdst = -1;
-          Start = mktime (&tm);
+          Start = mktime_z (tz, &tm);
           if (Start == (time_t) -1)
             {
               if (pc.parse_datetime_debug)
@@ -2086,12 +2137,12 @@ parse_datetime2 (struct timespec *result, char const *p,
         {
           if (pc.parse_datetime_debug)
             {
-              if ((pc.rel.year != 0 || pc.rel.month !=0) && tm.tm_mday==1)
+              if ((pc.rel.year != 0 || pc.rel.month !=0) && tm.tm_mday!=15)
                 dbg_printf (_("warning: when adding relative months/years, " \
                               "it is recommended to specify the 15th of the " \
                               "months\n"));
 
-              if (pc.rel.day != 0 && tm.tm_hour==0)
+              if (pc.rel.day != 0 && tm.tm_hour!=12)
                 dbg_printf (_("warning: when adding relative days, "    \
                               "it is recommended to specify 12:00pm\n"));
             }
@@ -2116,7 +2167,7 @@ parse_datetime2 (struct timespec *result, char const *p,
           tm.tm_min = tm0.tm_min;
           tm.tm_sec = tm0.tm_sec;
           tm.tm_isdst = tm0.tm_isdst;
-          Start = mktime (&tm);
+          Start = mktime_z (tz, &tm);
           if (Start == (time_t) -1)
             {
               if (pc.parse_datetime_debug)
@@ -2136,6 +2187,48 @@ parse_datetime2 (struct timespec *result, char const *p,
               dbg_printf (_("    new date/time = '%s'\n"),
                           debug_strfdatetime (&tm, &pc, dbg_tm,
                                               sizeof (dbg_tm)));
+
+              /* warn about crossing DST due to time adjustment.
+                 Example: https://bugs.gnu.org/8357
+                 env TZ=Europe/Helsinki \
+                   date --debug \
+                        -d 'Mon Mar 28 00:36:07 2011 EEST 1 day ago'
+
+                 This case is different than DST changes due to time adjustment,
+                 i.e. "1 day ago" vs "24 hours ago" are calculated in different
+                 places.
+
+                 'tm0.tm_isdst' contains the DST of the input date,
+                 'tm.tm_isdst' is the normalized result after calling
+                 mktime(&tm).
+              */
+              if ((tm0.tm_isdst!=-1) && (tm.tm_isdst != tm0.tm_isdst))
+                dbg_printf (_("warning: daylight saving time changed after " \
+                              "date adjustment\n"));
+
+              /* warn if the user did not ask to adjust days but mday changed,
+                 or
+                 user did not ask to adjust months/days but the month changed.
+
+                 Example for first case:
+                 2016-05-31 + 1 month => 2016-06-31 => 2016-07-01.
+                 User asked to adjust month, but the day changed from 31 to 01.
+
+                 Example for second case:
+                 2016-02-29 + 1 year => 2017-02-29 => 2017-03-01.
+                 User asked to adjust year, but the month changed from 02 to 03.
+              */
+              if (((pc.rel.day==0) && (tm.tm_mday != day))
+                  || ((pc.rel.day==0) && (pc.rel.month==0)
+                      && (tm.tm_mon != month)))
+                {
+                  dbg_printf (_("warning: month/year adjustment resulted in "\
+                                "shifted dates:\n"));
+                  dbg_printf (_("     adjusted Y M D: %04d %02d %02d\n"),
+                              year+1900, month+1, day);
+                  dbg_printf (_("   normalized Y M D: %04d %02d %02d\n"),
+                              tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday);
+                }
             }
 
         }
@@ -2150,8 +2243,8 @@ parse_datetime2 (struct timespec *result, char const *p,
           delta -= tm.tm_gmtoff;
 #else
           time_t t = Start;
-          struct tm const *gmt = gmtime (&t);
-          if (! gmt)
+          struct tm gmt;
+          if (! gmtime_r (&t, &gmt))
             {
               /* TODO: use 'warn(3)' + print errno ? */
               if (pc.parse_datetime_debug)
@@ -2159,7 +2252,7 @@ parse_datetime2 (struct timespec *result, char const *p,
 
               goto fail;
             }
-          delta -= tm_diff (&tm, gmt);
+          delta -= tm_diff (&tm, &gmt);
 #endif
           t1 = Start - delta;
           if ((Start < t1) != (delta < 0))
@@ -2217,10 +2310,28 @@ parse_datetime2 (struct timespec *result, char const *p,
           if (pc.parse_datetime_debug
               && (pc.rel.hour | pc.rel.minutes | pc.rel.seconds | pc.rel.ns))
             {
+              struct tm lmt;
               dbg_printf (_("after time adjustment (%+ld hours, " \
                             "%+ld minutes, %+ld seconds, %+ld ns),\n"),
                           pc.rel.hour,pc.rel.minutes,pc.rel.seconds,pc.rel.ns);
               dbg_printf (_("    new time = %ld epoch-seconds\n"),t5);
+
+              /* warn about crossing DST due to time adjustment.
+                 Example: https://bugs.gnu.org/8357
+                 env TZ=Europe/Helsinki \
+                   date --debug \
+                        -d 'Mon Mar 28 00:36:07 2011 EEST 24 hours ago'
+
+                 This case is different than DST changes due to days adjustment,
+                 i.e. "1 day ago" vs "24 hours ago" are calculated in different
+                 places.
+
+                 'tm.tm_isdst' contains the date after date adjustment.
+              */
+              if (tm.tm_isdst != -1 && localtime_rz (tz, &t5, &lmt)
+                  && tm.tm_isdst != lmt.tm_isdst)
+                dbg_printf (_("warning: daylight saving time changed after " \
+                              "time adjustment\n"));
             }
 
         result->tv_sec = t5;
@@ -2233,29 +2344,22 @@ parse_datetime2 (struct timespec *result, char const *p,
  fail:
   ok = false;
  done:
-  if (tz_was_altered)
-    ok &= (tz0 ? setenv ("TZ", tz0, 1) : unsetenv ("TZ")) == 0;
-  if (tz0 != tz0buf)
-    free (tz0);
-
   if (ok && pc.parse_datetime_debug)
     {
-      /* print local timezone AFTER restoring TZ (if tz_was_altered)*/
-      const long int otz = get_effective_timezone ();
-      const char* tz_src;
-      const char* tz_env;
+      const long int otz = get_effective_timezone (tz);
+      const char *tz_src;
 
-      if ((tz_env = getenv("TZ")))
+      if (tzstring)
         {
           /* Special case: using 'date -u' simply set TZ=UTC0 */
-          if (STREQ(tz_env,"UTC0"))
+          if (STREQ (tzstring, "UTC0"))
             {
               tz_src = _("TZ=UTC0 environment value or -u");
             }
           else
             {
               snprintf (dbg_tm, sizeof(dbg_tm),
-                        _("TZ=\"%s\" environment value"), tz_env);
+                        _("TZ=\"%s\" environment value"), tzstring);
               tz_src = dbg_tm;
             }
         }
@@ -2273,16 +2377,21 @@ parse_datetime2 (struct timespec *result, char const *p,
           dbg_printf (_("final: %ld.%09ld (epoch-seconds)\n"),
                       result->tv_sec,result->tv_nsec);
 
-          struct tm const *gmt = gmtime (&result->tv_sec);
-          dbg_printf (_("final: %s (UTC0)\n"),
-                      debug_strfdatetime (gmt, NULL, dbg_tm, sizeof (dbg_tm)));
-          struct tm const *lmt = localtime (&result->tv_sec);
-          dbg_printf (_("final: %s (output timezone TZ=%+03d:%02d)\n"),
-                      debug_strfdatetime (lmt, NULL, dbg_tm, sizeof (dbg_tm)),
-                      (int)(otz/60), abs ((int)otz)%60);
+          struct tm gmt, lmt;
+          if (gmtime_r (&result->tv_sec, &gmt))
+            dbg_printf (_("final: %s (UTC0)\n"),
+                        debug_strfdatetime (&gmt, NULL,
+                                            dbg_tm, sizeof dbg_tm));
+          if (localtime_rz (tz, &result->tv_sec, &lmt))
+            dbg_printf (_("final: %s (output timezone TZ=%+03d:%02d)\n"),
+                        debug_strfdatetime (&lmt, NULL, dbg_tm, sizeof dbg_tm),
+                        (int) (otz / 60), abs ((int) (otz % 60)));
         }
     }
 
+  if (tz != tzdefault)
+    tzfree (tz);
+  free (tz1alloc);
   return ok;
 }
 

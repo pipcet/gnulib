@@ -1,5 +1,5 @@
-# hypotl.m4 serial 5
-dnl Copyright (C) 2012-2016 Free Software Foundation, Inc.
+# hypotl.m4 serial 6
+dnl Copyright (C) 2012-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -87,6 +87,10 @@ int main (int argc, char *argv[])
     ])
   else
     HAVE_HYPOTL=0
+    dnl If the function is declared but does not appear to exist, it may be
+    dnl defined as an inline function. In order to avoid a conflict, we have
+    dnl to define rpl_hypotl, not hypotl.
+    AC_CHECK_DECLS([hypotl], [REPLACE_HYPOTL=1], , [[#include <math.h>]])
   fi
   if test $HAVE_HYPOTL = 0 || test $REPLACE_HYPOTL = 1; then
     dnl Find libraries needed to link lib/hypotl.c.

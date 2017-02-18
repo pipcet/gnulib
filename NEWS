@@ -1,17 +1,17 @@
-Important notes
----------------
+Important general notes
+-----------------------
 
 Date        Modules         Changes
 
-2015-04-24  acl             This module no longer defines file_has_acl.
-                            Use the new file-has-acl module for that.
-                            Using only the latter module makes for fewer
-                            link-time dependencies on GNU/Linux.
-
-2015-04-15  acl             If your project only uses the file_has_acl()
-                            detection routine, then the requirements are
-                            potentially reduced by using $LIB_HAS_ACL rather
-                            than $LIB_ACL.
+2016-09-05  progname        There is now an alternate module 'getprogname'. It
+                            defines a getprogname() function; use it to obtain
+                            the name of the current program.
+                            Recommended use:
+                            - In a program's main() function, and associated
+                              usage() and help() functions, use 'progname'.
+                            - In library code, or more generally any code that
+                              is not near the main() function, use
+                              'getprogname'.
 
 2013-04-24  gettext         If your project uses 'gettextize --intl' it is now
                             your responsibility to put -I$(top_builddir)/intl
@@ -42,13 +42,26 @@ User visible incompatible changes
 
 Date        Modules         Changes
 
-2016-09-05  progname        This module is deprecated.  Please switch to the
-                            'getprogname' module and its getprogname()
-                            function to obtain the name of the current program.
-                            Note that there is no longer any need to export a
-                            'const char *program_name' variable.
-                            Currently there is no replacement for
-                            set_program_name().
+2017-02-16  binary-io       On MS-DOS and OS/2, set_binary_mode now fails
+                            on ttys, and sets errno == EINVAL.
+
+2017-01-20  parse-datetime  The parse_datetime2 function now takes two
+                            more arguments TZ and TZSTRING, for the
+                            time zone and its name.
+
+2017-01-16  host-cpu-c-abi  On ARM platforms, HOST_CPU_C_ABI is now set to
+                            'arm' or 'armhf' instead of 'armel'.
+
+2017-01-15  localeinfo      Change case_folded_counterparts's first arg's type
+                            from wchar_t to wint_t, so it now accepts WEOF.
+
+2016-12-17  getlogin        The link requirements of these modules are changed
+            getlogin_r      from empty to $(LIB_GETLOGIN).
+
+2016-12-13  dfa             Remove DFA_CASE_FOLD flag. Now based on RE_ICASE.
+
+2016-11-17  unistr/u32-strmblen   The function u32_strmblen can now return -1.
+2016-11-17  unistr/u32-strmbtouc  The function u32_strmbtouc can now return -1.
 
 2016-08-17  stdbool         This no longer supports _Bool for C++.
                             Programs intended to be portable to C++
@@ -69,6 +82,16 @@ Date        Modules         Changes
             strftime        type timezone_t (with NULL denoting UTC) instead of
                             type int (with nonzero denoting UTC).  These
                             modules now depend on time_rz.
+
+2015-04-24  acl             This module no longer defines file_has_acl.
+                            Use the new file-has-acl module for that.
+                            Using only the latter module makes for fewer
+                            link-time dependencies on GNU/Linux.
+
+2015-04-15  acl             If your project only uses the file_has_acl()
+                            detection routine, then the requirements are
+                            potentially reduced by using $LIB_HAS_ACL rather
+                            than $LIB_ACL.
 
 2015-04-03  hash            hash_insert0 function removed (deprecated in 2011).
 

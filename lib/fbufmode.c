@@ -1,5 +1,5 @@
 /* Retrieve information about a FILE stream.
-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ fbufmode (FILE *fp)
     return _IONBF;
   return _IOFBF;
 #elif defined __sferror || defined __DragonFly__ || defined __ANDROID__
-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
   if (fp_->_flags & __SLBF)
     return _IOLBF;
   if (fp_->_flags & __SNBF)
@@ -53,17 +53,24 @@ fbufmode (FILE *fp)
   return fp->_flags & (_IOLBF | _IONBF | _IOFBF);
 #elif defined __minix               /* Minix */
   return fp->_flags & (_IOLBF | _IONBF | _IOFBF);
-#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, NonStop Kernel */
-# if HAVE___FLBF                    /* Solaris >= 7 */
+#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel */
+# if defined WINDOWS_OPAQUE_FILE
+  if (fp_->_flag & 0x100)
+    return _IOFBF; /* Impossible to distinguish _IOFBF and _IOLBF.  */
+  else
+    return _IONBF;
+# else
+#  if HAVE___FLBF                   /* Solaris >= 7 */
   if (__flbf (fp))
     return _IOLBF;
-# else
+#  else
   if (fp->_flag & _IOLBF)
     return _IOLBF;
-# endif
+#  endif
   if (fp_->_flag & _IONBF)
     return _IONBF;
   return _IOFBF;
+# endif
 #elif defined __UCLIBC__            /* uClibc */
   if (fp->__modeflags & __FLAG_LBF)
     return _IOLBF;

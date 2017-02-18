@@ -1,5 +1,5 @@
 /* Test of POSIX compatible fflush() function.
-   Copyright (C) 2008-2016 Free Software Foundation, Inc.
+   Copyright (C) 2008-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ main (int argc, char **argv)
 
   /* Avoid the well-known bugs of fflush() on streams in O_TEXT mode
      on native Windows platforms.  */
-  SET_BINARY (0);
+  set_binary_mode (0, O_BINARY);
 
   if (argc > 1)
     switch (argv[1][0])

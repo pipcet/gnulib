@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (C) 2002-2016 Free Software Foundation, Inc.
+# Copyright (C) 2002-2017 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -4758,11 +4758,31 @@ s,^\(.................................................[^ ]*\) *,                
     if test -n "$lgpl"; then
       # Update license.
       case "$lgpl" in
-        yes | 3 | 3orGPLv2)
+        yes | 3)
           sed_transform_main_lib_file=$sed_transform_main_lib_file'
             s/GNU General/GNU Lesser General/g
             s/General Public License/Lesser General Public License/g
             s/Lesser Lesser General Public License/Lesser General Public License/g
+          '
+          ;;
+        3orGPLv2)
+          sed_transform_main_lib_file=$sed_transform_main_lib_file'
+            /^ *This program is free software/i\
+   This program is free software: you can redistribute it and\/or\
+   modify it under the terms of either:\
+\
+     * the GNU Lesser General Public License as published by the Free\
+       Software Foundation; either version 3 of the License, or (at your\
+       option) any later version.\
+\
+   or\
+\
+     * the GNU General Public License as published by the Free\
+       Software Foundation; either version 2 of the License, or (at your\
+       option) any later version.\
+\
+   or both in parallel, as here.
+            /^ *This program is free software/,/^$/d
           '
           ;;
         2)

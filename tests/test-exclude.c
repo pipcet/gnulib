@@ -1,5 +1,5 @@
 /* Test suite for exclude.
-   Copyright (C) 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2009-2017 Free Software Foundation, Inc.
    This file is part of the GNUlib Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -122,5 +122,7 @@ main (int argc, char **argv)
 
       printf ("%s: %d\n", word, excluded_file_name (exclude, word));
     }
+
+  free_exclude (exclude);
   return 0;
 }

@@ -1,5 +1,5 @@
 /* Test of u32_mbtouc() function.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,9 +21,6 @@
 #include "unistr.h"
 
 #include "macros.h"
-
-/* Enable all tests that may be skipped when testing u32_mbtouc_unsafe.  */
-#define FULL_SAFETY 1
 
 #include "test-u32-mbtouc.h"
 

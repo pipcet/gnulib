@@ -1,5 +1,5 @@
-# atanf.m4 serial 2
-dnl Copyright (C) 2011-2016 Free Software Foundation, Inc.
+# atanf.m4 serial 3
+dnl Copyright (C) 2011-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -22,6 +22,10 @@ AC_DEFUN([gl_FUNC_ATANF],
     ATANF_LIBM="$ATAN_LIBM"
   else
     HAVE_ATANF=0
+    dnl If the function is declared but does not appear to exist, it may be
+    dnl defined as an inline function. In order to avoid a conflict, we have
+    dnl to define rpl_atanf, not atanf.
+    AC_CHECK_DECLS([atanf], [REPLACE_ATANF=1], , [[#include <math.h>]])
     ATANF_LIBM="$ATAN_LIBM"
   fi
   AC_SUBST([ATANF_LIBM])

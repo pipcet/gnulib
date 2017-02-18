@@ -1,5 +1,5 @@
 /* Conversion from UTF-8 to legacy encodings.
-   Copyright (C) 2002, 2006-2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006-2007, 2009-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
@@ -41,13 +41,11 @@ u8_conv_to_encoding (const char *tocode,
       char *result;
 
       /* Conversion from UTF-8 to UTF-8.  No need to go through iconv().  */
-#if CONFIG_UNICODE_SAFETY
       if (u8_check (src, srclen))
         {
           errno = EILSEQ;
           return NULL;
         }
-#endif
 
       /* Memory allocation.  */
       if (resultbuf != NULL && *lengthp >= srclen)

@@ -1,3 +1,1557 @@
+2017-02-16  Tim Rühsen  <tim.ruehsen@gmx.de>
+
+	users.txt: Update links, use HTTPS where possible
+	* users.txt: Updated to HTTPS where possible,
+	fixed some links to new locations.
+
+2017-02-16  Bruno Haible  <bruno@clisp.org>
+
+	xbinary-io: Fix inlining.
+	* lib/xbinary-io.c: Set XBINARY_IO_INLINE, not XSETMODE_INLINE.
+
+2017-02-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	xbinary-io: rename from xsetmode
+	This patch is taken from suggestions by Bruno Haible in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2017-02/msg00060.html
+	http://lists.gnu.org/archive/html/bug-gnulib/2017-02/msg00061.html
+	* lib/binary-io.c (__gl_setmode_check): Set errno to EINVAL,
+	not ENOTTY, when it is an inappropriate device.
+	* lib/binary-io.h (SET_BINARY): Resurrect.
+	* lib/xbinary-io.c: Rename from lib/xsetmode.c.
+	(xset_binary_mode_error): Rename from xsetmode_error.
+	* lib/xbinary-io.h: Rename from lib/xsetmode.h.
+	(xset_binary_mode): Rename from xsetmode.
+	All uses changed.
+	* modules/xbinary-io: Rename from modules/xsetmode.
+	Update file names.
+	* tests/test-binary-io.sh (tmpfiles): Remove no-longer-used file name.
+	* NEWS: Update to match revised behavior.
+
+2017-02-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	tests: Adjust to recent SET_BINARY change
+	* tests/test-binary-io.c (main):
+	* tests/test-binary-io.sh: Remove test for SET_BINARY.
+	* tests/test-closein.c, tests/test-fflush2.c, tests/test-ftell.c:
+	* tests/test-ftello.c, tests/test-nonblocking-pipe-child.c:
+	* tests/test-yesno.c: Use set_binary_mode, not SET_BINARY.
+
+	xsetmode: new module
+	This is to fix a problem noted by Eric Blake.
+	Code was using xfreopen to change files to binary mode, but this
+	fails for stdout when in append mode.  Such code should use
+	xsetmode instead.
+	* NEWS: Document incompatible changes to binary-io module.
+	* lib/binary-io.c (__gl_setmode_check) [__DJGPP__ || __EMX__]:
+	New function.
+	* lib/binary-io.h (__gl_setmode): Rename from set_binary_mode.
+	(set_binary_mode): New function, which also checks for tty.
+	* lib/xsetmode.c, lib/xsetmode.h, modules/xsetmode: New files.
+
+2017-02-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	headers: fix begin-end typos
+	* lib/mbfile.h, lib/se-selinux.in.h: Fix typos by replacing
+	_GL_INLINE_HEADER_BEGIN with _GL_INLINE_HEADER_END.
+
+	selinux-h: port to PGI 16.10
+	* lib/se-selinux.in.h: Don't assume that include_next skips over
+	duplicate -I DIR options.
+
+	argp: port to PGI 16.10
+	* lib/argp-pin.c (dummy): Declare as needed to make file nonempty.
+
+2017-02-13  Darshit Shah  <darnir@gnu.org>
+
+	unicase: Update function protoype to match definition.
+	* lib/unicase/special-casing.h (gl_unicase_special_lookup): Gperf 3.1
+	uses 'size_t' as the datatype for the 'len' parameter in the functions
+	it generates. Update the prototype specified here to match the newly
+	generated function.
+
+2017-02-12  Bruno Haible  <bruno@clisp.org>
+
+	times test: Avoid gcc warnings on Linux/x32.
+	* tests/test-times.c (main): Really cast printf arguments from clock_t
+	to 'long int'.
+
+2017-02-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	glob: port better to emscripten
+	Problem reported by Bruno Haible in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2017-02/msg00031.html
+	* lib/glob.c (glob): Don't assume HAVE_GETPWNAM_R || _LIBC.
+
+2017-02-11  Bruno Haible  <bruno@clisp.org>
+
+	host-cpu-c-abi: Support for 64-bit AIX, 32-bit armhf on arm64, hppa64.
+	* m4/host-cpu-c-abi.m4 (gl_HOST_CPU_C_ABI): Define also HOST_CPU.
+	For the x32 ABI on x86_64, set HOST_CPU_C_ABI to 'x86_64-x32' and define
+	both __x86_64__ and __x86_64_x32__. For the ELFv2 ABI on powerpc64,
+	define both __powerpc64__ and __powerpc64_elfv2__. Recognize 64-bit
+	compilation on AIX. Recognize 32-bit compilation on arm64/Linux.
+	Distinguish hppa64 from hppa.
+
+2017-02-10  Bruno Haible  <bruno@clisp.org>
+
+	search: Don't assume that tsearch() exists if 'VISIT' is defined.
+	* m4/search_h.m4 (gl_SEARCH_H): Determine HAVE_TYPE_VISIT.
+	* modules/search (Makefile.am): Substitute HAVE_TYPE_VISIT.
+	* lib/search.in.h (VISIT): Define if HAVE_TYPE_VISIT is 0.
+
+2017-02-09  Bruno Haible  <bruno@clisp.org>
+
+	doc: Don't mention obsolete AC_LIBTOOL_WIN32_DLL macro.
+	* doc/gnulib.texi (Libtool and Windows): Recommend
+	LT_INIT([win32-dll]) instead of AC_LIBTOOL_WIN32_DLL.
+	Reported by Reuben Thomas <rrt@sc3d.org>.
+
+2017-02-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	stddef-tests: port to SIZE_MAX <= INT_MAX
+	* tests/test-stddef.c: Include <limits.h>, for INT_MAX.
+	Do not assume that INT_MAX < SIZE_MAX.
+
+2017-02-01  Bruno Haible  <bruno@clisp.org>
+
+	lock tests: Fix link error.
+	* modules/lock-tests (test_rwlock1_LDADD): Add @YIELD_LIB@.
+	Reported by Tom G. Christensen <tgc@jupiterrise.com>.
+
+2017-01-31  Bruno Haible  <bruno@clisp.org>
+
+	lock: Fix link error (regression from 2017-01-05).
+	* lib/glthread/lock.h [USE_POSIX_THREADS_WEAK]: Declare also
+	pthread_rwlockattr_init, pthread_rwlockattr_setkind_np,
+	pthread_rwlockattr_destroy weak.
+	Reported by Tom G. Christensen <tgc@jupiterrise.com>.
+
+2017-01-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Port to PGI 16.10 x86-64
+	This patch fixes one real bug in gl_anylinked_list2.h, along with
+	some minor glitches that are not bugs.  It does not silence PGI’s
+	thousands of bogus warnings when compiling test-intprops.c.
+	Fortunately, the warnings do not cause a failure.
+	* lib/c-ctype.h (_C_CTYPE_LOWER_A_THRU_F_N, _C_CTYPE_LOWER_N):
+	Rename parameter to avoid PGI warning about ‘#define f(n) 'n'’.
+	My goodness, PGI goes back a long ways - this predates C89!
+	* lib/gl_anylinked_list2.h (ASYNCSAFE): Fix bug caught by PGI.
+	For example, ASYNCSAFE (const void *) should expand to
+	‘const void *volatile’, not to ‘volatile const void *’.
+	* lib/spawn.in.h (POSIX_SPAWN_USEVFORK): Don't define if already defined.
+	* lib/verify.h (verify) [!__GNUC__]:
+	Use shorter albeit meaningless string to bypass silly compiler limits.
+	* tests/infinity.h (Infinityf, Infinityd, Infinityl) [__PGI]:
+	* tests/nan.h (NaNf, NaNd, NaNl):
+	Use static functions to avoid misguided compiler diagnostics.
+	Is there some reason we don’t use static functions on all platforms?
+
+2017-01-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	parse-datetime: handle timezones reentrantly
+	This API change was prompted by a report by Pádraig Brady in:
+	https://bug.debian.org/851934#10
+	To help fix the bug, make parse_datetime2 more reentrant.
+	* NEWS: Document this incompatible change.
+	* lib/parse-datetime.h, lib/parse-datetime.y (parse_datetime2):
+	Add two arguments, the timezone and the timezone name.
+	All callers changed.  If TZ="..." is specified, use it for
+	calculating defaults.
+	* lib/parse-datetime.y: Don't include xalloc.h or use xmalloc, as
+	this code should be usable in a library.
+	(mktime_ok, get_effective_timezone):
+	Accept timezone arg too.  All callers changed.
+	(get_tz): Remove.
+	(get_effective_timezone): Check for failures.
+
+2017-01-20  Eric Blake  <eblake@redhat.com>
+
+	localename: port to cygwin 2.6
+	* lib/localename.c (gl_locale_name_thread_unsafe): Add clause for
+	Cygwin.
+	* modules/localename (Depends-on): Add extensions, since
+	NL_LOCALE_NAME() is not visible without it.
+
+2017-01-17  Pádraig Brady  <P@draigBrady.com>
+
+	parse-datetime: fix dependence on AC_PROG_SED
+	* modules/parse-datetime: Use `sed` directly like all other modules.
+	Reported by J William Piggott
+
+2017-01-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	intprops: update doc URLs
+	* doc/intprops.texi (Integer Range Overflow): Update URLs.
+
+2017-01-16  Bruno Haible  <bruno@clisp.org>
+
+	host-cpu-c-abi: Add support for armhf, arm64, x32, s390x.
+	* m4/host-cpu-c-abi.m4 (gl_HOST_CPU_C_ABI): Require gl_C_ASM. On x86_64
+	systems, distinguish x86_64 and x32. On arm systems, distinguish arm,
+	armhf, arm64, and no longer distinguish arm and armel. On s390x systems,
+	distinguish s390 and s390x.
+	* modules/host-cpu-c-abi (Files): Add m4/asm-underscore.m4.
+	* NEWS: Mention the change regarding 'armel'.
+
+2017-01-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	localeinfo: case_folded_counterparts and WEOF
+	* NEWS: Document this.
+	* lib/localeinfo.c (case_folded_counterparts):
+	First arg is now wint_t, not wchar_t.  This generalizes the
+	function to also work on WEOF, where it returns 0.
+
+	dfa: port to gcc -fsanitize=undefined
+	* lib/dfa.c (copy): Don’t pass NULL with size 0 to memcpy,
+	as this runs afoul of gcc -fsanitize=undefined.
+
+2017-01-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	strftime: %z is -00 if unknown
+	* lib/strftime.c (DO_TZ_OFFSET): Omit arg 'negative'; it's now
+	the caller's responsibility to set 'negative_number'.  All uses changed.
+	(__strftime_internal): Put '-' before a zero UTC offset if the time
+	zone abbreviation starts with "-", which is the recently-introduced
+	tzdb convention for an unknown UTC offset that is arbitrarily set to 0.
+	* tests/test-strftime.c: Test for this.
+
+2017-01-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: port to older GCC
+	Problem reported by Assaf Gordon in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2017-01/msg00103.html
+	* modules/c99: New module.  This merely attempts to use the latest
+	C version, which should be enough to solve this particular problem.
+	The idea is to document which Gnulib modules assume C99 or later.
+	* modules/dfa (Depends-on): Add it.
+
+2017-01-10  Bruno Haible  <bruno@clisp.org>
+
+	Update DEPENDENCIES.
+	* DEPENDENCIES: List only https URLs. Update recommended version for
+	autoconf, automake, gperf.
+
+2017-01-10  Jim Meyering  <meyering@fb.com>
+
+	maint.mk: enforce spelling of "timestamp" (i.e., no space)
+	* top/maint.mk (prohibit_undesirable_word_seq_RE_): Also
+	disallow /\btime\s+stamps?\b/.  Prefer "timestamp".
+
+2017-01-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: minor simplification with emptyset
+	* lib/dfa.c (build_state): Simplify by using emptyset.
+
+2017-01-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: shrink constraints from 4 bits to 3
+	* lib/dfa.c (newline_constraint, letter_constraint)
+	(other_constraint, prev_newline_dependent)
+	(prev_letter_dependent, NO_CONSTRAINT, BEGLINE_CONSTRAINT)
+	(ENDLINE_CONSTRAINT, BEGWORD_CONSTRAINT, ENDWORD_CONSTRAINT)
+	(LIMWORD_CONSTRAINT, NOTLIMWORD_CONSTRAINT):
+	Constraints need only 3 bits, not 4.  Using smaller integers
+	shrinks the code a bit and makes grep a tad faster on x86-64.
+
+	dfa: omit unnecessary ptrdiff_t check
+	* lib/dfa.c (alloc_position_set): Do not worry about ptrdiff_t
+	overflow, since xnmalloc does that now.
+
+	dfa: omit unnecessary allocation
+	* lib/dfa.c (dfaanalyze): Do not allocate follow set, since
+	an all-zero follow set works just fine.
+
+	dfa: omit unused local
+	* lib/dfa.c (build_state): Fix up recent change.
+
+	maint: remove stray .texi files
+	Although these were superseded by other files like
+	doc/posix-functions/ctime.texi, the old files were not removed.
+	* doc/ctime.texi, doc/inet_ntoa.texi: Remove.
+
+2017-01-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	getprogname: fix port to IRIX
+	* lib/getprogname.c (getprogname) [__sgi]:
+	Don't dump core if malloc returns NULL.
+
+	dfa: fix reallocation bug when matching newlines
+	Problem reported for sed by S. Gilles (Bug#25390).
+	* lib/dfa.c (realloc_trans_if_necessary): Move earlier.
+	(dfastate): Reallocate before moving any newline transition ...
+	(build_state): ... instead of reallocating here, where it is too late.
+
+2017-01-07  Tim Rühsen  <tim.ruehsen@gmx.de>  (tiny change)
+
+	Avoid -Wundef warning about undefined WINDOWS_SOCKETS.
+	* lib/sockets.h: Test if WINDOWS_SOCKETS is defined.
+
+2017-01-07  Tim Rühsen  <tim.ruehsen@gmx.de>  (tiny change)
+
+	Avoid -Wundef warning about undefined __USE_FILE_OFFSET64.
+	* lib/glob-libc.h: Test if __USE_FILE_OFFSET64 is defined.
+
+2017-01-07  Bruno Haible  <bruno@clisp.org>
+
+	stdioext: Port to Minix 3.2 and newer.
+	* lib/stdio-impl.h: Treat __minix like the newest NetBSD.
+	* lib/fseeko.c (fseeko): Likewise.
+	Reported by Nelson Beebe via Paul Eggert.
+
+2017-01-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	getprogname: port to IRIX
+	* lib/getprogname.c (getprogname): Port to IRIX.
+	Based on an idea by Bastien Roucariès at:
+	http://lists.gnu.org/archive/html/bug-gnulib/2010-12/msg00096.html
+	via code from Bruno Haible at:
+	https://lists.gnu.org/archive/html/bug-gnulib/2010-12/msg00249.html
+
+	localename-tests: port to NetBSD 7
+	Problem reported by Nelson H. F. Beebe.
+	* tests/test-localename.c:
+	Test newlocale and uselocale only if both exist.
+
+	glob, intprops, xalloc: work around Clang bug
+	Work around LLVM bug 16404, which is still not fixed.
+	https://llvm.org/bugs/show_bug.cgi?id=16404
+	Problem reported by Nelson H. F. Beebe.
+	* lib/glob.c, lib/intprops.h, lib/xalloc-oversized.h (__has_builtin):
+	Remove.
+	* lib/glob.c (size_add_wrapv):
+	* lib/intprops.h (_GL_HAS_BUILTIN_OVERFLOW, _GL_HAS_BUILTIN_OVERFLOW_P):
+	* lib/xalloc-oversized.h (xalloc_oversized):
+	Do not use overflow builtins if Clang.
+
+	dfa: fix 'return' typo
+	Problem reported by Nelson H. F. Beebe.
+	* lib/dfa.c (merge): Fix typo that Sun compilers rejected.
+
+2017-01-05  Pádraig Brady  <P@draigBrady.com>
+
+	parse-datetime: fix generated paths for coverage files
+	* modules/parse-datetime: Adjust the paths for parse-datetime.y
+	within parse-datetime.c, so that gcc generates appropriate .gcno
+	files, allowing lcov to proceed without error.  Previously it
+	would error trying to find "lib/lib/parse-datetime.y".
+
+2017-01-05  Pádraig Brady  <P@draigBrady.com>
+
+	maint.mk: support parallel execution of coverage
+	* top/maint.mk (coverage): Run dependencies serially,
+	thus supporting parallel processing of each one,
+	particularly build-coverage, which builds and runs tests.
+
+2017-01-05  Bruno Haible  <bruno@clisp.org>
+
+	lock tests: Prefer semaphore over mutex.
+	* tests/test-lock.c (USE_SEMAPHORE): New constant.
+	(struct atomic_int, init_atomic_int, get_atomic_int_value,
+	set_atomic_int_value) [USE_SEMAPHORE]: Define using a POSIX semaphore.
+	Suggested by Torvald Riegel <triegel@redhat.com>.
+
+2017-01-05  Bruno Haible  <bruno@clisp.org>
+
+	lock: Provide guarantee to avoid writer starvation for rwlocks.
+	The rationale is: 1) Read-preferring read-write locks are prone to
+	writer starvation if the number of reader threads multiplied by the
+	percentage of time they have the lock held is too high. 2) Write-
+	preferring read-write locks are the only reliable way to avoid this.
+	3) There have been reports of 'test-lock' hanging on glibc systems
+	http://lists.gnu.org/archive/html/bug-gnulib/2017-01/msg00009.html,
+	and glibc indeed implements read-preferring rwlocks by default, see
+	http://man7.org/linux/man-pages/man3/pthread_rwlockattr_setkind_np.3.html
+	and https://sourceware.org/bugzilla/show_bug.cgi?id=13701 .
+	* m4/pthread_rwlock_rdlock.m4: New file.
+	* m4/lock.m4 (gl_LOCK): Invoke gl_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER.
+	* lib/glthread/lock.h [USE_POSIX_THREADS]: Test
+	HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER. Use a different implementation
+	of rwlock initialization on glibc systems without
+	HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER. Use a different implementation
+	of rwlocks altogether on non-glibc systems without
+	HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER.
+	[USE_PTH_THREADS]: Use a different implementation of rwlocks altogether.
+	* lib/glthread/lock.c [USE_POSIX_THREADS]
+	(glthread_rwlock_init_for_glibc): New function.
+	[USE_POSIX_THREADS] (glthread_rwlock_rdlock_multithreaded): Update
+	comment.
+	[USE_PTH_THREADS]: New implementation of rwlocks.
+	[USE_WINDOWS_THREADS] (glthread_rwlock_rdlock_func): Prefer writers over
+	readers.
+	* modules/lock (Files): Add m4/pthread_rwlock_rdlock.m4.
+	(Depends-on): Add 'extensions'.
+	* tests/test-rwlock1.c: New file.
+	* lock-tests (Files): Add it.
+	(Depends-on): Add usleep.
+	(Makefile.am): Add test-rwlock1 to the tests.
+
+2017-01-05  Bruno Haible  <bruno@clisp.org>
+
+	thread: Fix pth port.
+	* lib/glthread/thread.h (pth_init): Declare weak.
+	(glthread_create, glthread_sigmask, glthread_join, gl_thread_self,
+	gl_thread_exit): Make sure Pth is initialized before invoking any Pth
+	function.
+
+2017-01-04  Assaf Gordon <assafgordon@gmail.com>
+
+	parse-datetime: fix debug message on lone year number
+	Input dates such as
+	  date -d "Apr 11 22:59:00 2011"
+	are parsed as date (Apr 11, with default year 2016), then time, then a
+	number (2011). Based on the combination of previously seen tokens,
+	'digits_to_date_time' determines 2011 to be a year value.
+	This fixes the debug messages to correctly show the updated year.
+	Before:
+	    $ date --debug -d 'Apr 11 22:59:00 2011'
+	    date: parsed date part: (Y-M-D) 2016-04-11
+	    date: parsed time part: 22:59:00
+	    date: parsed number part: today/this/now
+	After:
+	    $ ./src/date --debug -d 'Apr 11 22:59:00 2011'
+	    date: parsed date part: (Y-M-D) 2016-04-11
+	    date: parsed time part: 22:59:00
+	    date: parsed number part: year: 2011
+	* lib/parse-datetime.y (struct parser_control): Add 'year_seen',
+	'debug_year_seen' member fields.
+	(digits_to_date_time): Update 'year_seen' as needed.
+	(debug_print_current_time): Inform about year updates.
+	(parse_datetime2): Initialize year_seen,debug_year_seen member fields.
+
+	parse-datetime: fix local timezone debug messages
+	"Local timezones" are strings that affect only DST relative to the
+	default timezone. The debug messages in parse-datetime.y printed
+	wrong information when encountering local timezones.
+	Examples:
+	Here EET/EEST are time zones ('zone' token, with values +02:00/+03:00):
+	     TZ=Asia/Tokyo ./src/date --debug -d '2011-12-11 EET'
+	     TZ=Asia/Tokyo ./src/date --debug -d '2011-06-11 EEST'
+	When the default timezone relates to the zone strings, EET/EEST are
+	parsed as local timezones (tLOCAL_ZONE), and only change the DST
+	value (0/1, respectively):
+	     TZ=Europe/Helsinki ./src/date --debug -d '2011-12-11 EET'
+	     TZ=Europe/Helsinki ./src/date --debug -d '2011-06-11 EEST'
+	* lib/parse-datetime.y (debug_print_current_time): If local timezone
+	was seen, inform about DST change, don't print actual timezone.
+	(debug_strfdatetime): If local timezone was seen, use default timezone
+	(and adjust as needed) instead of using incorrect timezone.
+	(parse_datetime2): Use correct time-zone source string, and adjust
+	default timezone as needed.
+
+	parse-datetime: add debug warning about DST changes
+	Incorrect date arithmetic due to daylight saving time (DST) are a
+	common (false) bug report in coreutils.
+	Detect two such cases and print a warning:
+	1. year/month/day adjustments (performed on 'struct tm'),
+	   where 'mktime' returns a different isdst value.
+	2. hour/minute/seconds/ns adjustments (performed on 'time_t'),
+	   where the result of 'localtime(3)' on the value will return a
+	   different isdst value.
+	Note: DST changes could be harmless or unnoticeable.
+	Examples (with 'TZ=America/New_York'):
+	Unnoticeable: result is 2016-Dec-14
+	   $ date -d '2016-06-15 EDT + 6 months' +%b
+	   Dec
+	Unnoticeable: result is 2016-Dec-15 11:00:00
+	   $ date -d '2016-06-15 12:00:00 EDT + 6 months' +%F
+	   2016-12-15
+	This is unexpected:
+	   $ date -d '2016-06-01 EDT + 6 months' +%F
+	   2016-11-30
+	The new debug warnings will show:
+	   $ ./src/date --debug -d '2016-06-01 EDT + 6 months' +%F
+	   ...
+	   date: warning: daylight saving time changed after date adjustment
+	   ...
+	* lib/parse-datetime.y (parse_datetime2): Detect DST changes, and
+	print an appropriate warning message.
+
+	parse-datetime: add debug warning about date arithmetic
+	Date arithmetic are done directly on the fields of 'struct tm',
+	which can result in invalid dates. Normalization with 'mktime(3)'
+	will then produce a different date - which might cause unexpected
+	results.
+	Examples:
+	  '2016-10-31 - 1 month' => 2016-09-31 normalized to 2016-10-01.
+	  '2016-02-29 + 1 year'  => 2017-02-29 normalized to 2017-03-01.
+	Note that date normalization is not inherently wrong and not rejected,
+	as it has legitimate uses:
+	  '2016-12-29 + 5 days' => 2016-12-34 noramlized to 2017-01-03.
+	If the user asked to adjust months but 'mday' changed,
+	or user asked to adjust years but 'month' changed - warn about it.
+	    $ ./src/date --debug -d '2016-10-31 - 1 month'
+	    ...
+	    date: warning: when adding relative months/years, \
+	                   it is recommended to specify the 15th of the month
+	    ...
+	    date: warning: month/year adjustment resulted in shifted dates:
+	    date:      adjusted Y M D: 2016 09 31
+	    date:    normalized Y M D: 2010 10 01
+	    ...
+	* lib/parse-datetime.y (parse_datetime2): Detect such cases and print
+	a warning message. Improve recommendation of when to use 15 of the
+	month or noon for date arithmetic.
+
+	parse-datetime: fix debug message of relative part after timezone
+	Relative part (e.g '+8 days') after a timezone string was not
+	reported (was only reported after a timezone number). Due to the
+	parser's structure, timezone strings with numbers were handled
+	separately.
+	before:
+	     # Timezone number + relative part: OK
+	     $ ./src/date --debug +%F -d '2013-10-30 00:00:00 +00:00 -8 days'
+	     ...
+	     date: parsed relative part: -8 day(s)
+	     # Timezone string + relative part: missing
+	     $ ./src/date --debug +%F -d '2013-10-30 00:00:00 UTC -8 days'
+	     [ missing message ]
+	After: messages are printed in both cases.
+	* lib/parse-datetime.y ('zone' token): Call debug_print_relative_time.
+
+	parse-datetime: fix incorrect debug message on lone number
+	A lone number is an absolute value, not a relative time part.
+	before:
+	   $ date --debug -d '20130101'
+	   date: parsed number part: today/this/now
+	After:
+	   $ ./src/date --debug -d '20130101'
+	   date: parsed number part: (Y-M-D) 2013-01-01
+	* lib/parse-datetime.y ('item'/'number' tokens): Call
+	'debug_print_current_time' instead of 'debug_print_relative_time'.
+
+2017-01-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	doc: modernize for C11 etc.
+	* doc/gnulib-readme.texi (Portability guidelines): Modernize a bit
+	for C11, MinGW, etc.  This responds to Paul Smith's question in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2017-01/msg00014.html
+
+	dfa: prefer functions to FETCH_WC macro
+	* lib/dfa.c (FETCH_WC): Remove, replacing with ...
+	(fetch_wc, bracket_fetch_wc): ... new functions.  These store the
+	wint_t result into DFA->lex.wctok instead of to a separate arg.
+	All callers changed.  Move more local decls closer to where
+	they're used.
+
+	dfa: narrow more local var scopes
+	* lib/dfa.c: Move more local decls to be more local.
+
+	dfa: remove duplicate assignment
+	Problem reported by Bruno Haible in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2017-01/msg00007.html
+	* lib/dfa.c (parse_bracket_exp): Simplify.
+
+2017-01-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: simplify constraint-dependency checking
+	* lib/dfa.c (prev_newline_constraint, prev_letter_constraint)
+	(prev_other_constraint): Remove.
+	(prev_newline_dependent, prev_letter_dependent):
+	Simplify, to avoid an unnecessary bitwise AND operation.
+
+	dfa: prefer functions and constants to macros
+	* lib/dfa.c: Prefer constants to macros where either will do.
+	(streq, isasciidigit, newline_constraint)
+	(letter_constraint, other_constraint, succeeds_in_context)
+	(prev_newline_constraint, prev_letter_constraint)
+	(prev_other_constraint, prev_newline_dependent)
+	(prev_letter_dependent, accepting, accepts_in_context):
+	Now static functions instead of function-like macros.
+	Use lower-case names accordingly.  All uses changed.
+
+	dfa: narrow more local var scopes
+	* lib/dfa.c: Move some more local decls down to nearer where
+	they're needed.
+
+2016-12-31  Jim Meyering  <meyering@fb.com>
+
+	dfa: narrow the scope of many local variables
+	* lib/dfa.c: Now that we are no longer constrained to c89, move
+	declarations of many variables (often indices) "down" into the
+	scope(s) where used or to the point of definition.  This is a
+	no-semantic-change diff.
+
+2017-01-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	version-etc: new year
+	* build-aux/gendocs.sh (version):
+	* doc/gendocs_template:
+	* doc/gendocs_template_min:
+	* doc/gnulib.texi:
+	* lib/version-etc.c (COPYRIGHT_YEAR):
+	Update copyright dates by hand in templates and the like.
+	* all files: Run 'make update-copyright'.
+
+2016-12-31  Eric Blake  <eblake@redhat.com>
+
+	do-release-commit-and-tag: avoid shell syntax error
+	* build-aux/do-release-commit-and-tag (curr_br): $branch can
+	contain spaces when rebasing.
+
+	maint.mk: hoist gnulib_dir definition earlier
+	* top/maint.mk (gnulib_dir): Move near top of file.
+
+2016-12-31  Jim Meyering  <meyering@fb.com>
+
+	maint.mk: do not always evaluate intprops-related shell
+	* top/maint.mk (_intprops_names): Change := to just "=" to avoid
+	using gnulib_dir undefined (gnulib_dir is defined later in the
+	file, which will be fixed separately), and besides, there is no
+	need to incur the cost of this shell invocation for every single
+	use of this .mk file.  Reported by Eric Blake in
+	https://lists.gnu.org/archive/html/bug-gnulib/2016-12/msg00137.html
+
+2016-12-30  Jim Meyering  <meyering@fb.com>
+
+	maint.mk: improve sc_prohibit_intprops_without_use
+	* top/maint.mk (_intprops_names): Don't hard-code the list of
+	symbol names.  Instead, derive it on the fly.
+
+2016-12-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: shorten sbit, success
+	* lib/dfa.c (struct regex_syntax.sbit):
+	(struct dfa.success): Use char, not int, for array elements, since
+	they are all in the range 0..7.
+
+	dfa: simplify multibyte_prop etc.
+	This follows up on a change made when dfa.c was in grep, namely grep
+	commit c797046c7c13c2647182b919a79a4c5b4ecf82b1
+	dated 2015-08-12 07:35:03 -0700, which removed unused multibyte support.
+	That earlier simplification allows for some more simplification
+	and trimming down here.
+	* lib/dfa.c (struct mb_char_classes): New member nchars_alloc.
+	(struct lexer_state): New mamber brack.
+	(struct dfa, addtok_mb): multibyte_prop elements are now char, not int,
+	since they must be in the range 0..3 now.
+	Remove members mbcsets, nmbcsets, mbcsets_alloc, since
+	the brack member now supersedes them.
+	(parse_bracket_exp): Update dfa->lex.brack instead of dfa->mbcsets.
+	(addtok): Use dfa->lex.brack instead of dfa->mbcsets.
+	(dfaparse): Remove unnecessary initializations of already-0 storage.
+	(free_mbdata): Free d->lex.brack.chars instead of d->mbcsets.
+	(dfassbuild): No need to clear sup->mbcsets.
+
+	dfa: minor performance tweak
+	* lib/dfa.c (setbit_wc): Test < 0, not == EOF.
+
+	dfa: wrap charclass inside a struct
+	On my platform (gcc Ubuntu 5.4.0-6ubuntu1~16.04.4 x86-64,
+	en_US.utf8 locale) this makes 'grep -Fi -f list.txt list.txt >out'
+	about 5% faster, where list.txt is generated by 'aspell dump
+	master | head -n 100000 >list.txt'.  See Bug#22239.
+	* lib/dfa.c (charclass): Wrap inside a struct.  All uses changed.
+	(CHARCLASS_INIT, tstbit, setbit, clrbit, zeroset, fillset, notset)
+	(equal, emptyset, charclass_index, setbit_wc, setbit_case_fold_c):
+	Adjust to this, e.g., by using charclass * rather than charclass.
+	All callers changed as needed.
+	(copyset): Remove.  All uses changed to simple assignment.
+	(parse_bracket_exp): Use zeroset instead of memset.
+
+2016-12-30  Jim Meyering  <meyering@fb.com>
+
+	maint.mk: update list of intprops.h symbol names
+	* top/maint.mk (_intprops_names): Regenerate the list of symbol names.
+	This avoids a false failure of the sc_prohibit_intprops_without_use
+	rule in grep.
+
+2016-12-29  Eric Blake  <eblake@redhat.com>
+
+	getopt: fix parallel test failure
+	* tests/test-getopt-posix.c (TEST_GETOPT_TMP_NAME): Set name.
+	* tests/test-getopt-gnu.c (TEST_GETOPT_TMP_NAME): Likewise.
+	* tests/test-getopt-main.h (main): Use different file names
+	in case test-getopt-gnu and test-getopt-posix run in parallel.
+
+2016-12-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	xalloc: x2nrealloc check for ptrdiff_t overflow
+	* lib/xalloc.h (x2nrealloc): Check for ptrdiff_t overflow, too.
+	* modules/xalloc, modules/xvasprintf (Depends-on): Add stdint.
+
+2016-12-24  Bruno Haible  <bruno@clisp.org>
+
+	lock test: Fix performance problem on multi-core machines.
+	* tests/test-lock.c (USE_VOLATILE): New macro.
+	(struct atomic_int): New type.
+	(init_atomic_int, get_atomic_int_value, set_atomic_int_value): New
+	functions.
+	(lock_checker_done, rwlock_checker_done, reclock_checker_done): Define
+	as 'struct atomic_int'.
+	(lock_checker_thread, test_lock, rwlock_checker_thread, test_rwlock,
+	reclock_checker_thread, test_recursive_lock): Use the new functions.
+	Reported by Eric Blake in
+	https://www.redhat.com/archives/libvir-list/2012-March/msg00854.html
+	and by Pádraig Brady in
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-12/msg00117.html.
+
+2016-12-19  Bruno Haible  <bruno@clisp.org>
+
+	vma-iter: Fix endless loop on 64-bit Windows.
+	* lib/vma-iter.c (vma_iterate): On Windows, use 'uintptr_t' instead of
+	'unsigned long'.
+
+2016-12-19  Bruno Haible  <bruno@clisp.org>
+
+	stdint: Fix WINT_MAX to match the gnulib provided wint_t on minw.
+	* m4/wint_t.m4 (gt_TYPE_WINT_T): Define GNULIB_OVERRIDES_WINT_T here.
+	* m4/stdint.m4 (gl_STDINT_H): Don't define GNULIB_OVERRIDES_WINT_T.
+	Invoke gt_TYPE_WINT_T instead.
+	(gl_STDINT_TYPE_PROPERTIES): Test GNULIB_OVERRIDES_WINT_T.
+	* modules/stdint (Files): Add m4/wint_t.m4.
+	* modules/wchar (Makefile.am): Substitute GNULIB_OVERRIDES_WINT_T.
+	* modules/wctype-h (Makefile.am): Likewise.
+	* lib/wchar.in.h (wint_t): Override if GNULIB_OVERRIDES_WINT_T is set,
+	not only on MSVC.
+	* lib/wctype.in.h (wint_t): Likewise.
+
+2016-12-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	getopt-posix-tests: fix Makefile typo
+	* modules/getopt-posix-tests (test_getopt_posix_LDADD):
+	Fix typo: the last ‘_’ was missing in the name.
+	I suspect that the typo explains this build failure:
+	https://buildfarm.opencsw.org/buildbot/builders/ggrep-solaris10-sparc/builds/39
+	although I can’t reproduce the problem on Solaris 10 sparc.
+
+2016-12-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: improve worst-case 'replace' performance
+	See my note in Bug#22357#71.
+	* lib/dfa.c (insert, delete): Rework to avoid duplicate test.
+	(merge_constrained): New function, which is like
+	the old 'merge' function, except with a new argument C2.
+	Simplify the body by avoiding the need for different sections
+	of code depending on whether one input is exhausted.
+	(merge): Use the new function.
+	(delete): Return the constraint of the deleted position,
+	not the entire position.  Caller changed.
+	(replace): Change from O(N*(N + log N)) to O(N log N) algorithm.
+
+2016-12-18  Norihiro Tanaka  <noritnk@kcn.ne.jp>
+
+	dfa: performance improvement for removal of epsilon closure
+	See Bug#22357#32.
+	* lib/dfa.c (delete): Use binary search to find deleted index.
+	(replace): New function.  It replaces a position with the followed set.
+	(epsclosure): Replace it with a new algorithm.  Update caller.
+
+2016-12-18  Bruno Haible  <bruno@clisp.org>
+
+	Split tests for getopt-posix and getopt-gnu.
+	* tests/test-getopt-posix.c: New file.
+	* tests/test-getopt-gnu.c: New file, with code from test-getopt.c.
+	* tests/test-getopt-main.h: Renamed from tests/test-getopt.c. Remove
+	stuff moved to test-getopt-gnu.c. Test TEST_GETOPT_GNU instead of
+	GNULIB_TEST_GETOPT_GNU.
+	* modules/getopt-posix-tests (Files): Add test-getopt-posix.c,
+	test-getopt-main.h. Remove test-getopt.c, test-getopt_long.h.
+	(Makefile.am): Test test-getopt-posix instead of test-getopt.
+	* modules/getopt-gnu-tests: New file.
+	* modules/getopt-gnu (configure.ac): Don't define GNULIB_TEST_GETOPT_GNU.
+
+2016-12-18  Bruno Haible  <bruno@clisp.org>
+
+	posix-modules: Add options for specific platforms.
+	* posix-modules (func_usage): Document options --for-mingw, --for-msvc.
+	(exclude_for_mingw, exclude_for_msvc, exclude): New variables.
+	Invoke func_tmpdir. Filter out the excludes.
+
+2016-12-18  Bruno Haible  <bruno@clisp.org>
+
+	getopt: Fix link error for users of getopt() in <unistd.h>.
+	* lib/getopt.in.h (getopt etc.): Do the macro definitions also when
+	__need_getopt is defined. Undefine all macros before defining them.
+	* modules/getopt (Include): Clarify that including <unistd.h> is also
+	OK.
+	* tests/test-getopt.c: Add comment.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	getaddrinfo tests: Avoid compilation error on MSVC.
+	* tests/test-getaddrinfo.c: Don't check the prototypes of freeaddrinfo,
+	getaddrinfo on native Windows.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	getlogin, getlogin_r: Fix link errors on MSVC.
+	* m4/getlogin.m4 (gl_LIB_GETLOGIN): New macro.
+	* modules/getlogin (configure.ac): Require gl_LIB_GETLOGIN.
+	(Link): New section.
+	* modules/getlogin_r (Files): Add m4/getlogin.m4.
+	(configure.ac): Require gl_LIB_GETLOGIN.
+	(Link): New section.
+	* NEWS: Mention the new link requirements.
+	* modules/getlogin-tests (test_getlogin_LDADD): New variable.
+	* modules/getlogin_r-tests (test_getlogin_r_LDADD): New variable.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	Un-deprecate the 'progname' module.
+	* NEWS: Describe the appropriate use-cases of 'progname' versus
+	'getprogname'. Based on discussion summary at
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-10/msg00105.html
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	Reorganize NEWS a bit.
+	* NEWS: Move some not so important changes away from section
+	"Important Notes".
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	tanhf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_TANHF.
+	* m4/tanhf.m4 (gl_FUNC_TANHF): Set REPLACE_TANHF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_TANHF.
+	* lib/math.in.h (tanhf): Override if REPLACE_TANHF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	tanf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_TANF.
+	* m4/tanf.m4 (gl_FUNC_TANF): Set REPLACE_TANF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_TANF.
+	* lib/math.in.h (tanf): Override if REPLACE_TANF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	sqrtf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_SQRTF.
+	* m4/sqrtf.m4 (gl_FUNC_SQRTF): Set REPLACE_SQRTF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_SQRTF.
+	* lib/math.in.h (sqrtf): Override if REPLACE_SQRTF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	sinhf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_SINHF.
+	* m4/sinhf.m4 (gl_FUNC_SINHF): Set REPLACE_SINHF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_SINHF.
+	* lib/math.in.h (sinhf): Override if REPLACE_SINHF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	sinf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_SINF.
+	* m4/sinf.m4 (gl_FUNC_SINF): Set REPLACE_SINF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_SINF.
+	* lib/math.in.h (sinf): Override if REPLACE_SINF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	logf: Avoid redefinition error on MSVC.
+	* m4/logf.m4 (gl_FUNC_LOGF): Set REPLACE_LOGF to 1 if the function
+	may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	log10l: Avoid redefinition error on MSVC.
+	* m4/log10l.m4 (gl_FUNC_LOG10L): Set REPLACE_LOG10L to 1 if the function
+	may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	log10f: Avoid redefinition error on MSVC.
+	* m4/log10f.m4 (gl_FUNC_LOG10F): Set REPLACE_LOG10F to 1 if the function
+	may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	hypotl: Avoid redefinition error on MSVC.
+	* m4/hypotl.m4 (gl_FUNC_HYPOTL): Set REPLACE_HYPOTL to 1 if the function
+	may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	hypotf: Avoid redefinition error on MSVC.
+	* m4/hypotf.m4 (gl_FUNC_HYPOTF): Set REPLACE_HYPOTF to 1 if the function
+	may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	fmodl: Avoid redefinition error on MSVC.
+	* m4/fmodl.m4 (gl_FUNC_FMODL): Set REPLACE_FMODL to 1 if the function
+	may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	fmodf: Avoid redefinition error on MSVC.
+	* m4/fmodf.m4 (gl_FUNC_FMODF): Set REPLACE_FMODF to 1 if the function
+	may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	expf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_EXPF.
+	* m4/expf.m4 (gl_FUNC_EXPF): Set REPLACE_EXPF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_EXPF.
+	* lib/math.in.h (expf): Override if REPLACE_EXPF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	coshf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_COSHF.
+	* m4/coshf.m4 (gl_FUNC_COSHF): Set REPLACE_COSHF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_COSHF.
+	* lib/math.in.h (coshf): Override if REPLACE_COSHF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	cosf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_COSF.
+	* m4/cosf.m4 (gl_FUNC_COSF): Set REPLACE_COSF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_COSF.
+	* lib/math.in.h (cosf): Override if REPLACE_COSF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	atan2f: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_ATAN2F.
+	* m4/atan2f.m4 (gl_FUNC_ATAN2F): Set REPLACE_ATAN2F to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_ATAN2F.
+	* lib/math.in.h (atan2f): Override if REPLACE_ATAN2F is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	atanf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_ATANF.
+	* m4/atanf.m4 (gl_FUNC_ATANF): Set REPLACE_ATANF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_ATANF.
+	* lib/math.in.h (atanf): Override if REPLACE_ATANF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	asinf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_ASINF.
+	* m4/asinf.m4 (gl_FUNC_ASINF): Set REPLACE_ASINF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_ASINF.
+	* lib/math.in.h (asinf): Override if REPLACE_ASINF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	acosf: Avoid redefinition error on MSVC.
+	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Define REPLACE_ACOSF.
+	* m4/acosf.m4 (gl_FUNC_ACOSF): Set REPLACE_ACOSF to 1 if the function
+	may be defined as an inline function.
+	* modules/math (Makefile.am): Substitute REPLACE_ACOSF.
+	* lib/math.in.h (acosf): Override if REPLACE_ACOSF is 1.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	Avoid redefinition errors on MSVC.
+	* m4/snprintf.m4 (gl_REPLACE_SNPRINTF): Set REPLACE_SNPRINTF to 1 if
+	the function may be defined as an inline function.
+	* m4/vsnprintf.m4 (gl_REPLACE_VSNPRINTF): Set REPLACE_VSNPRINTF to 1 if
+	the function may be defined as an inline function.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	Avoid redefinition errors on MSVC.
+	* lib/stdio.in.h: Include <stdlib.h> and <io.h> when necessary.
+	* lib/unistd.in.h: Include <stdio.h> when necessary.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	stdint: Fix WINT_MAX to match the gnulib provided wint_t on MSVC.
+	* m4/stdint.m4 (gl_STDINT_H): Define GNULIB_OVERRIDES_WINT_T.
+	* modules/stdint (Makefile.am): Substitute GNULIB_OVERRIDES_WINT_T.
+	* lib/stdint.in.h [GNULIB_OVERRIDES_WINT_T]: Redefine WINT_MIN and
+	WINT_MAX.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	Avoid autoconf warning.
+	* modules/frexpl (configure.ac): Require, not invoke, gl_FUNC_FREXPL.
+	* modules/frexp (configure.ac): Require, not invoke, gl_FUNC_FREXP.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	fpending: Revert workaround against Emacs bug.
+	* lib/stdio-impl.h [__MINGW32__]: Revert conditional.
+	The Emacs bug is fixed by Eli Zaretskii in
+	http://lists.gnu.org/archive/html/emacs-devel/2016-12/msg00715.html
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	getlogin_r tests: Port to mingw.
+	* tests/test-getlogin_r.c: Don't include <pwd.h> on native Windows. Fixes
+	regression introduced on 2014-05-19.
+
+2016-12-17  Bruno Haible  <bruno@clisp.org>
+
+	getlogin: Port to newer mingw.
+	* m4/unistd_h.m4 (gl_UNISTD_H_DEFAULTS): Initialize HAVE_DECL_GETLOGIN.
+	* m4/getlogin.m4 (gl_FUNC_GETLOGIN): Set HAVE_DECL_GETLOGIN.
+	* modules/unistd (Makefile.am): Substitute HAVE_DECL_GETLOGIN, not
+	HAVE_GETLOGIN.
+	* lib/unistd.in.h (getlogin): Test HAVE_DECL_GETLOGIN, not
+	HAVE_GETLOGIN.
+	* doc/posix-functions/getlogin.texi: Mention the issue.
+	* tests/test-getlogin.c: Don't include <pwd.h> on native Windows. Fixes
+	regression introduced on 2014-05-14.
+
+2016-12-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	builtin-expect: improve port to IBM XL C
+	Problem reported for z/OS by Daniel Richard G. in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-12/msg00079.html
+	* m4/builtin-expect.m4 (gl___BUILTIN_EXPECT):
+	Test for <builtins.h> directly.
+
+	builtin-expect: port to IBM XL C
+	Problem reported for z/OS by Daniel Richard G. in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-12/msg00074.html
+	* m4/builtin-expect.m4 (gl___BUILTIN_EXPECT):
+	Also allow __builtin_expect defined via a standard include file.
+
+	regex: fix dependency
+	Problem reported by Bruno Haible in:
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-12/msg00073.html
+	* modules/regex: Depend on builtin-expect.
+
+	builtin-expect: new module
+	Fix fnmatch to use it.
+	Problem reported for z/OS by Daniel Richard G.
+	* lib/fnmatch.c (__builtin_expect):
+	* lib/glob.c (__builtin_expect):
+	* lib/grantpt.c (__builtin_expect) [!_LIBC]:
+	* lib/memmem.c (__builtin_expect) [!_LIBC]:
+	* lib/scandir.c (__builtin_expect):
+	* lib/strstr.c (__builtin_expect) [!_LIBC]:
+	Remove macro; config.h now does this.
+	* lib/gl_anytreehash_list1.h (add_to_bucket):
+	* lib/regex_internal.h (BE):
+	Assume __builtin_expect.
+	* m4/builtin-expect.m4, modules/builtin-expect: New files.
+	* modules/avltreehash-list, modules/fnmatch, modules/glob:
+	* modules/grantpt, modules/memmem-simple, modules/rbtreehash-list:
+	* modules/scandir, modules/strstr-simple:
+	Depend on builtin-expect.
+
+2016-12-15  Bruno Haible  <bruno@clisp.org>
+
+	init.sh: Add possibility to not delete temporary files.
+	* tests/init.sh (remove_tmp_): If the environment variable KEEP is set
+	to yes, don't erase the temporary directory.
+
+2016-12-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	regex: fix integer-overflow bug in never-used code
+	Problem reported by Clément Pit–Claudel in:
+	http://lists.gnu.org/archive/html/emacs-devel/2016-12/msg00654.html
+	* lib/regex_internal.h: Include intprops.h.
+	* lib/regexec.c (re_search_2_stub): Use it to avoid undefined
+	behavior on integer overflow.
+	* modules/regex (Depends-on): Add intprops.
+
+	fpending: fix port to MinGW on Emacs
+	* lib/stdio-impl.h [__MINGW32__]: Do not include errno.h.
+	Problem reported by Eli Zaretskii in:
+	http://lists.gnu.org/archive/html/emacs-devel/2016-12/msg00642.html
+	Is Plan 9 still a valid porting target, anyway?
+
+2016-12-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	safe-alloc: use xalloc-oversized
+	* lib/safe-alloc.c: Include xalloc-oversized.h.
+	(safe_alloc_oversized): Remove.  All uses changed to xalloc_oversized.
+	* modules/safe-alloc (Depends-on): Add xalloc-oversized.
+
+	xalloc: do not exceed PTRDIFF_MAX
+	* lib/xmalloc.c (xcalloc) [HAVE_GNU_CALLOC]: Do not omit
+	xalloc_oversized check, since objects larger than PTRDIFF_MAX
+	bytes have pointer-subtraction problems.
+
+	malloca: do not exceed PTRDIFF_MAX
+	* lib/malloca.h: Include xalloc-oversized.
+	(nmalloca): Use xalloc_oversized instead of rolling our own.
+	* modules/malloca (Depends-on):
+	* modules/relocatable-prog-wrapper (Depends-on):
+	Add xalloc-oversized.
+
+	quotearg: pacify GCC better
+	* modules/quotearg (Depends-on): Add minmax, stdint.
+	* lib/quotearg.c: Include minmax.h, stdint.h.
+	(nslots): Now int, as there seems little point to going to extra
+	work merely to support the INT_MAX slot, which nobody ever uses.
+	(quotearg_n_options): Redo size-overflow checks to pacify GCC
+	and to catch (mostly-theoretical) ptrdiff_t problems too.
+	This can be done via one comparison.
+
+2016-12-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	xalloc-oversized: check for PTRDIFF_MAX too
+	This avoids undefined behavior when subtracting pointers to
+	objects containing more than PTRDIFF_MAX bytes.
+	* lib/xalloc-oversized.h (__xalloc_oversized, xalloc_oversized):
+	Also return 1 if the result would exceed PTRDIFF_MAX>
+	* modules/xalloc-oversized (Depends-on):
+	Add stdint.
+
+	dfa: fix glitches in previous commit
+	Sorry, I don't know how I managed to commit the wrong version.
+	* lib/dfa.c (MIN): Move up.
+	(xpalloc): Now static.
+
+	dfa: fix some unlikely integer overflows
+	I found these while reviewing the recent Coverity-related fix.
+	This patch changes part of dfa.c to prefer ptrdiff_t instead of
+	size_t for object counts.  Using ptrdiff_t is the style typically
+	used in Emacs; although it wastes a sign bit as sizes can never be
+	negative, it makes -fsanitize=undefined more likely to catch
+	integer overflows in index calculation, and nowadays the upside is
+	typically more important than the downside.  Although perhaps the
+	rest of dfa.c should be changed to prefer ptrdiff_t as well (much
+	of dfa.c already does, since it uses state_num which is signed),
+	that is a bigger change and is not needed to fix the bugs I found.
+	* lib/dfa.c: Include stdint.h and intprops.h.
+	(TOKEN_MAX): New macro.
+	(position_set, struct mb_char_classes, struct dfa, maybe_realloc)
+	(charclass_index, parse_bracket_exp, addtok, insert, merge)
+	(realloc_trans_if_necessary, free_mbdata):
+	Use ptrdiff_t instead of size_t for object counts related to xpalloc.
+	This is safe because xpalloc checks that the sizes do not exceed
+	either SIZE_MAX or PTRDIFF_MAX.
+	(xpalloc): New function, mostly taken from Emacs.
+	(maybe_realloc, copy, realloc_trans_if_necessary): Use it.
+	(maybe_realloc): Add NITEMS_MAX to signature.  All callers changed.
+	(charclass_index): Check for integer overflow in computing
+	charclass index; it must not exceed TOKEN_MAX - CSET, as CSET is
+	added to it later.
+	(alloc_position_set): Check for integer overflow.  On typical
+	platforms this check has zero overhead, since the constant
+	expression is false.
+	(realloc_trans_if_necessary):
+	Remove assertion, which I hope Coverity no longer needs.
+
+	* modules/dfa (Depends-on): Add intprops, stdint.
+
+2016-12-12  Jim Meyering  <meyering@fb.com>
+
+	dfa: add an assertion to avoid coverity false positive
+	* lib/dfa.c (realloc_trans_if_necessary): Otherwise, coverity
+	warned that "newalloc1 - 2" could overflow.
+
+2016-12-13   Arnold D. Robbins  <arnold@skeeve.com>
+
+	dfa: remove DFA_CASE_FOLD flag in favor of RE_ICASE
+	* dfa.h (DFA_CASE_FOLD): Remove.
+	* dfa.c (dfasyntax): Set dfa->syntax.case_fold based on RE_ICASE.
+
+2016-12-13  John W. Eaton  <gnu@jweaton.org>
+
+	link: fix test to declare use of rename()
+	* m4/link.m4 (gl_FUNC_LINK): Include <stdio.h> needed with
+	-Werror=implicit-function-declaration
+
+2016-12-12  Bruno Haible  <bruno@clisp.org>
+
+	fpending: Port to native Windows with MSVC.
+	* lib/fpending.c: Include stdio-impl.h.
+	(__fpending): Include all known implementations. Err out if it's not
+	ported.
+	* m4/fpending.m4 (gl_PREREQ_FPENDING): Remove macro.
+	* modules/fpending (Files): Add lib/stdio-impl.h.
+	(configure.ac): Don't invoke gl_PREREQ_FPENDING.
+
+2016-12-12  Bruno Haible  <bruno@clisp.org>
+
+	stdioext: Port to native Windows with MSVC.
+	* lib/stdio-impl.h (WINDOWS_OPAQUE_FILE): New macro.
+	(struct _gl_real_FILE): New type.
+	(fp_, _IOREAD, _IOWRT, _IORW, _IOEOF, _IOERR): New macros, for native
+	Windows.
+	* lib/fbufmode.c (fbufmode): Add code for native Windows.
+	* lib/fflush.c (clear_ungetc_buffer): Treat native Windows like the
+	other SystemV derived implementations.
+	* lib/fpurge.c (fpurge): Likewise.
+	* lib/freadable.c (freadable): Likewise.
+	* lib/freadahead.c (freadahead): Likewise.
+	* lib/freading.c (freading): Likewise.
+	* lib/freadptr.c (freadptr): Likewise.
+	* lib/freadseek.c (freadptrinc): Likewise.
+	* lib/fseeko.c (fseeko): Likewise.
+	* lib/fseterr.c (fseterr): Likewise.
+	* lib/fwritable.c (fwritable): Likewise.
+	* lib/fwriting.c (fwriting): Likewise.
+	Reported by Gisle Vanem <gvanem@yahoo.no>.
+
+2016-12-11  Jim Meyering  <meyering@fb.com>
+
+	non-recursive-gnulib-prefix-hack.m4: remove leading "(" in case stmt
+	* m4/non-recursive-gnulib-prefix-hack.m4: That leading "(" happens
+	to work with most shells, but not with the one provided by many
+	Solaris 10 systems, so running configure with such a /bin/sh evokes
+	e.g., "./configure: syntax error at line 33602: `(' unexpected".
+	Reported by Assaf Gordon in
+	https://lists.gnu.org/archive/html/sed-devel/2016-12/msg00002.html
+
+2016-12-10  Bruno Haible  <bruno@clisp.org>
+
+	threadlib: Optimize out runtime test on Solaris >= 10.
+	* m4/threadlib.m4 (gl_THREADLIB_BODY): Don't set
+	PTHREAD_IN_USE_DETECTION_HARD if configuring on Solaris 10 or newer.
+	Reported by Peter Felecan at <https://savannah.gnu.org/bugs/?32087>.
+
+2016-12-10  Bruno Haible  <bruno@clisp.org>
+
+	stdint: Update doc about Solaris 9.
+	* doc/posix-headers/stdint.texi: Add info about Solaris 9.
+
+2016-12-09  Bruno Haible  <bruno@clisp.org>
+
+	c-ctype tests: Fix link error on Solaris 9.
+	* modules/c-ctype-tests (Depends-on): Add 'isblank'.
+	Reported at <https://savannah.gnu.org/bugs/?46827>.
+
+2016-12-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: fix performance bug that recomputes trans
+	* lib/dfa.c (build_state): Fix performance bug introduced in Nov
+	25 on-demand changes.  The bug caused build_state to reset all
+	d->trans elements to -2 even when d->trans was already non-null.
+	Use C99 style decls after statements in this function.
+
+	same-inode: port to MinGW
+	Here st_ino is always 0, so change the definition of SAME_INODE so
+	that 1 means the two files are the same, 0 with st_ino != 0 means
+	they differ, and 0 with st_ino == 0 means we don’t know.  Problem
+	reported by Bruno Haible (Bug#25146).
+	* doc/posix-headers/sys_stat.texi (sys/stat.h): Update.
+	* lib/same-inode.h (SAME_INODE): Return 0 on MinGW.
+
+2016-12-04  Bruno Haible  <bruno@clisp.org>
+
+	javacomp: Support Java 7 and 8.
+	* m4/javacomp.m4 (gt_JAVACOMP): Accept source-version 1.7, 1.8 and
+	target-version 1.7, 1.8.
+
+2016-12-02  Daiki Ueno  <ueno@gnu.org>
+
+	* gnulib-tool (func_import): Relax the regex used for "LGPLv3+ or
+	GPLv2" rewriting.
+
+2016-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* gnulib-tool (func_import): Adhere to the license guideline when
+	rewriting the license text to "LGPLv3+ or GPLv2":
+	https://www.gnu.org/prep/maintain/maintain.html#Licensing-of-GNU-Packages
+
+2016-12-02  Bruno Haible  <bruno@clisp.org>
+
+	localcharset: Avoid theoretical buffer overrun.
+	* lib/localcharset.c (locale_charset) [WINDOWS_NATIVE]: Don't use the
+	return value from setlocale if it would lead to a buffer overrun.
+
+2016-12-01  Bruno Haible  <bruno@clisp.org>
+
+	Relicense some modules under LGPLv2+.
+	Kevin Cernekee's approval is in
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-11/msg00090.html.
+	* modules/fseterr (License): Change to LGPLv2+.
+	* modules/mbchar (License): Likewise.
+	* modules/mbiter (License): Likewise.
+	* modules/mbsnlen (License): Likewise.
+	* modules/wcwidth (License): Likewise.
+
+2016-12-01  KO Myung-Hun  <komh78@gmail.com>
+
+	scandir: Fix _D_ALLOC_NAMLEN() on OS/2 kLIBC
+	* lib/scandir.c (_D_ALLOC_NAMLEN): Consider the fields after d_name on
+	OS/2 kLIBC.
+
+2016-12-01  KO Myung-Hun  <komh78@gmail.com>
+
+	alphasort, scandir: Port to OS/2 kLIBC
+	* lib/alphasort.c (alphasort): Implement according to OS/2 kLIBC
+	declaration.
+	* lib/scandir.c (scandir): Add declaration for OS/2 kLIBC.
+
+2016-12-01  KO Myung-Hun  <komh78@gmail.com>
+
+	relocatable: Fix that /@unixroot prefix is not working on OS/2 kLIBC
+	* lib/relocatable.c (relocate): Do not touch pathname if it is started
+	with '/@unixroot'.
+
+2016-12-01  KO Myung-Hun  <komh78@gmail.com>
+
+	sys_socket: typedef sa_family_t correctly on OS/2 kLIBC
+	* lib/sys_socket.in.h (sa_family_t): Typedef to unsigned char on
+	OS/2 kLIBC unless TCPV40HDRS is defined.
+
+2016-11-29  Jim Meyering  <meyering@fb.com>
+
+	dfa: avoid new infinite loop
+	This would infloop: echo cx | LC_ALL=C grep -E 'c\b[x ]'
+	* lib/dfa.c (dfastate): When constructing a new state table, we could
+	initially declare that we had found a match, and later find that
+	constraints eliminate that possibility, yet continue to use the
+	now stale "matched" indicator.  That would lead to an infinite loop.
+	The solution is to update "matched" when necessary.
+	Introduced by commit v0.1-983-g403adf1.
+
+2016-11-27  Norihiro Tanaka <noritnk@kcn.ne.jp>
+
+	dfa: avoid match middle in multibyte character
+	* lib/dfa.c (transit_state): If fails in matching single byte characters
+	on a state including period expression in non-UTF8 multibyte locales,
+	skip trailing bytes.
+	(dfa_supported): Revert previous change.
+
+2016-11-27  Jim Meyering  <meyering@fb.com>
+
+	dfa: avoid false match in non-UTF8 multibyte locales
+	* lib/dfa.c (dfa_supported): Treat any non-UTF8 multibyte locale
+	as "not supported" so that callers will resort to using regex-based
+	matcher.  This will surely hurt performance, but correctness trumps
+	performance here, and the affected locales are less and less relevant,
+	these days.  See grep's bug report https://bugs.gnu.org/24975.
+
+2016-11-27  Mike Frysinger  <vapier@gentoo.org>
+
+	ptsname_r: leverage AC_HEADER_MAJOR to provide major()
+	* lib/ptsname_r.c: Include the appropriate headers.
+	[__sun]: Delete sys/sysmacros.h include.
+	[_AIX || __osf__]: Likewise.
+	* m4/ptsname_r.m4 (gl_FUNC_PTSNAME_R): Depend on AC_HEADER_MAJOR.
+
+2016-11-27  Pádraig Brady  <P@draigBrady.com>
+
+	md4,md5,sha*: allow _STRING_INLINE_unaligned enable unaligned operation
+	* lib/md4.c (md4_process_bytes): The existing define is made internal
+	in recent versions of glibc, so also use this new public define.
+	* lib/md5.c (md5_process_bytes): Likewise.
+	* lib/sha1.c (sha1_process_bytes): Likewise.
+	* lib/sha256.c (sha256_process_bytes): Likewise.
+	* lib/sha512.c (sha512_process_bytes): Likewise.
+
+2016-11-27  Pádraig Brady  <P@draigBrady.com>
+
+	maint: use a more standard return from mbrtowc test
+	* m4/mbrtowc.m4 (gl_MBRTOWC_C_LOCALE): Don't return 1
+	from the test program as this often indicates an
+	unhandled case in the test program.
+	(gl_MBRTOWC_INCOMPLETE_STATE): Likewise.
+	(gl_MBRTOWC_SANITYCHECK): Likewise.
+	(gl_MBRTOWC_NULL_ARG2): Likewise.
+	(gl_MBRTOWC_NUL_RETVAL): Likewise.
+
+2016-11-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	freopen: work around glibc bug with closed fd
+	Work around glibc bug#15589, where freopen mishandles the case
+	where stdin etc. are already closed.
+	* doc/posix-functions/freopen.texi (freopen): Document the bug.
+	* lib/freopen.c (_GL_ALREADY_INCLUDING_STDIO_H): Define this
+	instead of __need_FILE, as the latter does not work with glibc.
+	Include <fcntl.h>, for open flags.
+	(rpl_freopen): Work around glibc bug.
+	* m4/freopen.m4 (gl_FUNC_FREOPEN): Check for bug.
+	* modules/freopen (Depends-on): Add fcntl-h.
+	* tests/test-freopen.c (main): Test for bug.
+
+2016-11-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	fnmatch: fix typo introduced on 2016-08-17
+	This fixes the port to non-GCC compilers that lack __builtin_expect.
+	* lib/fnmatch.c (__builtin_expect): Change A&&B to !A||B.
+
+	dfa: simplify with new function fillset
+	* lib/dfa.c (fillset): New function.
+	Use it for clarity when applicable.
+
+	dfa: fix glitches with on-demand states
+	Also, adjust commentary to better match new code.
+	Some of these glitches predate the recent change.
+	* lib/dfa.c (dfaanalyze): Clear trcount here, so that it counts
+	only non-initial states.
+	(dfastate): Rename locals to better match new roles.
+	Move them into nested scopes if this is easy.
+	Omit unnecessary calls to zeroset.
+	Simplify test for whether to throw in the positions of state 0.
+	Omit C99-ism (decl after statement) since Gawk still wants C89.
+	(build_state): Omit unnecessary test and assignment.
+	Fix some confusion that counted transition tables inaccurately
+	and could cause a memory leak.
+	(dfaexec_main): Redo to make it clearer to the compiler that
+	-1 and -2 are the only negative state numbers here.
+
+2016-11-25  Norihiro Tanaka  <noritnk@kcn.ne.jp>
+
+	dfa: addition of new state on demand
+	* src/dfa.c (dfastate): Add argument UC, the current input character.
+	Fill only a group including the character in transition table.
+	(realloc_trans_if_necessary): Add the dummy state which means that a
+	transition table is assigned but the next state is not assigned.
+	(build_state): Return the next state.  All callers updated.
+	(transit_state_singlebyte): If we get the dummy state,
+	fill the transition table.
+	(dfaexec_main): Handle the dummy state.
+	(free_mbdata, dfafree): Consider the dummy state.
+
+2016-11-24  Daiki Ueno  <ueno@gnu.org>
+
+	srclist: sync with released gettext
+	* config/srclist.txt: Set "release" option to the files under
+	$GETTEXT.
+
+2016-11-24  Daiki Ueno  <ueno@gnu.org>
+
+	srclist: add "release" option
+	* config/srclist.txt: Change the format so that the first column
+	of each line points to the top-level directory of the source
+	archive.
+	* config/srclist-update: Accept "release" option that checks files
+	from the most recently tagged revision in the source archive.
+
+2016-11-21  Bruno Haible  <bruno@clisp.org>
+
+	snippet/c++defs: Simplify _GL_CXXALIAS_* macros.
+	* build-aux/snippet/c++defs.h [__cplusplus && GNULIB_NAMESPACE]
+	(_GL_CXXALIAS_RPL_1, _GL_CXXALIAS_RPL_CAST_1,
+	_GL_CXXALIAS_SYS, _GL_CXXALIAS_SYS_CAST, _GL_CXXALIAS_SYS_CAST2):
+	Inline and remove member function 'rpl ()' of the wrapper struct.
+
+2016-11-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	dfa: fix logic typo
+	Problem reported by Stephane Chazelas (Bug#24973).
+	* lib/dfa.c (using_simple_locale): Fix typo that caused some
+	non-simple locales like fr_FR to be treated as simple.
+
+2016-11-20  Jim Meyering  <meyering@fb.com>
+
+	fix test driver leaks: exclude, malloc, realloc
+	* tests/test-exclude.c (main): Fix trivial leak.
+	* tests/test-malloc-gnu.c (main): Likewise.
+	* tests/test-realloc-gnu.c (main): Likewise.
+	With these changes, grep's tests are now leak free.
+	I.e., running them with ASAN elicits no failure:
+	  make CFLAGS='-O0 -ggdb3' AM_CFLAGS=-fsanitize=address \
+	    AM_LDFLAGS='-fsanitize=address -static-libasan' check
+
+2016-11-11  Bruno Haible  <bruno@clisp.org>
+
+	libunistring: Relicense under dual "LGPLv3+ or GPLv2" license.
+	* modules/libunistring: (License): Change from LGPL to
+	"LGPLv3+ or GPLv2".
+	* modules/libunistring-optional: Likewise.
+	* modules/unicase/*: Likewise.
+	* modules/uniconv/*: Likewise.
+	* modules/unictype/*: Likewise.
+	* modules/unigbrk/*: Likewise.
+	* modules/unilbrk/*: Likewise.
+	* modules/uniname/*: Likewise.
+	* modules/uninorm/*: Likewise.
+	* modules/unistdio/*: Likewise.
+	* modules/unistr/*: Likewise.
+	* modules/uniwbrk/*: Likewise.
+	* modules/uniwidth/*: Likewise.
+
+2016-11-12  Bruno Haible  <bruno@clisp.org>
+
+	Relicense some modules under LGPLv2+.
+	Paul Eggert's approval is in
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-11/msg00037.html.
+	Eric Blake's approval is in
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-11/msg00042.html.
+	Ludovic Courtès's approval is in
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-11/msg00038.html.
+	* modules/isnand-nolibm (License): Change to LGPLv2+.
+	* modules/isnanf-nolibm (License): Likewise.
+	* modules/isnanl-nolibm (License): Likewise.
+
+2016-11-19  Bruno Haible  <bruno@clisp.org>
+
+	Relicense some modules under LGPLv2+.
+	lib/float+.h is already under LGPLv2+ since 2007-07-13, per
+	modules/vasnprintf.
+	Paolo Bonzini's approval for lib/frexp.c and lib/frexpl.c is in
+	http://lists.gnu.org/archive/html/bug-gnulib/2016-11/msg00074.html.
+	All other significant changes to the files in lib/ of these modules
+	are from me.
+	* modules/memcmp2 (License): Change to LGPLv2+.
+	* modules/amemxfrm (License): Likewise.
+	* modules/fpieee (License): Likewise.
+	* modules/fpucw (License): Likewise.
+	* modules/frexp-nolibm (License): Likewise.
+	* modules/frexpl-nolibm (License): Likewise.
+	* modules/printf-frexp (License): Likewise.
+	* modules/printf-frexpl (License): Likewise.
+	* modules/printf-safe (License): Likewise.
+	* modules/signbit (License): Likewise.
+
+2016-11-17  Bruno Haible  <bruno@clisp.org>
+
+	Enable Unicode decoder safety unconditionally.
+	* lib/unistr.in.h (u32_mbtouc_unsafe): Assume CONFIG_UNICODE_SAFETY.
+	* lib/unistr/u8-mblen.c (u8_mblen): Likewise.
+	* lib/unistr/u8-mbtouc-unsafe.c (u8_mbtouc_unsafe): Likewise.
+	* lib/unistr/u8-mbtouc-unsafe-aux.c (u8_mbtouc_unsafe_aux): Likewise.
+	* lib/unistr/u8-prev.c (u8_prev): Likewise.
+	* lib/unistr/u8-strmblen.c (u8_strmblen): Likewise.
+	* lib/unistr/u8-strmbtouc.c (u8_strmbtouc): Likewise.
+	* lib/unistr/u16-mblen.c (u16_mblen): Likewise.
+	* lib/unistr/u16-mbtouc-unsafe.c (u16_mbtouc_unsafe): Likewise.
+	* lib/unistr/u16-mbtouc-unsafe-aux.c (u16_mbtouc_unsafe_aux): Likewise.
+	* lib/unistr/u16-prev.c (u16_prev): Likewise.
+	* lib/unistr/u16-strmblen.c (u16_strmblen): Likewise.
+	* lib/unistr/u16-strmbtouc.c (u16_strmbtouc): Likewise.
+	* lib/unistr/u32-mblen.c (u32_mblen): Likewise.
+	* lib/unistr/u32-mbtouc-unsafe.c (u32_mbtouc_unsafe): Likewise.
+	* lib/unistr/u32-prev.c (u32_prev): Likewise.
+	* lib/unistr/u32-next.c (u32_next): Likewise.
+	* lib/unistr/u32-strmblen.c (u32_strmblen): Likewise.
+	* lib/unistr/u32-strmbtouc.c (u32_strmbtouc): Likewise.
+	* lib/uniconv/u8-conv-to-enc.c (u8_conv_to_encoding): Likewise.
+	* lib/uniconv/u8-strconv-to-enc.c (u8_strconv_to_encoding): Likewise.
+	* tests/unistr/test-u16-prev.c (check_invalid): Enable the
+	CONFIG_UNICODE_SAFETY tests unconditionally.
+	* tests/unistr/test-u32-mblen.c (main): Likewise.
+	* tests/unistr/test-u32-mbtouc.h (test_function): Likewise.
+	* tests/unistr/test-u32-prev.c (check_invalid): Likewise.
+	* tests/unistr/test-u32-next.c (main): Likewise.
+	* tests/unistr/test-u32-strmblen.c (main): Likewise.
+	* tests/unistr/test-u32-strmbtouc.c (main): Likewise.
+	* tests/unistr/test-u32-mbtouc.c (FULL_SAFETY): Remove macro.
+	* lib/unistr/u8-check.c (u8_check): Remove old dead code.
+	* lib/unistr/u8-mbtouc.c (u8_mbtouc): Likewise.
+	* lib/unistr/u8-mbtouc-aux.c (u8_mbtouc_aux): Likewise.
+	* lib/unistr/u8-mbtoucr.c (u8_mbtoucr): Likewise.
+	* lib/unistr/u8-uctomb.c (u8_uctomb): Likewise.
+	* lib/unistr/u8-uctomb-aux.c (u8_uctomb_aux): Likewise.
+	* lib/unistr/u16-check.c (u16_check): Update comment.
+	* NEWS: Mention the changes that callers should be aware of.
+
+2016-11-19  Bruno Haible  <bruno@clisp.org>
+
+	relocatable-prog-wrapper: Fix breakage on Cygwin.
+	* modules/relocatable-prog-wrapper (Files): Add lib/stat.c, lib/lstat.c.
+	(Depends-on): Remove intprops.
+	* lib/relocwrapper.c: Update dependency tree.
+	(strerror): Undefine.
+	* build-aux/install-reloc (func_create_wrapper): Do not compile
+	strerror.c and strerror-override.c. Erase stat.o and lstat.o.
+
+2016-11-19  Bruno Haible  <bruno@clisp.org>
+
+	strerror: Make it compile in C++ mode.
+	* lib/strerror.c (strerror): Ignore the return value of memcpy().
+
 2016-11-15  Pedro Alves  <palves@redhat.com>
 
 	sys_time: add gnulib::timeval for C++
@@ -97,6 +1651,20 @@
 	* m4/strerror_r.m4 (AC_FUNC_STRERROR_R): New override.
 	(gl_FUNC_STRERROR_R): Don't reuse AC_DEFINE() with a potentially
 	different value.
+
+2006-11-12  Pedro Alves  <palves@redhat.com>
+
+	Fix gnulib C++ namespace support and std::frexp
+	* lib/math.in.h (frexp): Use _GL_CXXALIASWARN1 instead of
+	_GL_CXXALIASWARN.
+
+2006-11-12  Pedro Alves  <palves@redhat.com>
+
+	GNULIB_NAMESPACE::func need not pull in rpl_func
+	* build-aux/snippet/c++defs.h [__cplusplus && GNULIB_NAMESPACE]
+	(_GL_CXXALIAS_RPL_1, _GL_CXXALIAS_RPL_CAST_1, _GL_CXXALIAS_SYS)
+	(_GL_CXXALIAS_SYS_CAST, _GL_CXXALIAS_SYS_CAST2): Define a wrapper
+	struct instead of a function pointer.
 
 2016-11-09  Frediano Ziglio  <fziglio@redhat.com>
 
@@ -78617,7 +80185,7 @@ o	Test only that noncanonical values do not cause crashes, not that
 	(signbit): New macro.
 	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Initialize GNULIB_SIGNBIT and
 	REPLACE_SIGNBIT.
-	* modules/math (Makefile.am): Substibute also GNULIB_SIGNBIT and
+	* modules/math (Makefile.am): Substitute also GNULIB_SIGNBIT and
 	REPLACE_FREXPL into math.h.
 
 2007-04-06  Bruno Haible  <bruno@clisp.org>
@@ -79304,7 +80872,7 @@ o	Test only that noncanonical values do not cause crashes, not that
 	* lib/math_.h (frexpl): Define as a replacement macro if REPLACE_FREXPL
 	is set. Don't provide a prototype if REPLACE_FREXPL is not set.
 	* m4/math_h.m4 (gl_MATH_H_DEFAULTS): Initialize REPLACE_FREXPL.
-	* modules/math (Makefile.am): Substibute also REPLACE_FREXPL into
+	* modules/math (Makefile.am): Substitute also REPLACE_FREXPL into
 	math.h.
 
 2007-03-25  Bruno Haible  <bruno@clisp.org>
@@ -84068,7 +85636,7 @@ o	Test only that noncanonical values do not cause crashes, not that
 
 2006-11-16  Paul Eggert  <eggert@cs.ucla.edu>
 
-	* modules/getaddinfo (Depends-on): Remove inttostr; add snprintf.
+	* modules/getaddrinfo (Depends-on): Remove inttostr; add snprintf.
 	* lib/getaddrinfo.c: Include snprintf.h rather than intprops.h
 	and inttostr.h.  Use snprintf rather than uinttostr, so that
 	LGPLed code doesn't depend on GPLed.
@@ -108206,7 +109774,7 @@ o	Test only that noncanonical values do not cause crashes, not that
 	coding: utf-8
 	End:
 
-	Copyright (C) 1997-2016 Free Software Foundation, Inc.
+	Copyright (C) 1997-2017 Free Software Foundation, Inc.
 
 	Copying and distribution of this file, with or without
 	modification, are permitted provided the copyright notice

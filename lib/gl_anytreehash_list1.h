@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a hash table with a binary tree.
-   Copyright (C) 2006-2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2017 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -185,10 +185,8 @@ add_to_bucket (gl_list_t list, gl_list_node_t new_node)
   return 0;
 }
 /* Tell GCC that the likely return value is 0.  */
-#if __GNUC__ >= 3
-# define add_to_bucket(list,node) \
+#define add_to_bucket(list,node) \
     __builtin_expect ((add_to_bucket) (list, node), 0)
-#endif
 
 /* Remove a node from the hash table structure.
    If duplicates are allowed, this function performs in average time

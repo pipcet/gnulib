@@ -1,5 +1,5 @@
 /* Test of u32_mbtouc() and u32_mbtouc_unsafe() functions.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -64,7 +64,6 @@ test_function (int (*my_u32_mbtouc) (ucs4_t *, const uint32_t *, size_t))
     ASSERT (uc == 0x1D51F);
   }
 
-#if FULL_SAFETY || CONFIG_UNICODE_SAFETY
   /* Test incomplete/invalid 1-unit input.  */
   {
     static const uint32_t input[] = { 0x340000 };
@@ -73,5 +72,4 @@ test_function (int (*my_u32_mbtouc) (ucs4_t *, const uint32_t *, size_t))
     ASSERT (ret == 1);
     ASSERT (uc == 0xFFFD);
   }
-#endif
 }

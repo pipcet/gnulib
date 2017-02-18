@@ -1,5 +1,5 @@
 /* Test of u32_strmbtouc() function.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -71,7 +71,6 @@ main ()
     ASSERT (uc == 0x1D51F);
   }
 
-#if CONFIG_UNICODE_SAFETY
   /* Test incomplete/invalid 1-unit input.  */
   {
     static const uint32_t input[] = { 0x340000, 0 };
@@ -80,7 +79,6 @@ main ()
     ASSERT (ret == -1);
     ASSERT (uc == 0xBADFACE);
   }
-#endif
 
   return 0;
 }

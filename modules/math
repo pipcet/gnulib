@@ -225,11 +225,18 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''HAVE_DECL_TRUNCF''@|$(HAVE_DECL_TRUNCF)|g' \
 	      -e 's|@''HAVE_DECL_TRUNCL''@|$(HAVE_DECL_TRUNCL)|g' \
 	  | \
-	  sed -e 's|@''REPLACE_CBRTF''@|$(REPLACE_CBRTF)|g' \
+	  sed -e 's|@''REPLACE_ACOSF''@|$(REPLACE_ACOSF)|g' \
+	      -e 's|@''REPLACE_ASINF''@|$(REPLACE_ASINF)|g' \
+	      -e 's|@''REPLACE_ATANF''@|$(REPLACE_ATANF)|g' \
+	      -e 's|@''REPLACE_ATAN2F''@|$(REPLACE_ATAN2F)|g' \
+	      -e 's|@''REPLACE_CBRTF''@|$(REPLACE_CBRTF)|g' \
 	      -e 's|@''REPLACE_CBRTL''@|$(REPLACE_CBRTL)|g' \
 	      -e 's|@''REPLACE_CEIL''@|$(REPLACE_CEIL)|g' \
 	      -e 's|@''REPLACE_CEILF''@|$(REPLACE_CEILF)|g' \
 	      -e 's|@''REPLACE_CEILL''@|$(REPLACE_CEILL)|g' \
+	      -e 's|@''REPLACE_COSF''@|$(REPLACE_COSF)|g' \
+	      -e 's|@''REPLACE_COSHF''@|$(REPLACE_COSHF)|g' \
+	      -e 's|@''REPLACE_EXPF''@|$(REPLACE_EXPF)|g' \
 	      -e 's|@''REPLACE_EXPM1''@|$(REPLACE_EXPM1)|g' \
 	      -e 's|@''REPLACE_EXPM1F''@|$(REPLACE_EXPM1F)|g' \
 	      -e 's|@''REPLACE_EXP2''@|$(REPLACE_EXP2)|g' \
@@ -285,7 +292,12 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''REPLACE_ROUNDL''@|$(REPLACE_ROUNDL)|g' \
 	      -e 's|@''REPLACE_SIGNBIT''@|$(REPLACE_SIGNBIT)|g' \
 	      -e 's|@''REPLACE_SIGNBIT_USING_GCC''@|$(REPLACE_SIGNBIT_USING_GCC)|g' \
+	      -e 's|@''REPLACE_SINF''@|$(REPLACE_SINF)|g' \
+	      -e 's|@''REPLACE_SINHF''@|$(REPLACE_SINHF)|g' \
+	      -e 's|@''REPLACE_SQRTF''@|$(REPLACE_SQRTF)|g' \
 	      -e 's|@''REPLACE_SQRTL''@|$(REPLACE_SQRTL)|g' \
+	      -e 's|@''REPLACE_TANF''@|$(REPLACE_TANF)|g' \
+	      -e 's|@''REPLACE_TANHF''@|$(REPLACE_TANHF)|g' \
 	      -e 's|@''REPLACE_TRUNC''@|$(REPLACE_TRUNC)|g' \
 	      -e 's|@''REPLACE_TRUNCF''@|$(REPLACE_TRUNCF)|g' \
 	      -e 's|@''REPLACE_TRUNCL''@|$(REPLACE_TRUNCL)|g' \

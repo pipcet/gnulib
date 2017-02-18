@@ -1,5 +1,5 @@
 /* Retrieve information about a FILE stream.
-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,14 +34,14 @@ freadable (FILE *fp)
 #if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
   return (fp->_flags & _IO_NO_READS) == 0;
 #elif defined __sferror || defined __DragonFly__ || defined __ANDROID__
-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
   return (fp_->_flags & (__SRW | __SRD)) != 0;
 #elif defined __EMX__               /* emx+gcc */
   return (fp->_flags & (_IORW | _IOREAD)) != 0;
 #elif defined __minix               /* Minix */
   return (fp->_flags & _IOREAD) != 0;
-#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, NonStop Kernel */
-  return (fp->_flag & (_IORW | _IOREAD)) != 0;
+#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel */
+  return (fp_->_flag & (_IORW | _IOREAD)) != 0;
 #elif defined __QNX__               /* QNX */
   return (fp->_Mode & 0x1 /* _MOPENR */) != 0;
 #elif defined __MINT__              /* Atari FreeMiNT */
