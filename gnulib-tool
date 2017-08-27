@@ -264,14 +264,16 @@ Options for --import, --add/remove-import:
                             placed (default \"tests\").
       --aux-dir=DIRECTORY   Directory relative to --dir where auxiliary build
                             tools are placed (default comes from configure.ac).
+      --gnu-make            Output for GNU Make instead of for the default
+                            Automake
       --lgpl[=2|=3orGPLv2|=3]
                             Abort if modules aren't available under the LGPL.
                             Also modify license template from GPL to LGPL.
                             The version number of the LGPL can be specified;
                             the default is currently LGPLv3.
-      --makefile-name=NAME  Name of makefile in automake syntax in the
-                            source-base and tests-base directories
-                            (default \"Makefile.am\").
+      --makefile-name=NAME  Name of makefile in the source-base and tests-base
+                            directories (default \"Makefile.am\", or
+                            \"Makefile.in\" if --gnu-make).
       --macro-prefix=PREFIX  Specify the prefix of the macros 'gl_EARLY' and
                             'gl_INIT'. Default is 'gl'.
       --po-domain=NAME      Specify the prefix of the i18n domain. Usually use
@@ -293,10 +295,15 @@ Options for --import, --add/remove-import, --update,
   -s, --symbolic, --symlink Make symbolic links instead of copying files.
       --local-symlink       Make symbolic links instead of copying files, only
                             for files from the local override directory.
+  -h, --hardlink            Make hard links instead of copying files.
+      --local-hardlink      Make hard links instead of copying files, only
+                            for files from the local override directory.
 
 Options for --import, --add/remove-import, --update:
 
   -S, --more-symlinks       Make symbolic links instead of copying files, and
+                            don't replace copyright notices.
+  -H, --more-hardlinks      Make hard links instead of copying files, and
                             don't replace copyright notices.
 
 Report bugs to <bug-gnulib@gnu.org>."
@@ -777,52 +784,80 @@ func_ln_s ()
 
     case "$1" in
       /* | ?:*) # SRC is absolute.
-        cp_src=$1 ;;
+        cp_src="$1" ;;
       *) # SRC is relative to the directory of DEST.
-        cp_src=${2%/*}/$1 ;;
+        case "$2" in
+          */*) cp_src="${2%/*}/$1" ;;
+          *)   cp_src="$1" ;;
+        esac
+        ;;
     esac
 
     cp -p "$cp_src" "$2"
   }
 }
 
-# func_ln SRC DEST
-# Like func_ln_s, except that SRC is given relative to the current directory (or
-# absolute), not given relative to the directory of DEST.
-func_ln ()
+# func_symlink_target SRC DEST
+# Determines LINK_TARGET such that "ln -s LINK_TARGET DEST" will create a
+# symbolic link DEST that points to SRC.
+# Output:
+# - link_target     link target, relative to the directory of DEST
+func_symlink_target ()
 {
   case "$1" in
     /* | ?:*)
-      func_ln_s "$1" "$2" ;;
+      link_target="$1" ;;
     *) # SRC is relative.
       case "$2" in
         /* | ?:*)
-          func_ln_s "`pwd`/$1" "$2" ;;
+          link_target="`pwd`/$1" ;;
         *) # DEST is relative too.
           ln_destdir=`echo "$2" | sed -e 's,[^/]*$,,'`
           test -n "$ln_destdir" || ln_destdir="."
           func_relativize "$ln_destdir" "$1"
-          func_ln_s "$reldir" "$2"
+          link_target="$reldir"
           ;;
       esac
       ;;
   esac
 }
 
-# func_ln_if_changed SRC DEST
-# Like func_ln, but avoids munging timestamps if the link is correct.
-func_ln_if_changed ()
+# func_symlink SRC DEST
+# Like func_ln_s, except that SRC is given relative to the current directory (or
+# absolute), not given relative to the directory of DEST.
+func_symlink ()
+{
+  func_symlink_target "$1" "$2"
+  func_ln_s "$link_target" "$2"
+}
+
+# func_symlink_if_changed SRC DEST
+# Like func_symlink, but avoids munging timestamps if the link is correct.
+# SRC is given relative to the current directory (or absolute).
+func_symlink_if_changed ()
 {
   if test $# -ne 2; then
-    echo "usage: func_ln_if_changed SRC DEST" >&2
+    echo "usage: func_symlink_if_changed SRC DEST" >&2
   fi
+  func_symlink_target "$1" "$2"
   ln_target=`func_readlink "$2"`
-  if test -h "$2" && test "$1" = "$ln_target"; then
+  if test -h "$2" && test "$link_target" = "$ln_target"; then
     :
   else
     rm -f "$2"
-    func_ln "$1" "$2"
+    func_ln_s "$link_target" "$2"
   fi
+}
+
+# func_hardlink SRC DEST
+# Like ln, except use cp -p if ln fails.
+# SRC is given relative to the current directory (or absolute).
+func_hardlink ()
+{
+  ln "$1" "$2" || {
+    echo "$progname: ln failed; falling back on cp -p" >&2
+    cp -p "$1" "$2"
+  }
 }
 
 # Ensure an 'echo' command that
@@ -1039,6 +1074,7 @@ func_determine_path_separator
 # - cond_dependencies  true if --conditional-dependencies was given, false if
 #                      --no-conditional-dependencies was given, blank otherwise
 # - lgpl            yes or a number if --lgpl was given, blank otherwise
+# - gnu_make        true if --gnu-make was given, false otherwise
 # - makefile_name   from --makefile-name
 # - libtool         true if --libtool was given, false if --no-libtool was
 #                   given, blank otherwise
@@ -1049,10 +1085,14 @@ func_determine_path_separator
 #                   given, blank otherwise
 # - autoconf_minversion  minimum supported autoconf version
 # - doit            : if actions shall be executed, false if only to be printed
-# - symbolic        true if --symlink or --more-symlinks was given, blank
-#                   otherwise
-# - lsymbolic       true if --local-symlink was given, blank otherwise
-# - do_copyrights   blank if --more-symlinks was given, true otherwise
+# - copymode        symlink if --symlink or --more-symlinks was given,
+#                   hardlink if --hardlink or --more-hardlinks was given,
+#                   blank otherwise
+# - lcopymode       symlink if --local-symlink was given,
+#                   hardlink if --local-hardlink was given,
+#                   blank otherwise
+# - do_copyrights   blank if --more-symlinks or --more-hardlinks was given,
+#                   true otherwise
 {
   mode=
   destdir=
@@ -1082,6 +1122,7 @@ func_determine_path_separator
   avoidlist=
   cond_dependencies=
   lgpl=
+  gnu_make=false
   makefile_name=
   libtool=
   macro_prefix=
@@ -1089,8 +1130,8 @@ func_determine_path_separator
   witness_c_macro=
   vc_files=
   doit=:
-  symbolic=
-  lsymbolic=
+  copymode=
+  lcopymode=
   do_copyrights=true
 
   supplied_opts="$@"
@@ -1305,6 +1346,9 @@ func_determine_path_separator
         esac
         lgpl=$arg
         shift ;;
+      --gnu-make )
+        gnu_make=true
+        shift ;;
       --makefile-name )
         shift
         if test $# = 0; then
@@ -1364,16 +1408,26 @@ func_determine_path_separator
         doit=false
         shift ;;
       -s | --symbolic | --symboli | --symbol | --symbo | --symb | --symlink | --symlin | --symli | --syml | --sym | --sy )
-        symbolic=true
+        copymode=symlink
         shift ;;
       --local-symlink | --local-symlin | --local-symli | --local-syml | --local-sym | --local-sy | --local-s )
-        lsymbolic=true
+        lcopymode=symlink
         shift ;;
-      -S | --more-symlinks | --more-symlink | --more-symlin | --more-symli | --more-syml | --more-sym | --more-sy | --more-s | --more- | --more | --mor | --mo )
-        symbolic=true
+      -h | --hardlink | --hardlin | --hardli | --hardl | --hard | --har | --ha )
+        copymode=hardlink
+        shift ;;
+      --local-hardlink | --local-hardlin | --local-hardli | --local-hardl | --local-hard | --local-har | --local-ha | --local-h )
+        lcopymode=hardlink
+        shift ;;
+      -S | --more-symlinks | --more-symlink | --more-symlin | --more-symli | --more-syml | --more-sym | --more-sy | --more-s )
+        copymode=symlink
         do_copyrights=
         shift ;;
-      --help | --hel | --he | --h )
+      -H | --more-hardlinks | --more-hardlink | --more-hardlin | --more-hardli | --more-hardl | --more-hard | --more-har | --more-ha | --more-h )
+        copymode=hardlink
+        do_copyrights=
+        shift ;;
+      --help | --hel | --he )
         func_usage
         func_exit $? ;;
       --version | --versio | --versi | --vers )
@@ -2454,13 +2508,6 @@ func_get_automake_snippet_unconditional ()
         echo "EXTRA_DIST += "`echo "$buildaux_files" | sed -e "$sed_prepend_auxdir"`
         echo
       fi
-      # Synthesize an EXTRA_DIST augmentation also for the files from top/.
-      func_filter_filelist top_files "$nl" "$all_files" 'top/' '' 'top/' ''
-      if test -n "$top_files"; then
-        sed_prepend_topdir='s,^,$(top_srcdir)/,'
-        echo "EXTRA_DIST += "`echo "$top_files" | sed -e "$sed_prepend_topdir"`
-        echo
-      fi
       ;;
   esac
 }
@@ -2780,6 +2827,7 @@ sed_dependencies_without_conditions='s/ *\[.*//'
 # func_modules_transitive_closure
 # Input:
 # - local_gnulib_path  from --local-dir
+# - gnu_make        true if --gnu-make was given, false otherwise
 # - modcache        true or false, from --cache-modules/--no-cache-modules
 # - modules         list of specified modules
 # - inctests        true if tests should be included, false otherwise
@@ -2846,7 +2894,9 @@ func_modules_transitive_closure ()
         if func_acceptable $module; then
           func_append outmodules " $module"
           if test "$cond_dependencies" = true; then
-            if func_get_automake_snippet_conditional $module | grep '^if ' > /dev/null; then
+            if ! $gnu_make \
+               && func_get_automake_snippet_conditional $module \
+                  | grep '^if ' > /dev/null; then
               # A module whose Makefile.am snippet contains a reference to an
               # automake conditional. If we were to use it conditionally, we
               # would get an error
@@ -3045,6 +3095,18 @@ func_modules_transitive_closure_separately ()
                           fi
                         done \
                         | LC_ALL=C sort -u | LC_ALL=C join -v 2 - "$tmp"/final-modules`
+  # If testsrelated_modules consists only of modules with applicability 'all',
+  # set it to empty (because such modules are only helper modules for other modules).
+  have_nontrivial_testsrelated_modules=
+  for module in $testsrelated_modules; do
+    if test `func_get_applicability $module` != all; then
+      have_nontrivial_testsrelated_modules=yes
+      break
+    fi
+  done
+  if test -z "$have_nontrivial_testsrelated_modules"; then
+    testsrelated_modules=
+  fi
   if test $verbose -ge 1; then
     echo "Tests-related module list:"
     echo "$testsrelated_modules" | sed -e 's/^/  /'
@@ -3287,19 +3349,26 @@ func_is_local_file ()
   func_path_foreach "$local_gnulib_path" test %dir% = "$dname"
 }
 
-# func_should_symlink
-# returns 0 when the file $f should be symlinked
+# func_should_link
+# determines whether the file $f should be copied, symlinked, or hardlinked.
 # Input:
-# - symbolic        true if files should be symlinked, copied otherwise
-# - lsymbolic       true if files from local_gnulib_path should be symlinked,
-#                   copied otherwise
+# - copymode        copy mode for files in general
+# - lcopymode       copy mode for files from local_gnulib_path
 # - f               the original file name
 # - lookedup_file   name of the merged (combined) file
-func_should_symlink ()
+# Sets variable:
+# - copyaction      copy or symlink or hardlink
+func_should_link ()
 {
-  test -n "$symbolic" \
-    || { test -n "$lsymbolic" \
-         && func_is_local_file "$lookedup_file" "$f"; }
+  if test -n "$lcopymode" && func_is_local_file "$lookedup_file" "$f"; then
+    copyaction="$lcopymode"
+  else
+    if test -n "$copymode"; then
+      copyaction="$copymode"
+    else
+      copyaction=copy
+    fi
+  fi
 }
 
 # func_add_file
@@ -3315,19 +3384,25 @@ func_should_symlink ()
 # - g               the rewritten file name
 # - tmpfile         absolute filename of the temporary file
 # - doit            : if actions shall be executed, false if only to be printed
-# - symbolic        true if files should be symlinked, copied otherwise
-# - lsymbolic       true if files from local_gnulib_path should be symlinked,
-#                   copied otherwise
+# - copymode        copy mode for files in general
+# - lcopymode       copy mode for files from local_gnulib_path
 func_add_file ()
 {
   if $doit; then
     echo "Copying file $g"
-    if func_should_symlink \
+    func_should_link
+    if test "$copyaction" = symlink \
        && test -z "$lookedup_tmp" \
        && cmp -s "$lookedup_file" "$tmpfile"; then
-      func_ln_if_changed "$lookedup_file" "$destdir/$g"
+      func_symlink_if_changed "$lookedup_file" "$destdir/$g"
     else
-      mv -f "$tmpfile" "$destdir/${g}" || func_fatal_error "failed"
+      if test "$copyaction" = hardlink \
+         && test -z "$lookedup_tmp" \
+         && cmp -s "$lookedup_file" "$tmpfile"; then
+        func_hardlink "$lookedup_file" "$destdir/$g"
+      else
+        mv -f "$tmpfile" "$destdir/${g}" || func_fatal_error "failed"
+      fi
     fi
   else
     echo "Copy file $g"
@@ -3347,9 +3422,8 @@ func_add_file ()
 # - g               the rewritten file name
 # - tmpfile         absolute filename of the temporary file
 # - doit            : if actions shall be executed, false if only to be printed
-# - symbolic        true if files should be symlinked, copied otherwise
-# - lsymbolic       true if files from local_gnulib_path should be symlinked,
-#                   copied otherwise
+# - copymode        copy mode for files in general
+# - lcopymode       copy mode for files from local_gnulib_path
 # - already_present  nonempty if the file should already exist, empty otherwise
 func_update_file ()
 {
@@ -3364,12 +3438,19 @@ func_update_file ()
         echo "Replacing file $g (non-gnulib code backed up in ${g}~) !!"
       fi
       mv -f "$destdir/$g" "$destdir/${g}~" || func_fatal_error "failed"
-      if func_should_symlink \
+      func_should_link
+      if test "$copyaction" = symlink \
          && test -z "$lookedup_tmp" \
          && cmp -s "$lookedup_file" "$tmpfile"; then
-        func_ln_if_changed "$lookedup_file" "$destdir/$g"
+        func_symlink_if_changed "$lookedup_file" "$destdir/$g"
       else
-        mv -f "$tmpfile" "$destdir/${g}" || func_fatal_error "failed"
+        if test "$copyaction" = hardlink \
+           && test -z "$lookedup_tmp" \
+           && cmp -s "$lookedup_file" "$tmpfile"; then
+          func_hardlink "$lookedup_file" "$destdir/$g"
+        else
+          mv -f "$tmpfile" "$destdir/${g}" || func_fatal_error "failed"
+        fi
       fi
     else
       if test -n "$already_present"; then
@@ -3390,6 +3471,7 @@ func_update_file ()
 # - libname         library name
 # - pobase          directory relative to destdir where to place *.po files
 # - auxdir          directory relative to destdir where to place build aux files
+# - gnu_make        true if --gnu-make was given, false otherwise
 # - makefile_name   from --makefile-name
 # - libtool         true if libtool will be used, false or blank otherwise
 # - macro_prefix    prefix of gl_LIBOBJS macros to use
@@ -3407,9 +3489,10 @@ func_update_file ()
 # - uses_subdirs    nonempty if object files in subdirs exist
 func_emit_lib_Makefile_am ()
 {
-  # When creating an includable Makefile.am snippet, augment variables with
-  # += instead of assigning them.
-  if test -n "$makefile_name"; then
+
+  # When using GNU make, or when creating an includable Makefile.am snippet,
+  # augment variables with += instead of assigning them.
+  if $gnu_make || test -n "$makefile_name"; then
     assign='+='
   else
     assign='='
@@ -3474,20 +3557,33 @@ func_emit_lib_Makefile_am ()
         # Skip the contents if it's entirely empty.
         if grep '[^	 ]' "$tmp"/amsnippet1 "$tmp"/amsnippet2 > /dev/null ; then
           echo "## begin gnulib module $module"
+          if $gnu_make; then
+            echo "ifeq (,\$(OMIT_GNULIB_MODULE_$module))"
+            convert_to_gnu_make='s/^if \(.*\)/ifneq (,$(\1))/'
+          else
+            convert_to_gnu_make=
+          fi
           echo
           if test "$cond_dependencies" = true; then
             if func_cond_module_p "$module"; then
               func_module_conditional_name "$module"
-              echo "if $conditional"
+              if $gnu_make; then
+                echo "ifneq (,\$($conditional))"
+              else
+                echo "if $conditional"
+              fi
             fi
           fi
-          cat "$tmp"/amsnippet1
+          sed "$convert_to_gnu_make" "$tmp"/amsnippet1
           if test "$cond_dependencies" = true; then
             if func_cond_module_p "$module"; then
               echo "endif"
             fi
           fi
-          cat "$tmp"/amsnippet2
+          sed "$convert_to_gnu_make" "$tmp"/amsnippet2
+          if $gnu_make; then
+            echo "endif"
+          fi
           echo "## end   gnulib module $module"
           echo
         fi
@@ -3538,6 +3634,24 @@ func_emit_lib_Makefile_am ()
     echo "CLEANFILES ="
     echo "DISTCLEANFILES ="
     echo "MAINTAINERCLEANFILES ="
+  fi
+  if $gnu_make; then
+    echo "# Start of GNU Make output."
+
+    # Put autoconf output into a temporary file, so that its exit status
+    # can be checked from the shell.  Signal any error by putting a
+    # syntax error into the output makefile.
+    ${AUTOCONF} -t 'AC_SUBST:$1 = @$1@' "$configure_ac" \
+                >"$tmp"/makeout 2>"$tmp"/makeout2 &&
+      LC_ALL=C sort -u "$tmp"/makeout || {
+        echo "== gnulib-tool GNU Make output failed as follows =="
+        sed 's/^/# stderr: /' "$tmp"/makeout2
+      }
+    rm -f "$tmp"/makeout "$tmp"/makeout2
+
+    echo "# End of GNU Make output."
+  else
+    echo "# No GNU Make output."
   fi
   # Execute edits that apply to the Makefile.am being generated.
   edit=0
@@ -3713,6 +3827,7 @@ func_emit_po_POTFILES_in ()
 # - modules         list of modules, including dependencies
 # - libname         library name
 # - auxdir          directory relative to destdir where to place build aux files
+# - gnu_make        true if --gnu-make was given, false otherwise
 # - makefile_name   from --makefile-name
 # - libtool         true if libtool will be used, false or blank otherwise
 # - sourcebase      relative directory containing lib source code
@@ -3779,8 +3894,8 @@ func_emit_tests_Makefile_am ()
                 -e "$sed_transform_check_PROGRAMS" \
                 -e "$sed_replace_include_guard_prefix"
           if $use_libtests && test "$module" = 'alloca'; then
-            echo "libtests_a_LIBADD += @${perhapsLT}ALLOCA@"
-            echo "libtests_a_DEPENDENCIES += @${perhapsLT}ALLOCA@"
+            echo "libtests_a_LIBADD += @ALLOCA@"
+            echo "libtests_a_DEPENDENCIES += @ALLOCA@"
           fi
         } > "$tmp"/amsnippet
         # Skip the contents if it's entirely empty.
@@ -3794,8 +3909,14 @@ func_emit_tests_Makefile_am ()
             fi
           done
           { echo "## begin gnulib module $module"
+            if $gnu_make; then
+              echo "ifeq (,\$(OMIT_GNULIB_MODULE_$module))"
+            fi
             echo
             cat "$tmp"/amsnippet
+            if $gnu_make; then
+              echo "endif"
+            fi
             echo "## end   gnulib module $module"
             echo
           } >&$ofd
@@ -3837,6 +3958,7 @@ func_emit_tests_Makefile_am ()
   if ! $for_test; then
     echo "check_PROGRAMS ="
   fi
+  echo "EXTRA_PROGRAMS ="
   echo "noinst_HEADERS ="
   echo "noinst_LIBRARIES ="
   if $use_libtests; then
@@ -4352,9 +4474,8 @@ func_reconstruct_cached_local_gnulib_path ()
 #                   given, blank otherwise
 # - autoconf_minversion  minimum supported autoconf version
 # - doit            : if actions shall be executed, false if only to be printed
-# - symbolic        true if files should be symlinked, copied otherwise
-# - lsymbolic       true if files from local_gnulib_path should be symlinked,
-#                   copied otherwise
+# - copymode        copy mode for files in general
+# - lcopymode       copy mode for files from local_gnulib_path
 # - do_copyrights   true if copyright notices in files should be replaced,
 #                   blank otherwise
 func_import ()
@@ -4908,7 +5029,7 @@ s,^\(.................................................[^ ]*\) *,                
     exec 0<&5 5<&-
   }
 
-  # Copy files or make symbolic links. Remove obsolete files.
+  # Copy files or make symbolic links or hard links. Remove obsolete files.
   added_files=''
   removed_files=''
   delimiter='	'
@@ -5073,6 +5194,9 @@ s,^\(.................................................[^ ]*\) *,                
     else
       func_append actioncmd " --lgpl=$lgpl"
     fi
+  fi
+  if $gnu_make; then
+    func_append actioncmd " --gnu-make"
   fi
   if test -n "$makefile_name"; then
     func_append actioncmd " --makefile-name=$makefile_name"
@@ -5471,7 +5595,7 @@ s,//*$,/,'
 
     func_emit_pre_early_macros : '  ' "$final_modules"
 
-    if test -n "$uses_subdirs"; then
+    if ! $gnu_make && test -n "$uses_subdirs"; then
       echo "  AC_REQUIRE([AM_PROG_CC_C_O])"
     fi
     for module in $final_modules; do
@@ -5828,9 +5952,8 @@ s,//*$,/,'
 #                      --no-conditional-dependencies was given, blank otherwise
 # - libtool         true if --libtool was given, false if --no-libtool was
 #                   given, blank otherwise
-# - symbolic        true if files should be symlinked, copied otherwise
-# - lsymbolic       true if files from local_gnulib_path should be symlinked,
-#                   copied otherwise
+# - copymode        copy mode for files in general
+# - lcopymode       copy mode for files from local_gnulib_path
 func_create_testdir ()
 {
   testdir="$1"
@@ -5849,6 +5972,12 @@ func_create_testdir ()
 
   # Canonicalize the list of specified modules.
   specified_modules=`for m in $specified_modules; do echo $m; done | LC_ALL=C sort -u`
+
+  # Test modules which invoke AC_CONFIG_FILES cannot be used with
+  # --with-tests --single-configure. Avoid them.
+  if $inctests && $single_configure; then
+    avoidlist="$avoidlist havelib-tests"
+  fi
 
   # Unlike in func_import, here we want to include all kinds of tests for the
   # directly specified modules, but not for dependencies.
@@ -6002,7 +6131,7 @@ func_create_testdir ()
     exec 0<&5 5<&-
   }
 
-  # Copy files or make symbolic links.
+  # Copy files or make symbolic links or hard links.
   delimiter='	'
   for f in $files; do echo $f; done \
     | sed -e "s,^.*\$,&$delimiter&," -e "$sed_rewrite_files" \
@@ -6019,11 +6148,15 @@ func_create_testdir ()
       if test -n "$lookedup_tmp"; then
         cp -p "$lookedup_file" "$testdir/$g"
       else
-        ln "$lookedup_file" "$testdir/$g" 2>/dev/null ||
-        if func_should_symlink; then
-          func_ln "$lookedup_file" "$testdir/$g"
+        func_should_link
+        if test "$copyaction" = symlink; then
+          func_symlink "$lookedup_file" "$testdir/$g"
         else
-          cp -p "$lookedup_file" "$testdir/$g"
+          if test "$copyaction" = hardlink; then
+            func_hardlink "$lookedup_file" "$testdir/$g"
+          else
+            cp -p "$lookedup_file" "$testdir/$g"
+          fi
         fi
       fi
     done
@@ -6346,6 +6479,7 @@ func_create_testdir ()
    func_execute_command ${AUTOCONF} || func_exit 1
    func_execute_command ${AUTOHEADER} || func_exit 1
    func_execute_command ${AUTOMAKE} --add-missing --copy || func_exit 1
+   rm -rf autom4te.cache
   ) || func_exit 1
   if $inctests && ! $single_configure; then
     # Create autogenerated files.
@@ -6367,6 +6501,7 @@ func_create_testdir ()
      func_execute_command ${AUTOCONF} || func_exit 1
      func_execute_command ${AUTOHEADER} || func_exit 1
      func_execute_command ${AUTOMAKE} --add-missing --copy || func_exit 1
+     rm -rf autom4te.cache
     ) || func_exit 1
   fi
   # Need to run configure and make once, to create built files that are to be
@@ -6526,6 +6661,7 @@ func_create_megatestdir ()
    func_execute_command mkdir build-aux
    func_execute_command ${AUTOCONF} || func_exit 1
    func_execute_command ${AUTOMAKE} --add-missing --copy || func_exit 1
+   rm -rf autom4te.cache
   ) || func_exit 1
 }
 
@@ -6992,6 +7128,17 @@ s/\([.*$]\)/[\1]/g'
   * )
     func_fatal_error "unknown operation mode --$mode" ;;
 esac
+
+if test "$copymode" = hardlink -o "$lcopymode" = hardlink; then
+  # Setting hard links modifies the ctime of files in the gnulib checkout.
+  # This disturbs the result of the next "gitk" invocation.
+  # Workaround: Let git scan the files. This can be done through
+  # "git update-index --refresh" or "git status" or "git diff".
+  if test -d "$gnulib_dir"/.git \
+     && (git --version) >/dev/null 2>/dev/null; then
+    (cd "$gnulib_dir" && git update-index --refresh >/dev/null)
+  fi
+fi
 
 rm -rf "$tmp"
 # Undo the effect of the previous 'trap' command. Some shellology:

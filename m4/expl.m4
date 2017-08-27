@@ -1,4 +1,4 @@
-# expl.m4 serial 8
+# expl.m4 serial 10
 dnl Copyright (C) 2010-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -8,6 +8,7 @@ AC_DEFUN([gl_FUNC_EXPL],
 [
   AC_REQUIRE([gl_MATH_H_DEFAULTS])
   AC_REQUIRE([gl_LONG_DOUBLE_VS_DOUBLE])
+  AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
 
   dnl Persuade glibc <math.h> to declare expl().
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
@@ -70,9 +71,12 @@ AC_DEFUN([gl_FUNC_EXPL],
                       isnan(expl(-0.4)); ]])],
              [gl_cv_func_expl_buggy=no], [gl_cv_func_expl_buggy=yes],
              [case $host_os in
-                openbsd*) gl_cv_func_expl_buggy="guessing yes";;
-                *) gl_cv_func_expl_buggy="guessing no";;
-              esac])
+                openbsd*) gl_cv_func_expl_buggy="guessing yes" ;;
+                          # Guess no on native Windows.
+                mingw*)   gl_cv_func_expl_buggy="guessing no" ;;
+                *)        gl_cv_func_expl_buggy="guessing no" ;;
+              esac
+             ])
           LIBS="$save_LIBS"
         ])
     case "$gl_cv_func_expl_buggy" in

@@ -1,4 +1,4 @@
-# logbl.m4 serial 1
+# logbl.m4 serial 4
 dnl Copyright (C) 2012-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -54,8 +54,10 @@ AC_DEFUN([gl_FUNC_LOGBL],
 ])
 
 dnl Test whether logbl() works.
-dnl On glibc 2.11/ppc, glibc 2.7/sparc, glibc 2.7/hppa, Solaris 10/SPARC, the
-dnl return value for subnormal (denormalized) arguments is too large.
+dnl On glibc 2.11/powerpc, glibc 2.7/sparc, glibc 2.7/hppa, Solaris 10/SPARC,
+dnl the return value for subnormal (denormalized) arguments is too large.
+dnl On glibc 2.23/powerpc64le, the return value for negative subnormal arguments
+dnl is too large.
 AC_DEFUN([gl_FUNC_LOGBL_WORKS],
 [
   AC_REQUIRE([AC_PROG_CC])
@@ -71,7 +73,7 @@ AC_DEFUN([gl_FUNC_LOGBL_WORKS],
 # undef LDBL_MIN_EXP
 # define LDBL_MIN_EXP    (-16381)
 #endif
-#if defined __i386__ && defined __FreeBSD__
+#if defined __i386__ && (defined __FreeBSD__ || defined __DragonFly__)
 # undef LDBL_MIN_EXP
 # define LDBL_MIN_EXP    (-16381)
 #endif
@@ -94,14 +96,21 @@ int main ()
     if ((i == LDBL_MIN_EXP - 1 || i == LDBL_MIN_EXP - 54)
         && (x > 0.0L && !(logbl (x) == (long double)(i - 1))))
       return 1;
+  for (i = 1, x = -1.0L; i >= LDBL_MIN_EXP - 54; i--, x *= 0.5L)
+    /* Either x = -2^(i-1) or x = 0.0.  */
+    if ((i == LDBL_MIN_EXP - 1 || i == LDBL_MIN_EXP - 54)
+        && (x < 0.0L && !(logbl (x) == (long double)(i - 1))))
+      return 1;
   return 0;
 }
 ]])],
         [gl_cv_func_logbl_works=yes],
         [gl_cv_func_logbl_works=no],
         [case "$host_os" in
-           *gnu* | solaris*) gl_cv_func_logbl_works="guessing no";;
-           *)                gl_cv_func_logbl_works="guessing yes";;
+           *gnu* | solaris*) gl_cv_func_logbl_works="guessing no" ;;
+                             # Guess yes on native Windows.
+           mingw*)           gl_cv_func_logbl_works="guessing yes" ;;
+           *)                gl_cv_func_logbl_works="guessing yes" ;;
          esac
         ])
     ])

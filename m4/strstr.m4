@@ -1,4 +1,4 @@
-# strstr.m4 serial 17
+# strstr.m4 serial 19
 dnl Copyright (C) 2008-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -9,7 +9,7 @@ AC_DEFUN([gl_FUNC_STRSTR_SIMPLE],
 [
   AC_REQUIRE([gl_HEADER_STRING_H_DEFAULTS])
   AC_REQUIRE([gl_FUNC_MEMCHR])
-  if test "$gl_cv_func_memchr_works" != yes; then
+  if test $HAVE_MEMCHR = 0 || test $REPLACE_MEMCHR = 1; then
     REPLACE_STRSTR=1
   else
     dnl Detect http://sourceware.org/bugzilla/show_bug.cgi?id=12092.
@@ -99,6 +99,9 @@ static void quit (int sig) { _exit (sig + 128); }
         if (!strstr (haystack, needle))
           result |= 1;
       }
+    /* Free allocated memory, in case some sanitizer is watching.  */
+    free (haystack);
+    free (needle);
     return result;
     ]])],
         [gl_cv_func_strstr_linear=yes], [gl_cv_func_strstr_linear=no],

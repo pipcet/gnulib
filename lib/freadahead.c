@@ -22,6 +22,11 @@
 #include <stdlib.h>
 #include "stdio-impl.h"
 
+#if defined __DragonFly__
+/* Defined in libc, but not declared in <stdio.h>.  */
+extern size_t __sreadahead (FILE *);
+#endif
+
 size_t
 freadahead (FILE *fp)
 {
@@ -53,7 +58,7 @@ freadahead (FILE *fp)
   if ((fp_->_flags & _IOWRITING) != 0)
     return 0;
   return fp_->_count;
-#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel */
+#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel, OpenVMS */
   if ((fp_->_flag & _IOWRT) != 0)
     return 0;
   return fp_->_cnt;

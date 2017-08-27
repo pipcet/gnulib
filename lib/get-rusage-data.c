@@ -83,7 +83,10 @@
      a) setrlimit with RLIMIT_DATA works, except on HP-UX 11.00, where it
         cannot restore the previous limits, and except on HP-UX 11.11, where
         it sometimes has no effect.
-     b) No VMA iteration API exists.
+     b) pstat_getprocvm() can be used to find out about the virtual memory
+        areas.
+     Both methods agree, except that the value of get_rusage_data_via_iterator()
+     is sometimes 4 KB larger than get_rusage_data_via_setrlimit().
 
    IRIX:
      a) setrlimit with RLIMIT_DATA works.
@@ -98,7 +101,10 @@
 
    Solaris:
      a) setrlimit with RLIMIT_DATA works.
-     b) No VMA iteration API exists.
+     b) The /proc/$pid file supports ioctls PIOCNMAP and PIOCMAP, and the
+        /proc/self/maps file contains a list of the virtual memory areas.
+     get_rusage_data_via_setrlimit() ignores the data segment of the executable,
+     whereas get_rusage_data_via_iterator() includes it.
 
    Cygwin:
      a) setrlimit with RLIMIT_DATA always fails.
@@ -142,13 +148,16 @@
 #include "vma-iter.h"
 
 
-#if HAVE_SETRLIMIT && defined RLIMIT_DATA
+#if !(defined __APPLE__ && defined __MACH__) || defined TEST
+/* Implement get_rusage_data_via_setrlimit().  */
 
-# ifdef _AIX
-#  define errno_expected() (errno == EINVAL || errno == EFAULT)
-# else
-#  define errno_expected() (errno == EINVAL)
-# endif
+# if HAVE_SETRLIMIT && defined RLIMIT_DATA
+
+#  ifdef _AIX
+#   define errno_expected() (errno == EINVAL || errno == EFAULT)
+#  else
+#   define errno_expected() (errno == EINVAL)
+#  endif
 
 static uintptr_t
 get_rusage_data_via_setrlimit (void)
@@ -157,7 +166,7 @@ get_rusage_data_via_setrlimit (void)
 
   struct rlimit orig_limit;
 
-# ifdef __hpux
+#  ifdef __hpux
   /* On HP-UX 11.00, setrlimit() RLIMIT_DATA of does not work: It cannot
      restore the previous limits.
      On HP-UX 11.11, setrlimit() RLIMIT_DATA of does not work: It sometimes
@@ -171,7 +180,7 @@ get_rusage_data_via_setrlimit (void)
             || strcmp (buf.release + strlen (buf.release) - 5, "11.11") == 0))
       return 0;
   }
-# endif
+#  endif
 
   /* Record the original limit.  */
   if (getrlimit (RLIMIT_DATA, &orig_limit) < 0)
@@ -304,7 +313,7 @@ get_rusage_data_via_setrlimit (void)
   return result;
 }
 
-#else
+# else
 
 static uintptr_t
 get_rusage_data_via_setrlimit (void)
@@ -312,10 +321,15 @@ get_rusage_data_via_setrlimit (void)
   return 0;
 }
 
+# endif
+
 #endif
 
 
-#if VMA_ITERATE_SUPPORTED
+#if !(defined __APPLE__ && defined __MACH__) || defined TEST
+/* Implement get_rusage_data_via_iterator().  */
+
+# if VMA_ITERATE_SUPPORTED
 
 struct locals
 {
@@ -340,7 +354,7 @@ vma_iterate_callback (void *data, uintptr_t start, uintptr_t end,
 static uintptr_t
 get_rusage_data_via_iterator (void)
 {
-# if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __BEOS__ || defined __HAIKU__
+#  if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __BEOS__ || defined __HAIKU__
   /* On native Windows, there is no sbrk() function.
      On Haiku, sbrk(0) always returns 0.  */
   static void *brk_value;
@@ -351,13 +365,13 @@ get_rusage_data_via_iterator (void)
       if (brk_value == NULL)
         return 0;
     }
-# else
+#  else
   void *brk_value;
 
   brk_value = sbrk (0);
   if (brk_value == (void *)-1)
     return 0;
-# endif
+#  endif
 
   {
     struct locals l;
@@ -370,7 +384,7 @@ get_rusage_data_via_iterator (void)
   }
 }
 
-#else
+# else
 
 static uintptr_t
 get_rusage_data_via_iterator (void)
@@ -378,18 +392,25 @@ get_rusage_data_via_iterator (void)
   return 0;
 }
 
+# endif
+
 #endif
 
 
 uintptr_t
 get_rusage_data (void)
 {
-#if (defined __APPLE__ && defined __MACH__) || defined __CYGWIN__ /* Mac OS X, Cygwin */
+#if (defined __APPLE__ && defined __MACH__) /* Mac OS X */
+  /* get_rusage_data_via_setrlimit() does not work: it always returns 0.
+     get_rusage_data_via_iterator() does not work: it always returns 0x400000.
+     And sbrk() is deprecated.  */
+  return 0;
+#elif defined __CYGWIN__ /* Cygwin */
   /* get_rusage_data_via_setrlimit() does not work.
      Prefer get_rusage_data_via_iterator().  */
   return get_rusage_data_via_iterator ();
 #elif HAVE_SETRLIMIT && defined RLIMIT_DATA
-# if defined __linux__ || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__ || defined _AIX || defined __sgi || defined __osf__ || defined __sun /* Linux, FreeBSD, NetBSD, OpenBSD, AIX, IRIX, OSF/1, Solaris */
+# if defined __linux__ || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__ || defined _AIX || defined __hpux || defined __sgi || defined __osf__ || defined __sun /* Linux, FreeBSD, NetBSD, OpenBSD, AIX, HP-UX, IRIX, OSF/1, Solaris */
   /* get_rusage_data_via_setrlimit() works.  */
   return get_rusage_data_via_setrlimit ();
 # else

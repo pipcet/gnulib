@@ -46,6 +46,8 @@ enum backup_type
 
 extern char const *simple_backup_suffix;
 
+void set_simple_backup_suffix (char const *);
+char *backup_file_rename (char const *, enum backup_type);
 char *find_backup_file_name (char const *, enum backup_type);
 enum backup_type get_version (char const *context, char const *arg);
 enum backup_type xget_version (char const *context, char const *arg);

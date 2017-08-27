@@ -102,6 +102,7 @@
   __dcgettext (_libc_intl_domainname, msgid, LC_MESSAGES)
 # endif
 #else
+# undef gettext
 # define gettext(msgid) (msgid)
 #endif
 
@@ -896,6 +897,14 @@ re_string_elem_size_at (const re_string_t *pstr, Idx idx)
    __attribute__ ((__warn_unused_result__))
 #else
 # define __attribute_warn_unused_result__ /* empty */
+#endif
+
+#ifndef FALLTHROUGH
+# if __GNUC__ < 7
+#  define FALLTHROUGH ((void) 0)
+# else
+#  define FALLTHROUGH __attribute__ ((__fallthrough__))
+# endif
 #endif
 
 #endif /*  _REGEX_INTERNAL_H */

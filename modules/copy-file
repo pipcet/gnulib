@@ -9,6 +9,7 @@ m4/copy-file.m4
 Depends-on:
 acl
 binary-io
+close
 error
 fstat
 full-write
@@ -17,8 +18,10 @@ ignore-value
 open
 quote
 safe-read
+stat-time
 stdlib
 unistd
+utimens
 xalloc
 
 configure.ac:

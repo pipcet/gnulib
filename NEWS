@@ -42,6 +42,16 @@ User visible incompatible changes
 
 Date        Modules         Changes
 
+2017-08-14  fcntl-h         This module now defaults O_CLOEXEC to a nonzero
+                            value instead of to 0, as the 'open' and
+                            'openat' modules now emulate O_CLOEXEC.
+
+2017-07-23  strftime        This module is renamed to 'nstrftime'.
+
+2017-05-19  closeout        close_stdout longer closes stderr when addresses
+                            are being sanitized, as the sanitizer outputs to
+                            stderr afterwards.
+
 2017-02-16  binary-io       On MS-DOS and OS/2, set_binary_mode now fails
                             on ttys, and sets errno == EINVAL.
 

@@ -1,4 +1,4 @@
-# fmal.m4 serial 4
+# fmal.m4 serial 6
 dnl Copyright (C) 2011-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -88,7 +88,7 @@ AC_DEFUN([gl_FUNC_FMAL_WORKS],
 # undef LDBL_MAX_EXP
 # define LDBL_MAX_EXP    16384
 #endif
-#if defined __i386__ && defined __FreeBSD__
+#if defined __i386__ && (defined __FreeBSD__ || defined __DragonFly__)
 # undef LDBL_MANT_DIG
 # define LDBL_MANT_DIG   64
 # undef LDBL_MIN_EXP
@@ -369,8 +369,18 @@ int main()
 }]])],
         [gl_cv_func_fmal_works=yes],
         [gl_cv_func_fmal_works=no],
-        [dnl Guess no, even on glibc systems.
+        [dnl Guess yes on native Windows with MSVC.
+         dnl Otherwise guess no, even on glibc systems.
          gl_cv_func_fmal_works="guessing no"
+         case "$host_os" in
+           mingw*)
+             AC_EGREP_CPP([Known], [
+#ifdef _MSC_VER
+ Known
+#endif
+               ], [gl_cv_func_fmal_works="guessing yes"])
+             ;;
+         esac
         ])
     ])
   LIBS="$save_LIBS"

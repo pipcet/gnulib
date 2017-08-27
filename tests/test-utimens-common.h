@@ -22,6 +22,7 @@
 # include <fcntl.h>
 # include <errno.h>
 # include <string.h>
+# include <sys/stat.h>
 # include <unistd.h>
 
 /* Gnulib modules.  */
@@ -51,7 +52,8 @@ enum {
 # if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
 /* Skip ctime tests on native Windows, since it is either a copy of
    mtime or birth time (depending on the file system), rather than a
-   properly tracked change time.  */
+   properly tracked change time.  See
+   <https://msdn.microsoft.com/en-us/library/14h5k7ff(VS.80).aspx>.  */
 #  define check_ctime 0
 # else
 #  define check_ctime 1

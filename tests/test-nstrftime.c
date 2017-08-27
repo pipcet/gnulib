@@ -1,4 +1,4 @@
-/* Test that posixtime works as required.
+/* Test that nstrftime works as required.
    Copyright (C) 2011-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify

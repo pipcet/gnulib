@@ -59,8 +59,10 @@
      */
 #   undef getcwd
 #  endif
-#  ifdef VMS
-    /* We want the directory in Unix syntax, not in VMS syntax.  */
+#  if defined VMS && !defined getcwd
+    /* We want the directory in Unix syntax, not in VMS syntax.
+       The gnulib override of 'getcwd' takes 2 arguments; the original VMS
+       'getcwd' takes 3 arguments.  */
 #   define __getcwd(buf, max) getcwd (buf, max, 0)
 #  else
 #   define __getcwd getcwd
@@ -268,6 +270,8 @@ __realpath (const char *name, char *resolved)
 #endif
           *dest = '\0';
 
+          /* FIXME: if lstat fails with errno == EOVERFLOW,
+             the entry exists.  */
 #ifdef _LIBC
           if (__lxstat64 (_STAT_VER, rpath, &st) < 0)
 #else

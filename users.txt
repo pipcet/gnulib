@@ -29,6 +29,7 @@ The following packages appear to be using gnulib and gnulib-tool:
                   https://gitlab.com/gnutls/gnutls.git
   gpg             https://gnupg.org/
                   https://git.gnupg.org/
+  grub            https://git.savannah.gnu.org/cgit/grub.git
   gsasl           https://git.sv.gnu.org/gitweb/?p=gsasl.git
   gss             https://git.sv.gnu.org/gitweb/?p=gss.git
   gtkreindeer     https://git.sv.gnu.org/gitweb/?p=gtkreindeer.git
@@ -57,7 +58,7 @@ The following packages appear to be using gnulib and gnulib-tool:
   libtasn1        https://git.savannah.gnu.org/gitweb/?p=libtasn1.git
   libunistring    https://git.sv.gnu.org/gitweb/?p=libunistring.git
   libvirt         https://libvirt.org/
-                  http://git.et.redhat.com/?p=libvirt.git;a=summary
+                  https://libvirt.org/git/?p=libvirt.git;a=summary
   m4              https://git.sv.gnu.org/gitweb/?p=m4.git;a=summary
   mailfromd       http://svn.gnu.org.ua/viewvc/mailfromd/trunk/
   mailutils       https://git.sv.gnu.org/gitweb/?p=mailutils.git

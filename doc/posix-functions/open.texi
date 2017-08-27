@@ -9,6 +9,9 @@ Gnulib module: open, fchdir
 Portability problems fixed by the Gnulib module open:
 @itemize
 @item
+Some platforms do not support @code{O_CLOEXEC}:
+Mac OS X 10.5, FreeBSD 6.0, NetBSD 5.0, OpenBSD 3.8, Minix 3.1.8, AIX 5.1, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 10, Cygwin, mingw, MSVC 14, Interix 3.5.
+@item
 On platforms where @code{off_t} is a 32-bit type, @code{open} may not work
 correctly with files larger than 2 GB.  (Cf. @code{AC_SYS_LARGEFILE}.)
 @item
@@ -19,7 +22,7 @@ FreeBSD 7.2, AIX 7.1, HP-UX 11.00, Solaris 9, Irix 5.3.
 @item
 This function does not support the @code{O_NONBLOCK} flag when it is defined
 by the gnulib module @code{nonblocking} on some platforms:
-mingw, MSVC 9.
+mingw, MSVC 14.
 @item
 On Windows platforms (excluding Cygwin), this function does usually not
 recognize the @file{/dev/null} filename.
@@ -34,6 +37,9 @@ read-only descriptor for directories.
 
 Portability problems not fixed by Gnulib:
 @itemize
+@item
+The Gnulib replacement for @code{O_CLOEXEC} is not atomic, and so is
+not safe in the presence of multiple threads or signal handlers.
 @item
 @code{open ("symlink", O_NOFOLLOW ...)} fails with @code{errno} set to
 @code{EMLINK} instead of the POSIX-required @code{ELOOP} on some

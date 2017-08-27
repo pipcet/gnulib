@@ -3,16 +3,16 @@
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2.1 of the License, or
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License
+   You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 
@@ -542,27 +542,26 @@ relocate (const char *pathname)
 # ifdef __KLIBC__
 #  undef strncmp
 
-  if (pathname && strncmp (pathname, "/@unixroot", 10) == 0
-      && (pathname[10] == '\0' || pathname[10] == '/' || pathname[10] == '\\'))
+  if (strncmp (pathname, "/@unixroot", 10) == 0
+      && (pathname[10] == '\0' || ISSLASH (pathname[10])))
     {
       /* kLIBC itself processes /@unixroot prefix */
-
       return pathname;
     }
   else
 # endif
-  if (pathname && ISSLASH (pathname[0]))
+  if (ISSLASH (pathname[0]))
     {
       const char *unixroot = getenv ("UNIXROOT");
 
-      if (unixroot && HAS_DEVICE (unixroot) && !unixroot[2])
+      if (unixroot && HAS_DEVICE (unixroot) && unixroot[2] == '\0')
         {
           char *result = (char *) xmalloc (2 + strlen (pathname) + 1);
 #ifdef NO_XMALLOC
           if (result != NULL)
 #endif
             {
-              strcpy (result, unixroot);
+              memcpy (result, unixroot, 2);
               strcpy (result + 2, pathname);
               return result;
             }
@@ -572,6 +571,19 @@ relocate (const char *pathname)
 
   /* Nothing to relocate.  */
   return pathname;
+}
+
+/* Returns the pathname, relocated according to the current installation
+   directory.
+   This function sets *ALLOCATEDP to the allocated memory, or to NULL if
+   no memory allocation occurs.  So that, after you're done with the return
+   value, to reclaim allocated memory, you can do: free (*ALLOCATEDP).  */
+const char *
+relocate2 (const char *pathname, char **allocatedp)
+{
+  const char *result = relocate (pathname);
+  *allocatedp = (result != pathname ? (char *) result : NULL);
+  return result;
 }
 
 #endif

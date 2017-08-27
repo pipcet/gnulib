@@ -8,7 +8,7 @@ Portability problems fixed by either Gnulib module @code{vasprintf} or @code{vas
 @itemize
 @item
 This function is missing on some platforms:
-AIX 5.1, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 10, mingw, MSVC 9, Interix 3.5.
+AIX 5.1, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 10, mingw, MSVC 14, Interix 3.5.
 @end itemize
 
 Portability problems fixed by Gnulib module @code{vasprintf-posix}:
@@ -45,6 +45,10 @@ NetBSD 3.0, BeOS.
 @item
 This function doesn't support the @code{'} flag on some platforms:
 NetBSD 3.0, Cygwin 1.5.24.
+@item
+This function does not round the argument of the @samp{a} directive correctly
+on some platforms:
+Mac OS X 10.12, FreeBSD 6.1.
 @item
 printf @code{"%010f"} of NaN and Infinity yields an incorrect result (padded
 with zeroes) on some platforms:
