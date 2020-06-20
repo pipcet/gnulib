@@ -1,5 +1,5 @@
 /* arctwo.h --- The arctwo block cipher
- * Copyright (C) 2000-2003, 2005, 2009-2017 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2003, 2005, 2009-2020 Free Software Foundation, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -12,7 +12,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this file; if not, see <http://www.gnu.org/licenses/>.
+ * along with this file; if not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -48,7 +48,7 @@ arctwo_setkey_ekb (arctwo_context *context,
    arctwo_setkey_ekb. */
 extern void
 arctwo_encrypt (arctwo_context *context, const char *inbuf,
-                char *outbuf, size_t length);
+                char *restrict outbuf, size_t length);
 
 /* Decrypt INBUF of size LENGTH into OUTBUF.  LENGTH must be a
    multiple of ARCTWO_BLOCK_SIZE.  CONTEXT hold the decryption key,
@@ -56,6 +56,6 @@ arctwo_encrypt (arctwo_context *context, const char *inbuf,
    arctwo_setkey_ekb. */
 extern void
 arctwo_decrypt (arctwo_context *context, const char *inbuf,
-                char *outbuf, size_t length);
+                char *restrict outbuf, size_t length);
 
 #endif /* ARCTWO_H */

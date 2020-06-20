@@ -6,12 +6,14 @@ lib/getcwd.c
 m4/getcwd-abort-bug.m4
 m4/getcwd-path-max.m4
 m4/getcwd.m4
+m4/getpagesize.m4
 m4/pathmax.m4
 
 Depends-on:
 unistd
 extensions
 pathmax         [test $REPLACE_GETCWD = 1]
+msvc-inval      [test $REPLACE_GETCWD = 1]
 mempcpy         [test $REPLACE_GETCWD = 1]
 d-ino           [test $REPLACE_GETCWD = 1]
 memmove         [test $REPLACE_GETCWD = 1]

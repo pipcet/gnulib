@@ -1,6 +1,6 @@
 /* Macros for declaring functions as non-returning.
 
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert and Bruno Haible.  */
 
@@ -74,6 +74,9 @@
 # if (__cplusplus >= 201103 && !(__GNUC__ == 4 && __GNUC_MINOR__ == 7)) \
      || (_MSC_VER >= 1900)
 #  define _GL_NORETURN_FUNC [[noreturn]]
+  /* clang++ supports the _Noreturn keyword, but g++ doesn't.  */
+# elif defined __clang__
+#  define _GL_NORETURN_FUNC _Noreturn
 # else
 #  define _GL_NORETURN_FUNC /* empty */
 # endif

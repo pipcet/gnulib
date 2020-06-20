@@ -1,5 +1,5 @@
 /* Locale dependent memory area transformation for comparison.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
@@ -12,7 +12,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef AMEMXFRM_H
 #define AMEMXFRM_H
@@ -38,7 +38,8 @@ extern "C" {
    freshly allocated string is returned.  In both cases, *lengthp is set to the
    length of the returned string.
    Upon failure, return NULL, with errno set.  */
-extern char * amemxfrm (char *s, size_t n, char *resultbuf, size_t *lengthp);
+extern char * amemxfrm (char *restrict s, size_t n,
+                        char *restrict resultbuf, size_t *lengthp);
 
 
 #ifdef __cplusplus

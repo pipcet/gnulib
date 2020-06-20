@@ -2,7 +2,7 @@
 @section @code{wcswcs}
 @findex wcswcs
 
-POSIX specification: @url{http://www.opengroup.org/susv3xsh/wcswcs.html}
+POSIX specification: @url{https://pubs.opengroup.org/onlinepubs/009695399/functions/wcswcs.html}
 
 Gnulib module: ---
 
@@ -14,11 +14,11 @@ Portability problems not fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-Mac OS X 10.5, FreeBSD 6.0, IRIX 5.3, Solaris 2.5.1, Cygwin, mingw, MSVC 14, BeOS.
+Mac OS X 10.5, FreeBSD 6.0, Cygwin, mingw, MSVC 14, Android 9.0.
 @item
-On AIX and Windows platforms, @code{wchar_t} is a 16-bit type and therefore cannot
+On Windows and 32-bit AIX platforms, @code{wchar_t} is a 16-bit type and therefore cannot
 accommodate all Unicode characters.
 @item
-This function is marked as ``legacy'' in POSIX.  Better use @code{wcsstr}
+This function is marked as ``legacy'' in POSIX@.  Better use @code{wcsstr}
 instead.
 @end itemize

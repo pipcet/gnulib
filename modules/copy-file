@@ -10,6 +10,7 @@ Depends-on:
 acl
 binary-io
 close
+copy-file-range
 error
 fstat
 full-write
@@ -22,7 +23,6 @@ stat-time
 stdlib
 unistd
 utimens
-xalloc
 
 configure.ac:
 gl_COPY_FILE
@@ -32,6 +32,9 @@ lib_SOURCES += copy-file.h copy-file.c
 
 Include:
 "copy-file.h"
+
+Link:
+$(LIB_MBRTOWC)
 
 License:
 GPL

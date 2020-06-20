@@ -1,5 +1,5 @@
 /* Sequential list data type backed by another list.
-   Copyright (C) 2006, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _GL_SUBLIST_H
 #define _GL_SUBLIST_H
@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 
-/* Create a sublist of a given list.
+/* Creates a sublist of a given list.
    This is the list of elements with indices i, start_index <= i < end_index.
    The sublist is backed by the given list, which means:
      - Modifications to the sublist affect the whole list.
@@ -37,7 +37,7 @@ extern "C" {
 extern gl_list_t gl_sublist_create (gl_list_t whole_list,
                                     size_t start_index, size_t end_index);
 #endif
-/* Likewise.  Return NULL upon out-of-memory.  */
+/* Likewise.  Returns NULL upon out-of-memory.  */
 extern gl_list_t gl_sublist_nx_create (gl_list_t whole_list,
                                        size_t start_index, size_t end_index);
 

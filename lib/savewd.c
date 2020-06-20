@@ -1,6 +1,6 @@
 /* Save and restore the working directory, possibly using a child process.
 
-   Copyright (C) 2006-2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
 
@@ -33,16 +33,9 @@
 #include <unistd.h>
 
 #include "assure.h"
-#include "dosname.h"
+#include "attribute.h"
 #include "fcntl-safer.h"
-
-#ifndef FALLTHROUGH
-# if __GNUC__ < 7
-#  define FALLTHROUGH ((void) 0)
-# else
-#  define FALLTHROUGH __attribute__ ((__fallthrough__))
-# endif
-#endif
+#include "filename.h"
 
 /* Save the working directory into *WD, if it hasn't been saved
    already.  Return true if a child has been forked to do the real

@@ -2,7 +2,7 @@
 @section @code{mblen}
 @findex mblen
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/mblen.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/mblen.html}
 
 Gnulib module: ---
 
@@ -12,4 +12,7 @@ Portability problems fixed by Gnulib:
 
 Portability problems not fixed by Gnulib:
 @itemize
+@item
+This function is missing on some platforms:
+Android 7.1.
 @end itemize

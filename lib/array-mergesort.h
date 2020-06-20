@@ -1,5 +1,5 @@
 /* Stable-sorting of an array using mergesort.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* This file implements stable sorting of an array, using the mergesort
    algorithm.
@@ -29,6 +29,8 @@
                   respectively, less, equal, or greater than the element
                   pointed to by the second argument.
      STATIC       The storage class of the functions being defined.
+     STATIC_FROMTO  (Optional.) Overrides STATIC for the 'merge_sort_fromto'
+                    function.
    Before including this file, you also need to include:
      #include <stddef.h>
  */
@@ -87,7 +89,12 @@ merge (const ELEMENT *src1, size_t n1,
 /* Sort src[0..n-1] into dst[0..n-1], using tmp[0..n/2-1] as temporary
    (scratch) storage.
    The arrays src, dst, tmp must not overlap.  */
-STATIC void
+#ifdef STATIC_FROMTO
+STATIC_FROMTO
+#else
+STATIC
+#endif
+void
 merge_sort_fromto (const ELEMENT *src, ELEMENT *dst, size_t n, ELEMENT *tmp)
 {
   switch (n)

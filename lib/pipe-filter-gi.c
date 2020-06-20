@@ -1,5 +1,5 @@
 /* Filtering of data through a subprocess.
-   Copyright (C) 2001-2003, 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2008-2020 Free Software Foundation, Inc.
    Written by Paolo Bonzini <bonzini@gnu.org>, 2009,
    and Bruno Haible <bruno@clisp.org>, 2009.
 
@@ -14,7 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
 # include <windows.h>
 #else
 # include <signal.h>
@@ -66,7 +66,7 @@ struct pipe_filter_gi
   volatile bool reader_terminated;
   volatile int reader_errno;
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
   CRITICAL_SECTION lock; /* protects the volatile fields */
   HANDLE reader_thread_handle;
 #else
@@ -95,7 +95,7 @@ static void filter_cleanup (struct pipe_filter_gi *filter,
                             bool finish_reading);
 
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
 /* Native Windows API.  */
 
 static unsigned int WINAPI
@@ -221,7 +221,7 @@ filter_cleanup (struct pipe_filter_gi *filter, bool finish_reading)
 static int
 filter_init (struct pipe_filter_gi *filter)
 {
-#if !((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)
+#if !(defined _WIN32 && ! defined __CYGWIN__)
   /* When we write to the child process and it has just terminated,
      we don't want to die from a SIGPIPE signal.  So set the SIGPIPE
      handler to SIG_IGN, and handle EPIPE error codes in write().  */

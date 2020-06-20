@@ -1,5 +1,5 @@
 /* rijndael-api-fst.h --- Rijndael cipher implementation.
- * Copyright (C) 2005, 2009-2017 Free Software Foundation, Inc.
+ * Copyright (C) 2005, 2009-2020 Free Software Foundation, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -12,7 +12,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this file; if not, see <http://www.gnu.org/licenses/>.
+ * along with this file; if not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -157,7 +157,7 @@ extern int
 rijndaelBlockEncrypt (rijndaelCipherInstance *cipher,
                       const rijndaelKeyInstance *key,
                       const char *input, size_t inputLen,
-                      char *outBuffer);
+                      char *restrict outBuffer);
 
 /* Encrypt data in INPUT, of INPUTOCTETS bytes length, placing the
    output in the pre-allocated OUTBUFFER which must hold at least
@@ -172,7 +172,7 @@ extern int
 rijndaelPadEncrypt (rijndaelCipherInstance *cipher,
                     const rijndaelKeyInstance *key,
                     const char *input, size_t inputOctets,
-                    char *outBuffer);
+                    char *restrict outBuffer);
 
 /* Decrypt data in INPUT, of INPUTLEN/8 bytes length, placing the
    output in the pre-allocated OUTBUFFER which must hold at least
@@ -185,7 +185,7 @@ extern int
 rijndaelBlockDecrypt (rijndaelCipherInstance *cipher,
                       const rijndaelKeyInstance *key,
                       const char *input, size_t inputLen,
-                      char *outBuffer);
+                      char *restrict outBuffer);
 
 /* Decrypt data in INPUT, of INPUTOCTETS bytes length, placing the
    output in the pre-allocated OUTBUFFER which must hold at least
@@ -200,6 +200,6 @@ extern int
 rijndaelPadDecrypt (rijndaelCipherInstance *cipher,
                     const rijndaelKeyInstance *key,
                     const char *input, size_t inputOctets,
-                    char *outBuffer);
+                    char *restrict outBuffer);
 
 #endif /* __RIJNDAEL_API_FST_H */

@@ -2,7 +2,7 @@
 @section @code{strftime}
 @findex strftime
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/strftime.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/strftime.html}
 
 Gnulib module: strftime-fixes
 
@@ -21,7 +21,7 @@ support the %e specifier (and possibly the other more recent SUS
 specifiers too, i.e., %C, %D, %h, %n, %r, %R, %t, and %T).
 @item
 Native Windows platforms (mingw, MSVC) support only a subset of time
-zones supported by GNU or specified by POSIX.  @xref{tzset}.
+zones supported by GNU or specified by POSIX@.  @xref{tzset}.
 @end itemize
 
 Extension: Gnulib offers a module @samp{nstrftime} that provides an

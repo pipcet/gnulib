@@ -3,6 +3,7 @@ Compute hashed message authentication codes with SHA256.
 
 Files:
 lib/hmac.h
+lib/hmac.c
 lib/hmac-sha256.c
 
 Depends-on:
@@ -10,6 +11,7 @@ memxor
 crypto/sha256
 
 configure.ac:
+AC_REQUIRE([AC_C_RESTRICT])
 
 Makefile.am:
 lib_SOURCES += hmac-sha256.c

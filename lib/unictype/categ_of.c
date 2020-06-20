@@ -1,5 +1,5 @@
 /* Categories of Unicode characters.
-   Copyright (C) 2002, 2006-2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006-2007, 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -39,7 +39,7 @@ lookup_withtable (ucs4_t uc)
               unsigned int index3 = ((uc & category_header_4) + lookup2) * 5;
               /* level3 contains 5-bit values, packed into 16-bit words.  */
               unsigned int lookup3 =
-                ((u_category.level3[index3>>4]
+                (((unsigned int) u_category.level3[index3>>4]
                   | ((unsigned int) u_category.level3[(index3>>4)+1] << 16))
                  >> (index3 % 16))
                 & 0x1f;

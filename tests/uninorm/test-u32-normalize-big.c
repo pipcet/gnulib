@@ -1,5 +1,5 @@
 /* Test of Unicode compliance of normalization of UTF-32 strings.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2009.  */
 
@@ -297,8 +297,34 @@ test_other (const struct normalization_test_file *file, uninorm_t nf)
           input[0] = uc;
           result = u32_normalize (nf, input, 1, NULL, &length);
           ASSERT (result != NULL && length == 1 && result[0] == uc);
+
+          free (result);
         }
     }
+}
+
+void
+free_normalization_test_file (struct normalization_test_file *file)
+{
+  size_t part_index;
+
+  for (part_index = 0; part_index < 4; part_index++)
+    {
+      const struct normalization_test_part *p = &file->parts[part_index];
+      size_t line_index;
+
+      for (line_index = 0; line_index < p->lines_length; line_index++)
+        {
+          const struct normalization_test_line *l = &p->lines[line_index];
+          size_t sequence_index;
+
+          for (sequence_index = 0; sequence_index < 5; sequence_index++)
+            free (l->sequences[sequence_index]);
+        }
+      free (p->lines);
+    }
+  free (file->part1_c1_sorted);
+  free (file->filename);
 }
 
 #endif

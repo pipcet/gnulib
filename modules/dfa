@@ -11,8 +11,8 @@ Depends-on:
 assert
 c99
 ctype
+flexmember
 intprops
-isblank
 locale
 regex
 stdbool
@@ -35,6 +35,9 @@ lib_SOURCES += dfa.c localeinfo.c
 Include:
 "dfa.h"
 "localeinfo.h"
+
+Link:
+$(LIB_MBRTOWC)
 
 License:
 GPL

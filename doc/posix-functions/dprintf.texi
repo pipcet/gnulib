@@ -2,7 +2,7 @@
 @section @code{dprintf}
 @findex dprintf
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/dprintf.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/dprintf.html}
 
 Gnulib module: dprintf or dprintf-posix
 
@@ -10,16 +10,23 @@ Portability problems fixed by either Gnulib module @code{dprintf} or @code{dprin
 @itemize
 @item
 This function is missing on many non-glibc platforms:
-Mac OS X 10.5, FreeBSD 6.0, NetBSD 5.0, OpenBSD 3.8, Minix 3.1.8, AIX 5.1, HP-UX 11,
-IRIX 6.5, OSF/1 5.1, Solaris 11 2011-11, Cygwin 1.5.x, mingw, MSVC 14, Interix 3.5, BeOS.
+Mac OS X 10.5, FreeBSD 6.0, NetBSD 5.0, OpenBSD 3.8, Minix 3.1.8, AIX 5.1, HP-UX 11, IRIX 6.5, Solaris 11.3, Cygwin 1.5.x, mingw, MSVC 14.
 @end itemize
 
 Portability problems fixed by Gnulib module @code{dprintf-posix}:
 @itemize
 @item
+printf @code{"%f"}, @code{"%e"}, @code{"%g"} of Infinity and NaN yields an
+incorrect result on some platforms:
+Solaris 11.4.
+@item
 This function does not support the @samp{a} and @samp{A} directives on some
 platforms:
 glibc-2.3.6.
+@item
+printf @code{"%010f"} of NaN and Infinity yields an incorrect result (padded
+with zeroes, or wrong capitalization) on some platforms:
+Solaris 11.4.
 @item
 This function does not support precisions larger than 512 or 1024 in integer,
 floating-point and pointer output on some platforms:
@@ -28,6 +35,10 @@ AIX 7.1.
 
 Portability problems not fixed by Gnulib:
 @itemize
+@item
+The @code{%m} directive is not portable, use @code{%s} mapped to an
+argument of @code{strerror(errno)} (or a version of @code{strerror_r})
+instead.
 @item
 Formatting noncanonical @samp{long double} numbers produces
 nonmeaningful results on some platforms:

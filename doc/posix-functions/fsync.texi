@@ -2,7 +2,7 @@
 @section @code{fsync}
 @findex fsync
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/fsync.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/fsync.html}
 
 Gnulib module: fsync
 
@@ -18,5 +18,5 @@ Portability problems not fixed by Gnulib:
 @item
 If the argument is a read-only file descriptor, this function fails
 with @code{EBADF} on some platforms:
-AIX 7.1.
+AIX 7.2, Cygwin 2.9.
 @end itemize

@@ -1,5 +1,5 @@
 /* Test of filtering of data through a subprocess.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -102,7 +102,7 @@ main (int argc, char *argv[])
 
   /* Read some text from a file.  */
   input_filename = argv[2];
-  input = read_binary_file (input_filename, &input_size);
+  input = read_file (input_filename, RF_BINARY, &input_size);
   ASSERT (input != NULL);
 
   /* Convert it to uppercase, line by line.  */
@@ -129,6 +129,8 @@ main (int argc, char *argv[])
     ASSERT (l.nwritten == input_size);
     ASSERT (l.nread == input_size);
   }
+
+  free (input);
 
   return 0;
 }

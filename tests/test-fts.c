@@ -1,5 +1,5 @@
 /* Test the fts function.
-   Copyright 2017 Free Software Foundation, Inc.
+   Copyright 2017-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -36,6 +36,22 @@ perror_exit (char const *message, int status)
 {
   perror (message);
   exit (status);
+}
+
+/* alloc/dealloc to ensure structures initialized appropriately.  */
+static void
+fts_dealloc (void)
+{
+  static char dir[] = "./";
+  static char *const curr_dir[2] = { dir, 0 };
+  FTS *ftsp = fts_open (curr_dir, FTS_NOSTAT | FTS_PHYSICAL | FTS_CWDFD, 0);
+  if (ftsp)
+    {
+      if (fts_close (ftsp) != 0)
+        perror_exit ("fts_close", 9);
+    }
+  else
+    perror_exit (base, 10);
 }
 
 /* Remove BASE and all files under it.  */
@@ -85,7 +101,7 @@ main (void)
 
   /* Create directories BASE, BASE/d, BASE/d/1, BASE/d/2, ..., BASE/d/65536,
      to stress-test fts.  Stop if directory creation fails due to
-     EMFILE problems, or if BASE/d's link count no longer matches the
+     EMFILE or EMLINK problems, or if BASE/d's link count no longer matches the
      Unix tradition.  See:
      https://bugzilla.kernel.org/show_bug.cgi?id=196405
      for more info.  */
@@ -98,7 +114,9 @@ main (void)
       sprintf (buf, "%s/d/%i", base, i);
       if (mkdir (buf, 0777) != 0)
         {
-          if (errno != EMFILE || i <= needles)
+          if (errno == EMFILE || errno == EMLINK)
+            break;
+          if (i <= needles)
             perror_exit (buf, 77);
           break;
         }
@@ -122,9 +140,15 @@ main (void)
     perror_exit (base, 6);
   while ((e = fts_read (ftsp)))
     needles_seen += strcmp (e->fts_name, "needle") == 0;
+  int fts_read_errno = errno;
   fflush (stdout);
-  if (errno)
-    perror_exit ("fts_read", 7);
+  if (fts_read_errno)
+    {
+      errno = fts_read_errno;
+      perror_exit ("fts_read", 7);
+    }
+  if (fts_close (ftsp) != 0)
+    perror_exit (base, 8);
 
   /* Report an error if we did not find the needles.  */
   if (needles_seen != needles)
@@ -140,5 +164,8 @@ main (void)
       fprintf (stderr, "fts could not remove directory\n");
       return 1;
     }
+
+  fts_dealloc ();
+
   return 0;
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 1992, 1997-1998, 2009-2017 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1997-1998, 2009-2020 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify it
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -28,7 +28,7 @@ alphasort (const struct dirent **a, const struct dirent **b)
 }
 #else
 /* On OS/2 kLIBC, the compare function declaration of scandir() is different
-   from POSIX. See <http://trac.netlabs.org/libc/browser/branches/libc-0.6/src/emx/include/dirent.h#L141>.  */
+   from POSIX. See <https://trac.netlabs.org/libc/browser/branches/libc-0.6/src/emx/include/dirent.h#L141>.  */
 alphasort (const void *a, const void *b)
 {
   return strcoll ((*(const struct dirent **)a)->d_name,

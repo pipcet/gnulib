@@ -1,6 +1,6 @@
 /* Invoke dirent-like functions, but avoid some glitches.
 
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,10 +13,18 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Eric Blake.  */
 
 #include <dirent.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 DIR *opendir_safer (const char *name);
+
+#ifdef __cplusplus
+}
+#endif

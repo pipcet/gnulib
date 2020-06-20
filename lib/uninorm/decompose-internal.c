@@ -1,5 +1,5 @@
 /* Decomposition of Unicode strings.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -23,6 +23,7 @@
 #define ELEMENT struct ucs4_with_ccc
 #define COMPARE(a,b) ((a)->ccc - (b)->ccc)
 #define STATIC
+#define STATIC_FROMTO static
 #define merge_sort_fromto gl_uninorm_decompose_merge_sort_fromto
 #define merge_sort_inplace gl_uninorm_decompose_merge_sort_inplace
 #include "array-mergesort.h"

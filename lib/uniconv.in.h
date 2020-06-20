@@ -1,5 +1,5 @@
 /* Conversions between Unicode and legacy encodings.
-   Copyright (C) 2002, 2005, 2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2007, 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
@@ -12,7 +12,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _UNICONV_H
 #define _UNICONV_H
@@ -98,19 +98,19 @@ extern char *
                             enum iconv_ilseq_handler handler,
                             const uint8_t *src, size_t srclen,
                             size_t *offsets,
-                            char *resultbuf, size_t *lengthp);
+                            char *_UC_RESTRICT resultbuf, size_t *lengthp);
 extern char *
        u16_conv_to_encoding (const char *tocode,
                              enum iconv_ilseq_handler handler,
                              const uint16_t *src, size_t srclen,
                              size_t *offsets,
-                             char *resultbuf, size_t *lengthp);
+                             char *_UC_RESTRICT resultbuf, size_t *lengthp);
 extern char *
        u32_conv_to_encoding (const char *tocode,
                              enum iconv_ilseq_handler handler,
                              const uint32_t *src, size_t srclen,
                              size_t *offsets,
-                             char *resultbuf, size_t *lengthp);
+                             char *_UC_RESTRICT resultbuf, size_t *lengthp);
 
 /* Converts a NUL terminated string from a given encoding.
    The result is malloc allocated, or NULL (with errno set) in case of error.

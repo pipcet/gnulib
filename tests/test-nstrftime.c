@@ -1,5 +1,5 @@
 /* Test that nstrftime works as required.
-   Copyright (C) 2011-2017 Free Software Foundation, Inc.
+   Copyright (C) 2011-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Jim Meyering.  */
 
@@ -22,11 +22,15 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "macros.h"
 #define STREQ(a, b) (strcmp (a, b) == 0)
+
+/* Support for settings like TZ='<+00>0' was added in IEEE Std 1003.1-2001.  */
+#define TZ_ANGLE_BRACKETS_SHOULD_WORK (200112 <= _POSIX_VERSION)
 
 struct posixtm_test
 {
@@ -40,6 +44,7 @@ static struct posixtm_test const T[] =
   {
     { 1300000000, 0,            "%F", "2011-03-13" },
     { 0,          10,           "%T.%N", "00:00:00.000000010" },
+    { 56,         123456789,    "%T.%12N", "00:00:56.123456789000" },
     { 0,          0,            NULL, NULL }
   };
 
@@ -123,21 +128,23 @@ static struct localtime_rz_test LT[] =
     { TZ+CentEur,          0, "1970-01-01 01:00:00 +0100 (CET)",  0 },
     { TZ+Japan  ,          0, "1970-01-01 09:00:00 +0900 (JST)",  0 },
     { TZ+NZ     ,          0, "1970-01-01 13:00:00 +1300 (NZDT)", 1 },
-    { TZ+Unknown,          0, "1970-01-01 00:00:00 -0000 (-00)",  0 },
     { TZ+Pacific,  500000001, "1985-11-04 16:53:21 -0800 (PST)",  0 },
     { TZ+Arizona,  500000001, "1985-11-04 17:53:21 -0700 (MST)",  0 },
     { TZ+UTC    ,  500000001, "1985-11-05 00:53:21 +0000 (UTC)",  0 },
     { TZ+CentEur,  500000001, "1985-11-05 01:53:21 +0100 (CET)",  1 },
     { TZ+Japan  ,  500000001, "1985-11-05 09:53:21 +0900 (JST)",  0 },
     { TZ+NZ     ,  500000001, "1985-11-05 13:53:21 +1300 (NZDT)", 0 },
-    { TZ+Unknown,  500000001, "1985-11-05 00:53:21 -0000 (-00)",  0 },
     { TZ+Pacific, 1000000002, "2001-09-08 18:46:42 -0700 (PDT)",  0 },
     { TZ+Arizona, 1000000002, "2001-09-08 18:46:42 -0700 (MST)",  0 },
     { TZ+UTC    , 1000000002, "2001-09-09 01:46:42 +0000 (UTC)",  0 },
     { TZ+CentEur, 1000000002, "2001-09-09 03:46:42 +0200 (CEST)", 0 },
     { TZ+Japan  , 1000000002, "2001-09-09 10:46:42 +0900 (JST)",  0 },
     { TZ+NZ     , 1000000002, "2001-09-09 13:46:42 +1200 (NZST)", 0 },
+#if TZ_ANGLE_BRACKETS_SHOULD_WORK
+    { TZ+Unknown,          0, "1970-01-01 00:00:00 -0000 (-00)",  0 },
+    { TZ+Unknown,  500000001, "1985-11-05 00:53:21 -0000 (-00)",  0 },
     { TZ+Unknown, 1000000002, "2001-09-09 01:46:42 -0000 (-00)",  0 },
+#endif
     { 0 }
   };
 

@@ -2,7 +2,7 @@
 @section @code{stat}
 @findex stat
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/stat.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/stat.html}
 
 Gnulib module: stat
 
@@ -11,6 +11,11 @@ Portability problems fixed by Gnulib:
 @item
 On platforms where @code{off_t} is a 32-bit type, @code{stat} may not correctly
 report the size of files or block devices larger than 2 GB.
+(Cf. @code{AC_SYS_LARGEFILE}.)
+@item
+On Linux/x86 and Linux/x86_64, applications compiled in 32-bit mode cannot
+access files that happen to have a 64-bit inode number.  This can occur with
+file systems such as XFS (typically on large disks) and NFS.
 (Cf. @code{AC_SYS_LARGEFILE}.)
 @item
 The @code{st_atime}, @code{st_ctime}, @code{st_mtime} fields are affected by
@@ -29,6 +34,11 @@ FreeBSD 7.2, AIX 7.1, Solaris 9, mingw64.
 On some platforms, @code{stat(".",buf)} and @code{stat("./",buf)} give
 different results:
 mingw, MSVC 14.
+@item
+On Solaris 11.4, when this function yields a timestamp with a
+nonpositive @code{tv_sec} value, @code{tv_nsec} might be in the range
+@minus{}1000000000..@minus{}1, representing a negative nanoseconds
+offset from @code{tv_sec}.
 @end itemize
 
 Portability problems not fixed by Gnulib:

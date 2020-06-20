@@ -1,5 +1,5 @@
 /* Construct a regular expression from a literal string.
-   Copyright (C) 1995, 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 1995, 2010-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2010.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _REGEX_QUOTE_H
 #define _REGEX_QUOTE_H
@@ -42,9 +42,9 @@ struct regex_quote_spec
    a pattern that can be compiled with regcomp().
    CFLAGS can be 0 or REG_EXTENDED.
    If it is 0, the result is a Basic Regular Expression (BRE)
-   <http://www.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_03>.
+   <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_03>.
    If it is REG_EXTENDED, the result is an Extended Regular Expression (ERE)
-   <http://www.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04>.
+   <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04>.
    If ANCHORED is false, the regular expression will match substrings of lines.
    If ANCHORED is true, it will match only complete lines,  */
 extern struct regex_quote_spec
@@ -77,7 +77,7 @@ extern size_t
 /* Copies the quoted string to p and returns the incremented p.
    There must be room for regex_quote_length (string, spec) + 1 bytes at p.  */
 extern char *
-       regex_quote_copy (char *p,
+       regex_quote_copy (char *restrict p,
                          const char *string, const struct regex_quote_spec *spec);
 
 /* Returns the freshly allocated quoted string.  */

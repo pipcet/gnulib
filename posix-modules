@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2002-2008, 2010-2017 Free Software Foundation, Inc.
+# Copyright (C) 2002-2008, 2010-2020 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
 progname=$0
@@ -65,7 +65,7 @@ q
   echo "\
 posix-modules (GNU $package $date)$version
 Copyright (C) $year Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 
@@ -227,7 +227,7 @@ exclude_for_mingw=
 # <grp.h> does not exist.
 exclude_for_mingw="$exclude_for_mingw pt_chown grantpt posix_openpt-tests posix_openpt"
 # The functions getuid, getgid, geteuid, getegid don't exist.
-exclude_for_mingw="$exclude_for_mingw euidaccess faccessat"
+exclude_for_mingw="$exclude_for_mingw faccessat"
 exclude_for_mingw="$exclude_for_mingw fchownat-tests fchownat"
 
 # Excludes for MSVC.

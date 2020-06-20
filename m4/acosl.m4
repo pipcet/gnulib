@@ -1,5 +1,5 @@
-# acosl.m4 serial 8
-dnl Copyright (C) 2010-2017 Free Software Foundation, Inc.
+# acosl.m4 serial 9
+dnl Copyright (C) 2010-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -22,7 +22,7 @@ AC_DEFUN([gl_FUNC_ACOSL],
              # define __NO_MATH_INLINES 1 /* for glibc */
              #endif
              #include <math.h>
-             long double (*funcptr) (long double) = acosl;
+             long double (* volatile funcptr) (long double) = acosl;
              long double x;]],
            [[return funcptr (x) > 1
                     || acosl (x) > 1;]])],
@@ -41,7 +41,7 @@ AC_DEFUN([gl_FUNC_ACOSL],
                # define __NO_MATH_INLINES 1 /* for glibc */
                #endif
                #include <math.h>
-               long double (*funcptr) (long double) = acosl;
+               long double (* volatile funcptr) (long double) = acosl;
                long double x;]],
              [[return funcptr (x) > 1
                       || acosl (x) > 1;]])],

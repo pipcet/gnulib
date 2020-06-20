@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004-2017 Free Software Foundation, Inc.
+   Copyright (C) 2004-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /*-
  * Copyright (c) 1990, 1993, 1994
@@ -70,9 +70,11 @@ static char sccsid[] = "@(#)fts.c       8.6 (Berkeley) 8/14/94";
 #include <unistd.h>
 
 #if ! _LIBC
+# include "attribute.h"
 # include "fcntl--.h"
 # include "flexmember.h"
 # include "openat.h"
+# include "opendirat.h"
 # include "same-inode.h"
 #endif
 
@@ -294,31 +296,6 @@ fts_set_stat_required (FTSENT *p, bool required)
                            : FTS_NO_STAT_REQUIRED);
 }
 
-/* file-descriptor-relative opendir.  */
-/* FIXME: if others need this function, move it into lib/openat.c */
-static DIR *
-internal_function
-opendirat (int fd, char const *dir, int extra_flags, int *pdir_fd)
-{
-  int open_flags = (O_RDONLY | O_CLOEXEC | O_DIRECTORY | O_NOCTTY
-                    | O_NONBLOCK | extra_flags);
-  int new_fd = openat (fd, dir, open_flags);
-  DIR *dirp;
-
-  if (new_fd < 0)
-    return NULL;
-  dirp = fdopendir (new_fd);
-  if (dirp)
-    *pdir_fd = new_fd;
-  else
-    {
-      int saved_errno = errno;
-      close (new_fd);
-      errno = saved_errno;
-    }
-  return dirp;
-}
-
 /* Virtual fchdir.  Advance SP's working directory file descriptor,
    SP->fts_cwd_fd, to FD, and push the previous value onto the fd_ring.
    CHDIR_DOWN_ONE is true if FD corresponds to an entry in the directory
@@ -370,8 +347,7 @@ internal_function
 diropen (FTS const *sp, char const *dir)
 {
   int open_flags = (O_SEARCH | O_CLOEXEC | O_DIRECTORY | O_NOCTTY | O_NONBLOCK
-                    | (ISSET (FTS_PHYSICAL) ? O_NOFOLLOW : 0)
-                    | (ISSET (FTS_NOATIME) ? O_NOATIME : 0));
+                    | (ISSET (FTS_PHYSICAL) ? O_NOFOLLOW : 0));
 
   int fd = (ISSET (FTS_CWDFD)
             ? openat (sp->fts_cwd_fd, dir, open_flags)
@@ -406,9 +382,9 @@ fts_open (char * const *argv,
         }
 
         /* Allocate/initialize the stream */
-        if ((sp = malloc(sizeof(FTS))) == NULL)
+        sp = calloc (1, sizeof *sp);
+        if (sp == NULL)
                 return (NULL);
-        memset(sp, 0, sizeof(FTS));
         sp->fts_compar = compar;
         sp->fts_options = options;
 
@@ -426,8 +402,7 @@ fts_open (char * const *argv,
                early, doing it here saves us the trouble of ensuring
                later (where it'd be messier) that "." can in fact
                be opened.  If not, revert to FTS_NOCHDIR mode.  */
-            int fd = open (".",
-                           O_SEARCH | (ISSET (FTS_NOATIME) ? O_NOATIME : 0));
+            int fd = open (".", O_SEARCH | O_CLOEXEC);
             if (fd < 0)
               {
                 /* Even if "." is unreadable, don't revert to FTS_NOCHDIR mode
@@ -471,7 +446,6 @@ fts_open (char * const *argv,
                 if ((parent = fts_alloc(sp, "", 0)) == NULL)
                         goto mem2;
                 parent->fts_level = FTS_ROOTPARENTLEVEL;
-                parent->fts_n_dirs_remaining = -1;
           }
 
         /* The classic fts implementation would call fts_stat with
@@ -546,6 +520,7 @@ fts_open (char * const *argv,
                 goto mem3;
         sp->fts_cur->fts_link = root;
         sp->fts_cur->fts_info = FTS_INIT;
+        sp->fts_cur->fts_level = 1;
         if (! setup_dir (sp))
                 goto mem3;
 
@@ -659,9 +634,8 @@ fts_close (FTS *sp)
 }
 
 /* Minimum link count of a traditional Unix directory.  When leaf
-   optimization is OK and MIN_DIR_NLINK <= st_nlink, then st_nlink is
-   an upper bound on the number of subdirectories (counting "." and
-   "..").  */
+   optimization is OK and a directory's st_nlink == MIN_DIR_NLINK,
+   then the directory has no subdirectories.  */
 enum { MIN_DIR_NLINK = 2 };
 
 /* Whether leaf optimization is OK for a directory.  */
@@ -670,26 +644,21 @@ enum leaf_optimization
     /* st_nlink is not reliable for this directory's subdirectories.  */
     NO_LEAF_OPTIMIZATION,
 
-    /* Leaf optimization is OK, but is not useful for avoiding stat calls.  */
-    OK_LEAF_OPTIMIZATION,
-
-    /* Leaf optimization is not only OK: it is useful for avoiding
-       stat calls, because dirent.d_type does not work.  */
-    NOSTAT_LEAF_OPTIMIZATION
+    /* st_nlink == 2 means the directory lacks subdirectories.  */
+    OK_LEAF_OPTIMIZATION
   };
 
-#if defined __linux__ \
+#if (defined __linux__ || defined __ANDROID__) \
   && HAVE_SYS_VFS_H && HAVE_FSTATFS && HAVE_STRUCT_STATFS_F_TYPE
 
 # include <sys/vfs.h>
 
 /* Linux-specific constants from coreutils' src/fs.h */
 # define S_MAGIC_AFS 0x5346414F
+# define S_MAGIC_CIFS 0xFF534D42
 # define S_MAGIC_NFS 0x6969
 # define S_MAGIC_PROC 0x9FA0
-# define S_MAGIC_REISERFS 0x52654973
 # define S_MAGIC_TMPFS 0x1021994
-# define S_MAGIC_XFS 0x58465342
 
 # ifdef HAVE___FSWORD_T
 typedef __fsword_t fsword;
@@ -725,11 +694,12 @@ dev_type_compare (void const *x, void const *y)
   return ax->st_dev == ay->st_dev;
 }
 
-/* Return the file system type of P, or 0 if not known.
+/* Return the file system type of P with file descriptor FD, or 0 if not known.
+   If FD is negative, P's file descriptor is unavailable.
    Try to cache known values.  */
 
 static fsword
-filesystem_type (FTSENT const *p)
+filesystem_type (FTSENT const *p, int fd)
 {
   FTS *sp = p->fts_fts;
   Hash_table *h = sp->fts_leaf_optimization_works_ht;
@@ -755,7 +725,7 @@ filesystem_type (FTSENT const *p)
     }
 
   /* Look-up failed.  Query directly and cache the result.  */
-  if (fstatfs (p->fts_fts->fts_cwd_fd, &fs_buf) != 0)
+  if (fd < 0 || fstatfs (fd, &fs_buf) != 0)
     return 0;
 
   if (h)
@@ -777,12 +747,12 @@ filesystem_type (FTSENT const *p)
   return fs_buf.f_type;
 }
 
-/* Return false if it is easy to determine the file system type of the
-   directory P, and sorting dirents on inode numbers is known not to
-   improve traversal performance with that type of file system.
-   Otherwise, return true.  */
+/* Return true if sorting dirents on inode numbers is known to improve
+   traversal performance for the directory P with descriptor DIR_FD.
+   Return false otherwise.  When in doubt, return true.
+   DIR_FD is negative if unavailable.  */
 static bool
-dirent_inode_sort_may_be_useful (FTSENT const *p)
+dirent_inode_sort_may_be_useful (FTSENT const *p, int dir_fd)
 {
   /* Skip the sort only if we can determine efficiently
      that skipping it is the right thing to do.
@@ -790,10 +760,11 @@ dirent_inode_sort_may_be_useful (FTSENT const *p)
      while the cost of *not* performing it can be O(N^2) with
      a very large constant.  */
 
-  switch (filesystem_type (p))
+  switch (filesystem_type (p, dir_fd))
     {
-    case S_MAGIC_TMPFS:
+    case S_MAGIC_CIFS:
     case S_MAGIC_NFS:
+    case S_MAGIC_TMPFS:
       /* On a file system of any of these types, sorting
          is unnecessary, and hence wasteful.  */
       return false;
@@ -803,29 +774,26 @@ dirent_inode_sort_may_be_useful (FTSENT const *p)
     }
 }
 
-/* Given an FTS entry P for a directory D,
-   return true if it is both useful and valid to apply leaf optimization.
-   The optimization is useful only for file systems that lack usable
-   dirent.d_type info.  The optimization is valid if an st_nlink value
-   of at least MIN_DIR_NLINK is an upper bound on the number of
-   subdirectories of D, counting "." and ".."  as subdirectories.  */
+/* Given an FTS entry P for a directory with descriptor DIR_FD,
+   return whether it is valid to apply leaf optimization.
+   The optimization is valid if a directory's st_nlink value equal
+   to MIN_DIR_NLINK means the directory has no subdirectories.
+   DIR_FD is negative if unavailable.  */
 static enum leaf_optimization
-leaf_optimization (FTSENT const *p)
+leaf_optimization (FTSENT const *p, int dir_fd)
 {
-  switch (filesystem_type (p))
+  switch (filesystem_type (p, dir_fd))
     {
-      /* List here the file system types that lack usable dirent.d_type
-         info, yet for which the optimization does apply.  */
-    case S_MAGIC_REISERFS:
-    case S_MAGIC_XFS:
-      return NOSTAT_LEAF_OPTIMIZATION;
-
     case 0:
       /* Leaf optimization is unsafe if the file system type is unknown.  */
       FALLTHROUGH;
     case S_MAGIC_AFS:
       /* Although AFS mount points are not counted in st_nlink, they
          act like directories.  See <https://bugs.debian.org/143111>.  */
+      FALLTHROUGH;
+    case S_MAGIC_CIFS:
+      /* Leaf optimization causes 'find' to abort.  See
+         <https://lists.gnu.org/r/bug-gnulib/2018-04/msg00015.html>.  */
       FALLTHROUGH;
     case S_MAGIC_NFS:
       /* NFS provides usable dirent.d_type but not necessarily for all entries
@@ -834,8 +802,8 @@ leaf_optimization (FTSENT const *p)
          all implementations as per <https://bugzilla.redhat.com/1299169>.  */
       FALLTHROUGH;
     case S_MAGIC_PROC:
-      /* Per <http://bugs.debian.org/143111> /proc may have
-         bogus stat.st_nlink values.  */
+      /* Per <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=143111> /proc
+         may have bogus stat.st_nlink values.  */
       return NO_LEAF_OPTIMIZATION;
 
     default:
@@ -845,12 +813,13 @@ leaf_optimization (FTSENT const *p)
 
 #else
 static bool
-dirent_inode_sort_may_be_useful (FTSENT const *p _GL_UNUSED)
+dirent_inode_sort_may_be_useful (FTSENT const *p _GL_UNUSED,
+                                 int dir_fd _GL_UNUSED)
 {
   return true;
 }
 static enum leaf_optimization
-leaf_optimization (FTSENT const *p _GL_UNUSED)
+leaf_optimization (FTSENT const *p _GL_UNUSED, int dir_fd _GL_UNUSED)
 {
   return NO_LEAF_OPTIMIZATION;
 }
@@ -1039,26 +1008,7 @@ check_for_dir:
                 if (p->fts_info == FTS_NSOK)
                   {
                     if (p->fts_statp->st_size == FTS_STAT_REQUIRED)
-                      {
-                        FTSENT *parent = p->fts_parent;
-                        if (parent->fts_n_dirs_remaining == 0
-                            && ISSET(FTS_NOSTAT)
-                            && ISSET(FTS_PHYSICAL)
-                            && (leaf_optimization (parent)
-                                == NOSTAT_LEAF_OPTIMIZATION))
-                          {
-                            /* nothing more needed */
-                          }
-                        else
-                          {
-                            p->fts_info = fts_stat(sp, p, false);
-                            if (S_ISDIR(p->fts_statp->st_mode)
-                                && p->fts_level != FTS_ROOTLEVEL
-                                && 0 < parent->fts_n_dirs_remaining
-                                && parent->fts_n_dirs_remaining != (nlink_t) -1)
-                                  parent->fts_n_dirs_remaining--;
-                          }
-                      }
+                      p->fts_info = fts_stat(sp, p, false);
                     else
                       fts_assert (p->fts_statp->st_size == FTS_NO_STAT_REQUIRED);
                   }
@@ -1294,8 +1244,7 @@ set_stat_type (struct stat *st, unsigned int dtype)
                   (((ISSET(FTS_PHYSICAL)                        \
                      && ! (ISSET(FTS_COMFOLLOW)                 \
                            && cur->fts_level == FTS_ROOTLEVEL)) \
-                    ? O_NOFOLLOW : 0)                           \
-                   | (ISSET (FTS_NOATIME) ? O_NOATIME : 0)),    \
+                    ? O_NOFOLLOW : 0)),                         \
                   Pdir_fd)
 
 /*
@@ -1329,6 +1278,7 @@ fts_build (register FTS *sp, int type)
         int dir_fd;
         FTSENT *cur = sp->fts_cur;
         bool continue_readdir = !!cur->fts_dirp;
+        bool sort_by_inode = false;
         size_t max_entries;
 
         /* When cur->fts_dirp is non-NULL, that means we should
@@ -1417,12 +1367,12 @@ fts_build (register FTS *sp, int type)
         else
           {
             /* Try to descend unless it is a names-only fts_children,
-               or the directory is a known to lack subdirectories.  */
+               or the directory is known to lack subdirectories.  */
             descend = (type != BNAMES
                        && ! (ISSET (FTS_NOSTAT) && ISSET (FTS_PHYSICAL)
                              && ! ISSET (FTS_SEEDOT)
                              && cur->fts_statp->st_nlink == MIN_DIR_NLINK
-                             && (leaf_optimization (cur)
+                             && (leaf_optimization (cur, dir_fd)
                                  != NO_LEAF_OPTIMIZATION)));
             if (descend || type == BREAD)
               {
@@ -1562,10 +1512,11 @@ mem1:                           saved_errno = errno;
                            inode numbers.  Some day we might optimize that
                            away, too, for directories where d_ino is known to
                            be valid.  */
-                        bool skip_stat = (ISSET(FTS_PHYSICAL)
-                                          && ISSET(FTS_NOSTAT)
+                        bool skip_stat = (ISSET(FTS_NOSTAT)
                                           && DT_IS_KNOWN(dp)
-                                          && ! DT_MUST_BE(dp, DT_DIR));
+                                          && ! DT_MUST_BE(dp, DT_DIR)
+                                          && (ISSET(FTS_PHYSICAL)
+                                              || ! DT_MUST_BE(dp, DT_LNK)));
                         p->fts_info = FTS_NSOK;
                         /* Propagate dirent.d_type information back
                            to caller, when possible.  */
@@ -1583,6 +1534,19 @@ mem1:                           saved_errno = errno;
                         tail->fts_link = p;
                         tail = p;
                 }
+
+                /* If there are many entries, no sorting function has been
+                   specified, and this file system is of a type that may be
+                   slow with a large number of entries, arrange to sort the
+                   directory entries on increasing inode numbers.
+
+                   The NITEMS comparison uses ==, not >, because the test
+                   needs to be tried at most once once, and NITEMS will exceed
+                   the threshold after it is incremented below.  */
+                if (nitems == _FTS_INODE_SORT_DIR_ENTRIES_THRESHOLD
+                    && !sp->fts_compar)
+                  sort_by_inode = dirent_inode_sort_may_be_useful (cur, dir_fd);
+
                 ++nitems;
                 if (max_entries <= nitems) {
                         /* When there are too many dir entries, leave
@@ -1640,13 +1604,7 @@ mem1:                           saved_errno = errno;
                 return (NULL);
         }
 
-        /* If there are many entries, no sorting function has been specified,
-           and this file system is of a type that may be slow with a large
-           number of entries, then sort the directory entries on increasing
-           inode numbers.  */
-        if (nitems > _FTS_INODE_SORT_DIR_ENTRIES_THRESHOLD
-            && !sp->fts_compar
-            && dirent_inode_sort_may_be_useful (cur)) {
+        if (sort_by_inode) {
                 sp->fts_compar = fts_compare_ino;
                 head = fts_sort (sp, head, nitems);
                 sp->fts_compar = NULL;
@@ -1778,7 +1736,7 @@ fd_ring_check (FTS const *sp)
       int fd = i_ring_pop (&fd_w);
       if (0 <= fd)
         {
-          int open_flags = O_SEARCH | O_CLOEXEC | O_NOATIME;
+          int open_flags = O_SEARCH | O_CLOEXEC;
           int parent_fd = openat (cwd_fd, "..", open_flags);
           if (parent_fd < 0)
             {
@@ -1835,11 +1793,6 @@ err:            memset(sbp, 0, sizeof(struct stat));
         }
 
         if (S_ISDIR(sbp->st_mode)) {
-                p->fts_n_dirs_remaining
-                  = ((sbp->st_nlink < MIN_DIR_NLINK
-                      || p->fts_level <= FTS_ROOTLEVEL)
-                     ? -1
-                     : sbp->st_nlink - (ISSET (FTS_SEEDOT) ? 0 : MIN_DIR_NLINK));
                 if (ISDOT(p->fts_name)) {
                         /* Command-line "." and ".." are real directories. */
                         return (p->fts_level == FTS_ROOTLEVEL ? FTS_D : FTS_DOT);
@@ -2078,7 +2031,6 @@ fts_safe_changedir (FTS *sp, FTSENT *p, int fd, char const *dir)
                 int parent_fd;
                 fd_ring_print (sp, stderr, "pre-pop");
                 parent_fd = i_ring_pop (&sp->fts_fd_ring);
-                is_dotdot = true;
                 if (0 <= parent_fd)
                   {
                     fd = parent_fd;

@@ -1,5 +1,5 @@
 /* git-merge-changelog - git "merge" driver for GNU style ChangeLog files.
-   Copyright (C) 2008-2010 Bruno Haible <bruno@clisp.org>
+   Copyright (C) 2008-2020 Bruno Haible <bruno@clisp.org>
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* README:
    The default merge driver of 'git' *always* produces conflicts when
@@ -84,7 +84,7 @@
         git-merge-changelog.executable = /usr/local/bin/git-merge-changelog
         git-merge-changelog.args = $base $local $other
 
-       See <http://www.selenic.com/mercurial/hgrc.5.html> section merge-tools
+       See <https://www.selenic.com/mercurial/hgrc.5.html> section merge-tools
        for reference.
  */
 
@@ -232,7 +232,7 @@ entry_hashcode (const void *elt)
   struct entry *entry = (struct entry *) elt;
   if (!entry->hashcode_cached)
     {
-      /* See http://www.haible.de/bruno/hashfunc.html.  */
+      /* See https://www.haible.de/bruno/hashfunc.html.  */
       const char *s;
       size_t n;
       size_t h = 0;
@@ -300,7 +300,7 @@ read_changelog_file (const char *filename, struct changelog_file *result)
   /* Read the file in text mode, otherwise it's hard to recognize empty
      lines.  */
   size_t length;
-  char *contents = read_file (filename, &length);
+  char *contents = read_file (filename, 0, &length);
   if (contents == NULL)
     {
       fprintf (stderr, "could not read file '%s'\n", filename);
@@ -1041,7 +1041,7 @@ main (int argc, char *argv[])
       /* Version information is requested.  */
       printf ("%s\n", getprogname ());
       printf ("Copyright (C) %s Free Software Foundation, Inc.\n\
-License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>\n\
+License GPLv2+: GNU GPL version 2 or later <https://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\
 ",

@@ -1,6 +1,6 @@
 /* Provide a working getlogin_r for systems which lack it.
 
-   Copyright (C) 2005-2007, 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2005-2007, 2010-2020 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert, Derek Price, and Bruno Haible.  */
 
@@ -27,9 +27,12 @@
 
 #include "malloca.h"
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
+/* Don't assume that UNICODE is not defined.  */
+# undef GetUserName
+# define GetUserName GetUserNameA
 #else
 # if !HAVE_DECL_GETLOGIN
 extern char *getlogin (void);
@@ -41,7 +44,7 @@ int
 getlogin_r (char *name, size_t size)
 {
 #undef getlogin_r
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
   /* Native Windows platform.  */
   DWORD sz;
 

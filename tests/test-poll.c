@@ -1,5 +1,5 @@
 /* Test of poll() function.
-   Copyright (C) 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2008-2020 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paolo Bonzini.  */
 
@@ -37,7 +37,7 @@ SIGNATURE_CHECK (poll, int, (struct pollfd[], nfds_t, int));
 
 #include "macros.h"
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
 # define WINDOWS_NATIVE
 #endif
 
@@ -50,10 +50,6 @@ SIGNATURE_CHECK (poll, int, (struct pollfd[], nfds_t, int));
 #endif
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#endif
-
-#ifndef SO_REUSEPORT
-#define SO_REUSEPORT    SO_REUSEADDR
 #endif
 
 #define TEST_PORT       12345

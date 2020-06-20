@@ -1,5 +1,5 @@
-# expm1.m4 serial 4
-dnl Copyright (C) 2010-2017 Free Software Foundation, Inc.
+# expm1.m4 serial 9
+dnl Copyright (C) 2010-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -22,7 +22,7 @@ AC_DEFUN([gl_FUNC_EXPM1],
              # define __NO_MATH_INLINES 1 /* for glibc */
              #endif
              #include <math.h>
-             double (*funcptr) (double) = expm1;
+             double (* volatile funcptr) (double) = expm1;
              double x;]],
            [[return funcptr (x) > 0.5
                     || expm1 (x) > 0.5;]])],
@@ -41,7 +41,7 @@ AC_DEFUN([gl_FUNC_EXPM1],
                # define __NO_MATH_INLINES 1 /* for glibc */
                #endif
                #include <math.h>
-               double (*funcptr) (double) = expm1;
+               double (* volatile funcptr) (double) = expm1;
                double x;]],
              [[return funcptr (x) > 0.5
                       || expm1 (x) > 0.5;]])],
@@ -75,7 +75,7 @@ AC_DEFUN([gl_FUNC_EXPM1],
 static double dummy (double x) { return 0; }
 int main (int argc, char *argv[])
 {
-  double (*my_expm1) (double) = argc ? expm1 : dummy;
+  double (* volatile my_expm1) (double) = argc ? expm1 : dummy;
   double y = my_expm1 (minus_zerod);
   if (!(y == 0.0) || (signbitd (minus_zerod) && !signbitd (y)))
     return 1;
@@ -85,12 +85,14 @@ int main (int argc, char *argv[])
               [gl_cv_func_expm1_ieee=yes],
               [gl_cv_func_expm1_ieee=no],
               [case "$host_os" in
-                         # Guess yes on glibc systems.
-                 *-gnu*) gl_cv_func_expm1_ieee="guessing yes" ;;
-                         # Guess yes on native Windows.
-                 mingw*) gl_cv_func_expm1_ieee="guessing yes" ;;
-                         # If we don't know, assume the worst.
-                 *)      gl_cv_func_expm1_ieee="guessing no" ;;
+                                # Guess yes on glibc systems.
+                 *-gnu* | gnu*) gl_cv_func_expm1_ieee="guessing yes" ;;
+                                # Guess yes on musl systems.
+                 *-musl*)       gl_cv_func_expm1_ieee="guessing yes" ;;
+                                # Guess yes on native Windows.
+                 mingw*)        gl_cv_func_expm1_ieee="guessing yes" ;;
+                                # If we don't know, obey --enable-cross-guesses.
+                 *)             gl_cv_func_expm1_ieee="$gl_cross_guess_normal" ;;
                esac
               ])
             LIBS="$save_LIBS"

@@ -1,5 +1,5 @@
 /* Test of ptsname_r(3).
-   Copyright (C) 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2010-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,12 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Don't use __attribute__ __nonnull__ in this compilation unit.  Otherwise gcc
+   may "optimize" the null_ptr function, when its result gets passed to a
+   function that has an argument declared as _GL_ARG_NONNULL.  */
+#define _GL_ARG_NONNULL(params)
 
 #include <config.h>
 
@@ -31,7 +36,10 @@ SIGNATURE_CHECK (ptsname_r, int, (int, char *, size_t));
 
 #include "same-inode.h"
 
-#include "null-ptr.h"
+#if GNULIB_defined_ptsname_r
+# include "null-ptr.h"
+#endif
+
 #include "macros.h"
 
 /* Compare two slave names.
@@ -70,7 +78,6 @@ test_errors (int fd, const char *slave)
   for (buflen = 0; buflen <= buflen_max; buflen++)
     {
       memset (buffer, 'X', sizeof buffer);
-      errno = 0;
       result = ptsname_r (fd, buffer, buflen);
       if (buflen > len)
         {
@@ -80,17 +87,20 @@ test_errors (int fd, const char *slave)
       else
         {
           ASSERT (result != 0);
-          ASSERT (result == errno);
-          ASSERT (errno == ERANGE);
+          ASSERT (result == ERANGE);
           ASSERT (buffer[0] == 'X');
         }
     }
 
-  errno = 0;
+  /* This test works only if the ptsname_r implementation comes from gnulib.
+     If it comes from libc, we have no way to prevent gcc from "optimizing"
+     the null_ptr function in invalid ways.  See
+     <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93156>.  */
+#if GNULIB_defined_ptsname_r
   result = ptsname_r (fd, null_ptr (), 0);
   ASSERT (result != 0);
-  ASSERT (result == errno);
-  ASSERT (errno == EINVAL);
+  ASSERT (result == EINVAL);
+#endif
 }
 
 int
@@ -108,11 +118,9 @@ main (void)
     char buffer[256];
     int result;
 
-    errno = 0;
     result = ptsname_r (-1, buffer, sizeof buffer);
     ASSERT (result != 0);
-    ASSERT (result == errno);
-    ASSERT (errno == EBADF || errno == ENOTTY);
+    ASSERT (result == EBADF || result == ENOTTY);
   }
 
   {

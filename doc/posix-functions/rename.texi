@@ -2,7 +2,7 @@
 @section @code{rename}
 @findex rename
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/rename.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/rename.html}
 
 Gnulib module: rename
 
@@ -15,7 +15,7 @@ NetBSD 1.6.
 @item
 This function does not reject trailing slashes on the destination for
 non-directories on some platforms, as in @code{rename("file","new/")}:
-AIX 7.1, Solaris 11 2011-11, Cygwin 1.5.x, mingw, MSVC 14.
+AIX 7.1, Solaris 11.3, Cygwin 1.5.x, mingw, MSVC 14.
 @item
 This function does not reject trailing slashes on symlinks to
 non-directories on some platforms, as in
@@ -43,10 +43,6 @@ Cygwin 1.5.x, mingw, MSVC 14.
 This function does not reject attempts to rename existing directories
 and non-directories onto one another on some platforms:
 Cygwin 1.5.x, mingw, MSVC 14.
-@item
-This function does not allow trailing slashes on source directories on
-older platforms, as in @samp{rename("dir/","new")}:
-SunOS 4.1.
 @end itemize
 
 Portability problems not fixed by Gnulib:

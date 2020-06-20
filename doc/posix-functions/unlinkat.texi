@@ -2,7 +2,7 @@
 @section @code{unlinkat}
 @findex unlinkat
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/unlinkat.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/unlinkat.html}
 
 Gnulib module: unlinkat
 
@@ -11,18 +11,18 @@ Portability problems fixed by Gnulib:
 @item
 This function is missing on some platforms:
 glibc 2.3.6, Mac OS X 10.5, FreeBSD 6.0, NetBSD 5.0, OpenBSD 3.8, Minix 3.1.8,
-AIX 5.1, HP-UX 11, IRIX 6.5, OSF/1 5.1, Cygwin 1.5.x, mingw, MSVC 14, Interix 3.5, BeOS.
+AIX 5.1, HP-UX 11, IRIX 6.5, Cygwin 1.5.x, mingw, MSVC 14.
 But the replacement function is not safe to be used in libraries and is not multithread-safe.
+@item
+This function is declared in @code{<fcntl.h>}, not in @code{<unistd.h>},
+on some platforms:
+Cygwin 1.7.1, Android 4.3.
 @item
 On Mac OS X 10.10, in a writable HFS mount, @code{unlinkat(fd, "..", 0)} succeeds
 without doing anything.
 @item
 Some systems mistakenly succeed on @code{unlinkat(fd,"file/",flag)}:
 GNU/Hurd, Solaris 9.
-@item
-Some platforms declare this function in @code{fcntl.h} instead of
-@code{unistd.h}:
-Cygwin 1.7.1.
 @end itemize
 
 Portability problems not fixed by Gnulib:
@@ -44,7 +44,7 @@ not always the POSIX value of @code{EPERM}.  Meanwhile, if a process
 has the ability to unlink directories, POSIX requires that
 @code{unlinkat(fd,"symlink-to-dir/",0)} remove @file{dir} and leave
 @file{symlink-to-dir} dangling; this behavior is counter-intuitive.
-The gnulib module unlinkdir can help determine whether code must be
+The gnulib module @code{unlinkdir} can help determine whether code must be
 cautious of unlinking directories.
 @item
 Removing an open file is non-portable: On Unix this allows the programs that

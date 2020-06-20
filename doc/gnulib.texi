@@ -23,7 +23,7 @@ This manual is for GNU Gnulib (updated @value{UPDATED}),
 which is a library of common routines intended to be shared at the
 source level.
 
-Copyright @copyright{} 2004--2017 Free Software Foundation, Inc.
+Copyright @copyright{} 2004--2020 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -31,6 +31,7 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled ``GNU Free
 Documentation License''.
+@c A copy of the license is at <https://www.gnu.org/licenses/fdl-1.3.en.html>.
 @end copying
 
 @dircategory Software development
@@ -70,9 +71,12 @@ Documentation License''.
 * Glibc Header File Substitutes::   Overriding system headers.
 * Glibc Function Substitutes::      Replacing system functions.
 * Native Windows Support::          Support for the native Windows platforms.
+* Multithreading::                  Multiple threads of execution.
 * Particular Modules::              Documentation of individual modules.
 * Regular expressions::             The regex module.
 * Build Infrastructure Modules::    Modules that extend the GNU Build System.
+* Build Infrastructure Files::      Non-modules files for the build system.
+* Release Management Files::        Non-modules files for preparing releases.
 * GNU Free Documentation License::  Copying and sharing this manual.
 * Index::
 @end menu
@@ -101,10 +105,10 @@ Resources:
 
 @itemize
 @item Gnulib is hosted at Savannah:
-      @url{http://savannah.gnu.org/projects/gnulib}.  Get the sources
+      @url{https://savannah.gnu.org/projects/gnulib}.  Get the sources
       through Git from there.
 @item The Gnulib home page:
-      @url{http://www.gnu.org/software/gnulib/}.
+      @url{https://www.gnu.org/software/gnulib/}.
 @end itemize
 
 @include gnulib-readme.texi
@@ -240,7 +244,7 @@ and C++ programs alike.
 
 Note that putting a @code{#include} in an @code{extern "C" @{ ... @}}
 block yields a syntax error in C++ mode on some platforms (e.g., glibc
-systems with g++ v3.3 to v4.2, AIX, OSF/1, IRIX).  For this reason, it
+systems with g++ v3.3 to v4.2, AIX, IRIX).  For this reason, it
 is recommended to place the @code{#include} before the @code{extern
 "C"} block.
 
@@ -476,6 +480,8 @@ Example:
 $(POW_LIBM)
 $(LTLIBICONV) when linking with libtool, $(LIBICONV) otherwise
 @end smallexample
+When this field is omitted, it defaults to the union of the @code{Link}
+field of the dependencies.
 
 @item License
 This field specifies the license that governs the source code parts of
@@ -686,21 +692,21 @@ You can add modules of your own, that are not (yet) in Gnulib.
 You can also add unstructured amounts of code to the library, by
 grouping the non-Gnulib files of the library in a single kitchen-sink
 ``module.''  (This kind of kitchen-sink module is not needed when you
-use the @command{gnulib-tool} option @samp{--makefile-name}.)
+use the @command{gnulib-tool} option @option{--makefile-name}.)
 @end itemize
 
 In a release tarball, you can distribute the contents of this
 @option{--local-dir} directory that will be combinable with newer
 versions of Gnulib, barring incompatible changes to Gnulib.
 
-If the @samp{--local-dir=@var{directory}} option is specified, then
+If the @option{--local-dir=@var{directory}} option is specified, then
 @command{gnulib-tool} looks in @file{@var{directory}} whenever it
 reads a file from the Gnulib directory.  Suppose @command{gnulib-tool}
 is looking for @var{file}.  Then:
 
 @itemize @bullet
 @item
-If @file{@var{directory}/@var{file}} exists, then @samp{gnulib-tool} uses
+If @file{@var{directory}/@var{file}} exists, then @command{gnulib-tool} uses
 it instead of the file included in Gnulib.
 
 @item
@@ -711,6 +717,15 @@ using the @command{patch} program.
 @item
 Otherwise, @command{gnulib-tool} uses the file included in Gnulib.
 @end itemize
+
+You can specify the @option{--local-dir} multiple times.  In this case,
+the first specified directory has the highest precedence.  That is, a
+@file{@var{file}} found in one directory will shadow any @file{@var{file}}
+and @file{@var{file}.diff} in the later directories and in the Gnulib
+directory.  And a file @file{@var{file}.diff} found in one directory will
+be applied on top of the combination of @file{@var{file}} and
+@file{@var{file}.diff} files found in the later directories and in the
+Gnulib directory.
 
 Please make wise use of this option.  It also allows you to easily
 hold back modifications you make to Gnulib macros in cases it may be
@@ -726,7 +741,6 @@ better to share them.
 * Extra tests modules::
 * Modules that modify the way other modules work::
 * A C++ namespace for gnulib::      A different way of using Gnulib in C++
-* Running self-tests under valgrind::
 * License Texinfo sources::
 * Building gnulib::
 @end menu
@@ -740,8 +754,6 @@ better to share them.
 @include transversal.texi
 
 @include namespace.texi
-
-@include valgrind-tests.texi
 
 @include licenses-texi.texi
 
@@ -863,6 +875,7 @@ which (known) portability problems are not worked around by Gnulib.
 * tar.h::
 * termios.h::
 * tgmath.h::
+* threads.h::
 * time.h::
 * trace.h::
 * uchar.h::
@@ -952,6 +965,7 @@ which (known) portability problems are not worked around by Gnulib.
 @include posix-headers/tar.texi
 @include posix-headers/termios.texi
 @include posix-headers/tgmath.texi
+@include posix-headers/threads.texi
 @include posix-headers/time.texi
 @include posix-headers/trace.texi
 @include posix-headers/uchar.texi
@@ -968,9 +982,9 @@ which (known) portability problems are not worked around by Gnulib.
 @chapter ISO C and POSIX Function Substitutes
 
 This chapter describes which functions and function-like macros specified by
-ISO C or POSIX are substituted by Gnulib, which portability pitfalls are
-fixed by Gnulib, and which (known) portability problems are not worked around
-by Gnulib.
+ISO C (including ISO TS 18661-1) or POSIX are substituted by Gnulib, which
+portability pitfalls are fixed by Gnulib, and which (known) portability
+problems are not worked around by Gnulib.
 
 @nosuchmodulenote function
 
@@ -1045,6 +1059,10 @@ by Gnulib.
 * cacoshl::
 * cacosl::
 * calloc::
+* call_once::
+* canonicalize::
+* canonicalizef::
+* canonicalizel::
 * carg::
 * cargf::
 * cargl::
@@ -1101,6 +1119,12 @@ by Gnulib.
 * close::
 * closedir::
 * closelog::
+* cnd_broadcast::
+* cnd_destroy::
+* cnd_init::
+* cnd_signal::
+* cnd_timedwait::
+* cnd_wait::
 * confstr::
 * conj::
 * conjf::
@@ -1144,6 +1168,7 @@ by Gnulib.
 * ctermid::
 * ctime::
 * ctime_r::
+* daddl::
 * daylight::
 * dbm_clearerr::
 * dbm_close::
@@ -1154,6 +1179,7 @@ by Gnulib.
 * dbm_nextkey::
 * dbm_open::
 * dbm_store::
+* ddivl::
 * difftime::
 * dirfd::
 * dirname::
@@ -1162,8 +1188,10 @@ by Gnulib.
 * dlerror::
 * dlopen::
 * dlsym::
+* dmull::
 * dprintf::
 * drand48::
+* dsubl::
 * dup::
 * dup2::
 * duplocale::
@@ -1204,6 +1232,8 @@ by Gnulib.
 * fabsf::
 * fabsl::
 * faccessat::
+* fadd::
+* faddl::
 * fattach::
 * fchdir::
 * fchmod::
@@ -1217,20 +1247,26 @@ by Gnulib.
 * fdim::
 * fdimf::
 * fdiml::
+* fdiv::
+* fdivl::
 * fdopen::
 * fdopendir::
 * feclearexcept::
 * fegetenv::
 * fegetexceptflag::
+* fegetmode::
 * fegetround::
 * feholdexcept::
 * feof::
 * feraiseexcept::
 * ferror::
 * fesetenv::
+* fesetexcept::
 * fesetexceptflag::
+* fesetmode::
 * fesetround::
 * fetestexcept::
+* fetestexceptflag::
 * feupdateenv::
 * fexecve::
 * fflush::
@@ -1251,14 +1287,22 @@ by Gnulib.
 * fmax::
 * fmaxf::
 * fmaxl::
+* fmaxmag::
+* fmaxmagf::
+* fmaxmagl::
 * fmemopen::
 * fmin::
 * fminf::
 * fminl::
+* fminmag::
+* fminmagf::
+* fminmagl::
 * fmod::
 * fmodf::
 * fmodl::
 * fmtmsg::
+* fmul::
+* fmull::
 * fnmatch::
 * fopen::
 * fork::
@@ -1277,6 +1321,12 @@ by Gnulib.
 * frexp::
 * frexpf::
 * frexpl::
+* fromfp::
+* fromfpf::
+* fromfpl::
+* fromfpx::
+* fromfpxf::
+* fromfpxl::
 * fscanf::
 * fseek::
 * fseeko::
@@ -1284,6 +1334,8 @@ by Gnulib.
 * fstat::
 * fstatat::
 * fstatvfs::
+* fsub::
+* fsubl::
 * fsync::
 * ftell::
 * ftello::
@@ -1330,6 +1382,9 @@ by Gnulib.
 * getnetbyname::
 * getnetent::
 * getopt::
+* getpayload::
+* getpayloadf::
+* getpayloadl::
 * getpeername::
 * getpgid::
 * getpgrp::
@@ -1481,6 +1536,9 @@ by Gnulib.
 * listen::
 * llabs::
 * lldiv::
+* llogb::
+* llogbf::
+* llogbl::
 * llrint::
 * llrintf::
 * llrintl::
@@ -1566,6 +1624,12 @@ by Gnulib.
 * msgrcv::
 * msgsnd::
 * msync::
+* mtx_destroy::
+* mtx_init::
+* mtx_lock::
+* mtx_timedlock::
+* mtx_trylock::
+* mtx_unlock::
 * munlock::
 * munlockall::
 * munmap::
@@ -1580,9 +1644,15 @@ by Gnulib.
 * nextafter::
 * nextafterf::
 * nextafterl::
+* nextdown::
+* nextdownf::
+* nextdownl::
 * nexttoward::
 * nexttowardf::
 * nexttowardl::
+* nextup::
+* nextupf::
+* nextupl::
 * nftw::
 * nice::
 * nl_langinfo::
@@ -1847,6 +1917,9 @@ by Gnulib.
 * rintl::
 * rmdir::
 * round::
+* roundeven::
+* roundevenf::
+* roundevenl::
 * roundf::
 * roundl::
 * scalbln::
@@ -1897,6 +1970,12 @@ by Gnulib.
 * setlocale::
 * setlogmask::
 * setnetent::
+* setpayload::
+* setpayloadf::
+* setpayloadl::
+* setpayloadsig::
+* setpayloadsigf::
+* setpayloadsigl::
 * setpgid::
 * setpgrp::
 * setpriority::
@@ -1985,6 +2064,9 @@ by Gnulib.
 * strerror_r::
 * strfmon::
 * strfmon_l::
+* strfromd::
+* strfromf::
+* strfroml::
 * strftime::
 * strftime_l::
 * strlen::
@@ -2045,6 +2127,14 @@ by Gnulib.
 * tgamma::
 * tgammaf::
 * tgammal::
+* thrd_create::
+* thrd_current::
+* thrd_detach::
+* thrd_equal::
+* thrd_exit::
+* thrd_join::
+* thrd_sleep::
+* thrd_yield::
 * time::
 * timer_create::
 * timer_delete::
@@ -2058,6 +2148,12 @@ by Gnulib.
 * toascii::
 * tolower::
 * tolower_l::
+* totalorder::
+* totalorderf::
+* totalorderl::
+* totalordermag::
+* totalordermagf::
+* totalordermagl::
 * toupper::
 * toupper_l::
 * towctrans::
@@ -2071,11 +2167,21 @@ by Gnulib.
 * truncf::
 * truncl::
 * tsearch::
+* tss_create::
+* tss_delete::
+* tss_get::
+* tss_set::
 * ttyname::
 * ttyname_r::
 * twalk::
 * tzname::
 * tzset::
+* ufromfp::
+* ufromfpf::
+* ufromfpl::
+* ufromfpx::
+* ufromfpxf::
+* ufromfpxl::
 * ulimit::
 * umask::
 * uname::
@@ -2244,6 +2350,10 @@ by Gnulib.
 @include posix-functions/cacoshl.texi
 @include posix-functions/cacosl.texi
 @include posix-functions/calloc.texi
+@include posix-functions/call_once.texi
+@include posix-functions/canonicalize.texi
+@include posix-functions/canonicalizef.texi
+@include posix-functions/canonicalizel.texi
 @include posix-functions/carg.texi
 @include posix-functions/cargf.texi
 @include posix-functions/cargl.texi
@@ -2300,6 +2410,12 @@ by Gnulib.
 @include posix-functions/close.texi
 @include posix-functions/closedir.texi
 @include posix-functions/closelog.texi
+@include posix-functions/cnd_broadcast.texi
+@include posix-functions/cnd_destroy.texi
+@include posix-functions/cnd_init.texi
+@include posix-functions/cnd_signal.texi
+@include posix-functions/cnd_timedwait.texi
+@include posix-functions/cnd_wait.texi
 @include posix-functions/confstr.texi
 @include posix-functions/conj.texi
 @include posix-functions/conjf.texi
@@ -2343,6 +2459,7 @@ by Gnulib.
 @include posix-functions/ctermid.texi
 @include posix-functions/ctime.texi
 @include posix-functions/ctime_r.texi
+@include posix-functions/daddl.texi
 @include posix-functions/daylight.texi
 @include posix-functions/dbm_clearerr.texi
 @include posix-functions/dbm_close.texi
@@ -2353,6 +2470,7 @@ by Gnulib.
 @include posix-functions/dbm_nextkey.texi
 @include posix-functions/dbm_open.texi
 @include posix-functions/dbm_store.texi
+@include posix-functions/ddivl.texi
 @include posix-functions/difftime.texi
 @include posix-functions/dirfd.texi
 @include posix-functions/dirname.texi
@@ -2361,8 +2479,10 @@ by Gnulib.
 @include posix-functions/dlerror.texi
 @include posix-functions/dlopen.texi
 @include posix-functions/dlsym.texi
+@include posix-functions/dmull.texi
 @include posix-functions/dprintf.texi
 @include posix-functions/drand48.texi
+@include posix-functions/dsubl.texi
 @include posix-functions/dup.texi
 @include posix-functions/dup2.texi
 @include posix-functions/duplocale.texi
@@ -2403,6 +2523,8 @@ by Gnulib.
 @include posix-functions/fabsf.texi
 @include posix-functions/fabsl.texi
 @include posix-functions/faccessat.texi
+@include posix-functions/fadd.texi
+@include posix-functions/faddl.texi
 @include posix-functions/fattach.texi
 @include posix-functions/fchdir.texi
 @include posix-functions/fchmod.texi
@@ -2416,20 +2538,26 @@ by Gnulib.
 @include posix-functions/fdim.texi
 @include posix-functions/fdimf.texi
 @include posix-functions/fdiml.texi
+@include posix-functions/fdiv.texi
+@include posix-functions/fdivl.texi
 @include posix-functions/fdopen.texi
 @include posix-functions/fdopendir.texi
 @include posix-functions/feclearexcept.texi
 @include posix-functions/fegetenv.texi
 @include posix-functions/fegetexceptflag.texi
+@include posix-functions/fegetmode.texi
 @include posix-functions/fegetround.texi
 @include posix-functions/feholdexcept.texi
 @include posix-functions/feof.texi
 @include posix-functions/feraiseexcept.texi
 @include posix-functions/ferror.texi
 @include posix-functions/fesetenv.texi
+@include posix-functions/fesetexcept.texi
 @include posix-functions/fesetexceptflag.texi
+@include posix-functions/fesetmode.texi
 @include posix-functions/fesetround.texi
 @include posix-functions/fetestexcept.texi
+@include posix-functions/fetestexceptflag.texi
 @include posix-functions/feupdateenv.texi
 @include posix-functions/fexecve.texi
 @include posix-functions/fflush.texi
@@ -2450,14 +2578,22 @@ by Gnulib.
 @include posix-functions/fmax.texi
 @include posix-functions/fmaxf.texi
 @include posix-functions/fmaxl.texi
+@include posix-functions/fmaxmag.texi
+@include posix-functions/fmaxmagf.texi
+@include posix-functions/fmaxmagl.texi
 @include posix-functions/fmemopen.texi
 @include posix-functions/fmin.texi
 @include posix-functions/fminf.texi
 @include posix-functions/fminl.texi
+@include posix-functions/fminmag.texi
+@include posix-functions/fminmagf.texi
+@include posix-functions/fminmagl.texi
 @include posix-functions/fmod.texi
 @include posix-functions/fmodf.texi
 @include posix-functions/fmodl.texi
 @include posix-functions/fmtmsg.texi
+@include posix-functions/fmul.texi
+@include posix-functions/fmull.texi
 @include posix-functions/fnmatch.texi
 @include posix-functions/fopen.texi
 @include posix-functions/fork.texi
@@ -2476,6 +2612,12 @@ by Gnulib.
 @include posix-functions/frexp.texi
 @include posix-functions/frexpf.texi
 @include posix-functions/frexpl.texi
+@include posix-functions/fromfp.texi
+@include posix-functions/fromfpf.texi
+@include posix-functions/fromfpl.texi
+@include posix-functions/fromfpx.texi
+@include posix-functions/fromfpxf.texi
+@include posix-functions/fromfpxl.texi
 @include posix-functions/fscanf.texi
 @include posix-functions/fseek.texi
 @include posix-functions/fseeko.texi
@@ -2483,6 +2625,8 @@ by Gnulib.
 @include posix-functions/fstat.texi
 @include posix-functions/fstatat.texi
 @include posix-functions/fstatvfs.texi
+@include posix-functions/fsub.texi
+@include posix-functions/fsubl.texi
 @include posix-functions/fsync.texi
 @include posix-functions/ftell.texi
 @include posix-functions/ftello.texi
@@ -2529,6 +2673,9 @@ by Gnulib.
 @include posix-functions/getnetbyname.texi
 @include posix-functions/getnetent.texi
 @include posix-functions/getopt.texi
+@include posix-functions/getpayload.texi
+@include posix-functions/getpayloadf.texi
+@include posix-functions/getpayloadl.texi
 @include posix-functions/getpeername.texi
 @include posix-functions/getpgid.texi
 @include posix-functions/getpgrp.texi
@@ -2680,6 +2827,9 @@ by Gnulib.
 @include posix-functions/listen.texi
 @include posix-functions/llabs.texi
 @include posix-functions/lldiv.texi
+@include posix-functions/llogb.texi
+@include posix-functions/llogbf.texi
+@include posix-functions/llogbl.texi
 @include posix-functions/llrint.texi
 @include posix-functions/llrintf.texi
 @include posix-functions/llrintl.texi
@@ -2765,6 +2915,12 @@ by Gnulib.
 @include posix-functions/msgrcv.texi
 @include posix-functions/msgsnd.texi
 @include posix-functions/msync.texi
+@include posix-functions/mtx_destroy.texi
+@include posix-functions/mtx_init.texi
+@include posix-functions/mtx_lock.texi
+@include posix-functions/mtx_timedlock.texi
+@include posix-functions/mtx_trylock.texi
+@include posix-functions/mtx_unlock.texi
 @include posix-functions/munlock.texi
 @include posix-functions/munlockall.texi
 @include posix-functions/munmap.texi
@@ -2779,9 +2935,15 @@ by Gnulib.
 @include posix-functions/nextafter.texi
 @include posix-functions/nextafterf.texi
 @include posix-functions/nextafterl.texi
+@include posix-functions/nextdown.texi
+@include posix-functions/nextdownf.texi
+@include posix-functions/nextdownl.texi
 @include posix-functions/nexttoward.texi
 @include posix-functions/nexttowardf.texi
 @include posix-functions/nexttowardl.texi
+@include posix-functions/nextup.texi
+@include posix-functions/nextupf.texi
+@include posix-functions/nextupl.texi
 @include posix-functions/nftw.texi
 @include posix-functions/nice.texi
 @include posix-functions/nl_langinfo.texi
@@ -3046,6 +3208,9 @@ by Gnulib.
 @include posix-functions/rintl.texi
 @include posix-functions/rmdir.texi
 @include posix-functions/round.texi
+@include posix-functions/roundeven.texi
+@include posix-functions/roundevenf.texi
+@include posix-functions/roundevenl.texi
 @include posix-functions/roundf.texi
 @include posix-functions/roundl.texi
 @include posix-functions/scalbln.texi
@@ -3096,6 +3261,12 @@ by Gnulib.
 @include posix-functions/setlocale.texi
 @include posix-functions/setlogmask.texi
 @include posix-functions/setnetent.texi
+@include posix-functions/setpayload.texi
+@include posix-functions/setpayloadf.texi
+@include posix-functions/setpayloadl.texi
+@include posix-functions/setpayloadsig.texi
+@include posix-functions/setpayloadsigf.texi
+@include posix-functions/setpayloadsigl.texi
 @include posix-functions/setpgid.texi
 @include posix-functions/setpgrp.texi
 @include posix-functions/setpriority.texi
@@ -3184,6 +3355,9 @@ by Gnulib.
 @include posix-functions/strerror_r.texi
 @include posix-functions/strfmon.texi
 @include posix-functions/strfmon_l.texi
+@include posix-functions/strfromd.texi
+@include posix-functions/strfromf.texi
+@include posix-functions/strfroml.texi
 @include posix-functions/strftime.texi
 @include posix-functions/strftime_l.texi
 @include posix-functions/strlen.texi
@@ -3244,6 +3418,14 @@ by Gnulib.
 @include posix-functions/tgamma.texi
 @include posix-functions/tgammaf.texi
 @include posix-functions/tgammal.texi
+@include posix-functions/thrd_create.texi
+@include posix-functions/thrd_current.texi
+@include posix-functions/thrd_detach.texi
+@include posix-functions/thrd_equal.texi
+@include posix-functions/thrd_exit.texi
+@include posix-functions/thrd_join.texi
+@include posix-functions/thrd_sleep.texi
+@include posix-functions/thrd_yield.texi
 @include posix-functions/time.texi
 @include posix-functions/timer_create.texi
 @include posix-functions/timer_delete.texi
@@ -3257,6 +3439,12 @@ by Gnulib.
 @include posix-functions/toascii.texi
 @include posix-functions/tolower.texi
 @include posix-functions/tolower_l.texi
+@include posix-functions/totalorder.texi
+@include posix-functions/totalorderf.texi
+@include posix-functions/totalorderl.texi
+@include posix-functions/totalordermag.texi
+@include posix-functions/totalordermagf.texi
+@include posix-functions/totalordermagl.texi
 @include posix-functions/toupper.texi
 @include posix-functions/toupper_l.texi
 @include posix-functions/towctrans.texi
@@ -3270,11 +3458,21 @@ by Gnulib.
 @include posix-functions/truncf.texi
 @include posix-functions/truncl.texi
 @include posix-functions/tsearch.texi
+@include posix-functions/tss_create.texi
+@include posix-functions/tss_delete.texi
+@include posix-functions/tss_get.texi
+@include posix-functions/tss_set.texi
 @include posix-functions/ttyname.texi
 @include posix-functions/ttyname_r.texi
 @include posix-functions/twalk.texi
 @include posix-functions/tzname.texi
 @include posix-functions/tzset.texi
+@include posix-functions/ufromfp.texi
+@include posix-functions/ufromfpf.texi
+@include posix-functions/ufromfpl.texi
+@include posix-functions/ufromfpx.texi
+@include posix-functions/ufromfpxf.texi
+@include posix-functions/ufromfpxl.texi
 @include posix-functions/ulimit.texi
 @include posix-functions/umask.texi
 @include posix-functions/uname.texi
@@ -3396,7 +3594,12 @@ problems are not worked around by Gnulib.
 * gethostbyname::
 * getwd::
 * h_errno::
+@ifhtml
+* _index::
+@end ifhtml
+@ifnothtml
 * index::
+@end ifnothtml
 * makecontext::
 * mktemp::
 * pthread_attr_getstackaddr::
@@ -3479,6 +3682,7 @@ not worked around by Gnulib.
 * resolv.h::
 * shadow.h::
 * sys/ioctl.h::
+* sys/random.h::
 * sysexits.h::
 * ttyent.h::
 @end menu
@@ -3513,6 +3717,7 @@ not worked around by Gnulib.
 @include glibc-headers/resolv.texi
 @include glibc-headers/shadow.texi
 @include glibc-headers/sys_ioctl.texi
+@include glibc-headers/sys_random.texi
 @include glibc-headers/sysexits.texi
 @include glibc-headers/ttyent.texi
 
@@ -3536,7 +3741,6 @@ This list of functions is sorted according to the header that declares them.
 * Glibc arpa/inet.h::
 * Glibc byteswap.h::
 * Glibc complex.h::
-* Glibc crypt.h::
 * Glibc ctype.h::
 * Glibc dirent.h::
 * Glibc dlfcn.h::
@@ -3566,6 +3770,7 @@ This list of functions is sorted according to the header that declares them.
 * Glibc netinet/ether.h::
 * Glibc netinet/in.h::
 * Glibc obstack.h::
+* Glibc poll.h::
 * Glibc printf.h::
 * Glibc pthread.h::
 * Glibc pty.h::
@@ -3577,7 +3782,6 @@ This list of functions is sorted according to the header that declares them.
 * Glibc rpc/auth_des.h::
 * Glibc rpc/auth_unix.h::
 * Glibc rpc/clnt.h::
-* Glibc rpc/des_crypt.h::
 * Glibc rpc/key_prot.h::
 * Glibc rpc/netdb.h::
 * Glibc rpc/pmap_clnt.h::
@@ -3589,23 +3793,26 @@ This list of functions is sorted according to the header that declares them.
 * Glibc rpcsvc/nislib.h::
 * Glibc rpcsvc/nis_callback.h::
 * Glibc rpcsvc/yp.h::
-* Glibc rpcsvc/yp_prot.h::
 * Glibc rpcsvc/ypclnt.h::
-* Glibc rpcsvc/ypupd.h::
 * Glibc sched.h::
 * Glibc search.h::
 * Glibc selinux/selinux.h::
+* Glibc semaphore.h::
 * Glibc shadow.h::
 * Glibc signal.h::
+* Glibc spawn.h::
 * Glibc stdio.h::
 * Glibc stdlib.h::
 * Glibc string.h::
+* Glibc sys/auxv.h::
 * Glibc sys/capability.h::
 * Glibc sys/epoll.h::
+* Glibc sys/eventfd.h::
 * Glibc sys/fanotify.h::
 * Glibc sys/file.h::
 * Glibc sys/fsuid.h::
 * Glibc sys/gmon.h::
+* Glibc sys/inotify.h::
 * Glibc sys/io.h and sys/perm.h::
 * Glibc sys/kdaemon.h::
 * Glibc sys/klog.h::
@@ -3616,10 +3823,12 @@ This list of functions is sorted according to the header that declares them.
 * Glibc sys/profil.h::
 * Glibc sys/ptrace.h::
 * Glibc sys/quota.h::
+* Glibc sys/random.h::
 * Glibc sys/reboot.h::
 * Glibc sys/resource.h::
 * Glibc sys/sem.h::
 * Glibc sys/sendfile.h::
+* Glibc sys/signalfd.h::
 * Glibc sys/socket.h::
 * Glibc sys/stat.h::
 * Glibc sys/statfs.h::
@@ -3629,11 +3838,11 @@ This list of functions is sorted according to the header that declares them.
 * Glibc sys/syslog.h::
 * Glibc sys/sysmacros.h::
 * Glibc sys/time.h::
+* Glibc sys/timerfd.h::
 * Glibc sys/timex.h::
 * Glibc sys/uio.h::
 * Glibc sys/ustat.h::
 * Glibc sys/vlimit.h::
-* Glibc sys/vm86.h::
 * Glibc sys/vtimes.h::
 * Glibc sys/wait.h::
 * Glibc sys/xattr.h::
@@ -3800,18 +4009,8 @@ This list of functions is sorted according to the header that declares them.
 @c @node Glibc cpio.h
 @c @section Glibc Extensions to @code{<cpio.h>}
 
-@node Glibc crypt.h
-@section Glibc @code{<crypt.h>}
-
-@menu
-* crypt_r::
-* encrypt_r::
-* setkey_r::
-@end menu
-
-@include glibc-functions/crypt_r.texi
-@include glibc-functions/encrypt_r.texi
-@include glibc-functions/setkey_r.texi
+@c @node Glibc crypt.h
+@c @section Glibc @code{<crypt.h>}
 
 @node Glibc ctype.h
 @section Glibc Extensions to @code{<ctype.h>}
@@ -3946,12 +4145,14 @@ This list of functions is sorted according to the header that declares them.
 * name_to_handle_at::
 * readahead::
 * open_by_handle_at::
+* sync_file_range::
 @end menu
 
 @include glibc-functions/fallocate.texi
 @include glibc-functions/name_to_handle_at.texi
 @include glibc-functions/readahead.texi
 @include glibc-functions/open_by_handle_at.texi
+@include glibc-functions/sync_file_range.texi
 
 @node Glibc fenv.h
 @section Glibc Extensions to @code{<fenv.h>}
@@ -4506,8 +4707,14 @@ This list of functions is sorted according to the header that declares them.
 @c @node Glibc paths.h
 @c @section Glibc @code{<paths.h>}
 
-@c @node Glibc poll.h
-@c @section Glibc Extensions to @code{<poll.h>}
+@node Glibc poll.h
+@section Glibc Extensions to @code{<poll.h>}
+
+@menu
+* ppoll::
+@end menu
+
+@include glibc-functions/ppoll.texi
 
 @node Glibc printf.h
 @section Glibc @code{<printf.h>}
@@ -4536,16 +4743,23 @@ This list of functions is sorted according to the header that declares them.
 @menu
 * pthread_attr_getaffinity_np::
 * pthread_attr_setaffinity_np::
+* pthread_clockjoin_np::
+* pthread_cond_clockwait::
 * pthread_getaffinity_np::
+* pthread_getattr_default_np::
 * pthread_getattr_np::
 * pthread_getname_np::
 * pthread_kill_other_threads_np::
+* pthread_mutex_clocklock::
 * pthread_mutex_consistent_np::
 * pthread_mutexattr_getrobust_np::
 * pthread_mutexattr_setrobust_np::
+* pthread_rwlock_clockrdlock::
+* pthread_rwlock_clockwrlock::
 * pthread_rwlockattr_getkind_np::
 * pthread_rwlockattr_setkind_np::
 * pthread_setaffinity_np::
+* pthread_setattr_default_np::
 * pthread_setname_np::
 * pthread_sigqueue::
 * pthread_timedjoin_np::
@@ -4555,16 +4769,23 @@ This list of functions is sorted according to the header that declares them.
 
 @include glibc-functions/pthread_attr_getaffinity_np.texi
 @include glibc-functions/pthread_attr_setaffinity_np.texi
+@include glibc-functions/pthread_clockjoin_np.texi
+@include glibc-functions/pthread_cond_clockwait.texi
 @include glibc-functions/pthread_getaffinity_np.texi
+@include glibc-functions/pthread_getattr_default_np.texi
 @include glibc-functions/pthread_getattr_np.texi
 @include glibc-functions/pthread_getname_np.texi
 @include glibc-functions/pthread_kill_other_threads_np.texi
+@include glibc-functions/pthread_mutex_clocklock.texi
 @include glibc-functions/pthread_mutex_consistent_np.texi
 @include glibc-functions/pthread_mutexattr_getrobust_np.texi
 @include glibc-functions/pthread_mutexattr_setrobust_np.texi
+@include glibc-functions/pthread_rwlock_clockrdlock.texi
+@include glibc-functions/pthread_rwlock_clockwrlock.texi
 @include glibc-functions/pthread_rwlockattr_getkind_np.texi
 @include glibc-functions/pthread_rwlockattr_setkind_np.texi
 @include glibc-functions/pthread_setaffinity_np.texi
+@include glibc-functions/pthread_setattr_default_np.texi
 @include glibc-functions/pthread_setname_np.texi
 @include glibc-functions/pthread_sigqueue.texi
 @include glibc-functions/pthread_timedjoin_np.texi
@@ -4774,18 +4995,8 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/getrpcport.texi
 @include glibc-functions/rpc_createerr.texi
 
-@node Glibc rpc/des_crypt.h
-@section Glibc @code{<rpc/des_crypt.h>}
-
-@menu
-* cbc_crypt::
-* des_setparity::
-* ecb_crypt::
-@end menu
-
-@include glibc-functions/cbc_crypt.texi
-@include glibc-functions/des_setparity.texi
-@include glibc-functions/ecb_crypt.texi
+@c @node Glibc rpc/des_crypt.h
+@c @section Glibc @code{<rpc/des_crypt.h>}
 
 @node Glibc rpc/key_prot.h
 @section Glibc @code{<rpc/key_prot.h>}
@@ -5181,16 +5392,10 @@ This list of functions is sorted according to the header that declares them.
 @menu
 * xdr_domainname::
 * xdr_keydat::
-* xdr_mapname::
-* xdr_peername::
 * xdr_valdat::
-* xdr_ypbind_binding::
-* xdr_ypbind_resp::
 * xdr_ypbind_resptype::
-* xdr_ypbind_setdom::
 * xdr_ypmap_parms::
 * xdr_ypmaplist::
-* xdr_yppush_status::
 * xdr_yppushresp_xfr::
 * xdr_ypreq_key::
 * xdr_ypreq_nokey::
@@ -5208,16 +5413,10 @@ This list of functions is sorted according to the header that declares them.
 
 @include glibc-functions/xdr_domainname.texi
 @include glibc-functions/xdr_keydat.texi
-@include glibc-functions/xdr_mapname.texi
-@include glibc-functions/xdr_peername.texi
 @include glibc-functions/xdr_valdat.texi
-@include glibc-functions/xdr_ypbind_binding.texi
-@include glibc-functions/xdr_ypbind_resp.texi
 @include glibc-functions/xdr_ypbind_resptype.texi
-@include glibc-functions/xdr_ypbind_setdom.texi
 @include glibc-functions/xdr_ypmap_parms.texi
 @include glibc-functions/xdr_ypmaplist.texi
-@include glibc-functions/xdr_yppush_status.texi
 @include glibc-functions/xdr_yppushresp_xfr.texi
 @include glibc-functions/xdr_ypreq_key.texi
 @include glibc-functions/xdr_ypreq_nokey.texi
@@ -5232,14 +5431,8 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/xdr_ypstat.texi
 @include glibc-functions/xdr_ypxfrstat.texi
 
-@node Glibc rpcsvc/yp_prot.h
-@section Glibc @code{<rpcsvc/yp_prot.h>}
-
-@menu
-* xdr_ypall::
-@end menu
-
-@include glibc-functions/xdr_ypall.texi
+@c @node Glibc rpcsvc/yp_prot.h
+@c @section Glibc @code{<rpcsvc/yp_prot.h>}
 
 @node Glibc rpcsvc/ypclnt.h
 @section Glibc @code{<rpcsvc/ypclnt.h>}
@@ -5254,7 +5447,6 @@ This list of functions is sorted according to the header that declares them.
 * yp_next::
 * yp_order::
 * yp_unbind::
-* yp_update::
 * ypbinderr_string::
 * yperr_string::
 * ypprot_err::
@@ -5269,36 +5461,29 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/yp_next.texi
 @include glibc-functions/yp_order.texi
 @include glibc-functions/yp_unbind.texi
-@include glibc-functions/yp_update.texi
 @include glibc-functions/ypbinderr_string.texi
 @include glibc-functions/yperr_string.texi
 @include glibc-functions/ypprot_err.texi
 
-@node Glibc rpcsvc/ypupd.h
-@section Glibc @code{<rpcsvc/ypupd.h>}
-
-@menu
-* xdr_yp_buf::
-* xdr_ypdelete_args::
-* xdr_ypupdate_args::
-@end menu
-
-@include glibc-functions/xdr_yp_buf.texi
-@include glibc-functions/xdr_ypdelete_args.texi
-@include glibc-functions/xdr_ypupdate_args.texi
+@c @node Glibc rpcsvc/ypupd.h
+@c @section Glibc @code{<rpcsvc/ypupd.h>}
 
 @node Glibc sched.h
 @section Glibc Extensions to @code{<sched.h>}
 
 @menu
 * clone::
+* getcpu::
 * sched_getaffinity::
+* sched_getcpu::
 * sched_setaffinity::
 * setns::
 @end menu
 
 @include glibc-functions/clone.texi
+@include glibc-functions/getcpu.texi
 @include glibc-functions/sched_getaffinity.texi
+@include glibc-functions/sched_getcpu.texi
 @include glibc-functions/sched_setaffinity.texi
 @include glibc-functions/setns.texi
 
@@ -5310,12 +5495,14 @@ This list of functions is sorted according to the header that declares them.
 * hdestroy_r::
 * hsearch_r::
 * tdestroy::
+* twalk_r::
 @end menu
 
 @include glibc-functions/hcreate_r.texi
 @include glibc-functions/hdestroy_r.texi
 @include glibc-functions/hsearch_r.texi
 @include glibc-functions/tdestroy.texi
+@include glibc-functions/twalk_r.texi
 
 @node Glibc selinux/selinux.h
 @section Glibc Extensions to @code{<selinux/selinux.h>}
@@ -5331,8 +5518,14 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/getfilecon.texi
 @include glibc-functions/lgetfilecon.texi
 
-@c @node Glibc semaphore.h
-@c @section Glibc Extensions to @code{<semaphore.h>}
+@node Glibc semaphore.h
+@section Glibc Extensions to @code{<semaphore.h>}
+
+@menu
+* sem_clockwait::
+@end menu
+
+@include glibc-functions/sem_clockwait.texi
 
 @c @node Glibc setjmp.h
 @c @section Glibc Extensions to @code{<setjmp.h>}
@@ -5387,6 +5580,7 @@ This list of functions is sorted according to the header that declares them.
 * ssignal::
 * sys_siglist::
 * sysv_signal::
+* tgkill::
 @end menu
 
 @include glibc-functions/gsignal.texi
@@ -5402,9 +5596,18 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/ssignal.texi
 @include glibc-functions/sys_siglist.texi
 @include glibc-functions/sysv_signal.texi
+@include glibc-functions/tgkill.texi
 
-@c @node Glibc spawn.h
-@c @section Glibc Extensions to @code{<spawn.h>}
+@node Glibc spawn.h
+@section Glibc Extensions to @code{<spawn.h>}
+
+@menu
+* posix_spawn_file_actions_addchdir_np::
+* posix_spawn_file_actions_addfchdir_np::
+@end menu
+
+@include glibc-functions/posix_spawn_file_actions_addchdir_np.texi
+@include glibc-functions/posix_spawn_file_actions_addfchdir_np.texi
 
 @c @node Glibc stdarg.h
 @c @section Glibc Extensions to @code{<stdarg.h>}
@@ -5439,6 +5642,7 @@ This list of functions is sorted according to the header that declares them.
 * fwrite_unlocked::
 * getw::
 * putw::
+* renameat2::
 * setbuffer::
 * setlinebuf::
 * sys_errlist::
@@ -5464,6 +5668,7 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/fwrite_unlocked.texi
 @include glibc-functions/getw.texi
 @include glibc-functions/putw.texi
+@include glibc-functions/renameat2.texi
 @include glibc-functions/setbuffer.texi
 @include glibc-functions/setlinebuf.texi
 @include glibc-functions/sys_errlist.texi
@@ -5603,6 +5808,15 @@ This list of functions is sorted according to the header that declares them.
 @c @node Glibc stropts.h
 @c @section Glibc Extensions to @code{<stropts.h>}
 
+@node Glibc sys/auxv.h
+@section Glibc @code{<sys/auxv.h>}
+
+@menu
+* getauxval::
+@end menu
+
+@include glibc-functions/getauxval.texi
+
 @node Glibc sys/capability.h
 @section Glibc @code{<sys/capability.h>}
 
@@ -5619,13 +5833,30 @@ This list of functions is sorted according to the header that declares them.
 
 @menu
 * epoll_create::
+* epoll_create1::
 * epoll_ctl::
+* epoll_pwait::
 * epoll_wait::
 @end menu
 
 @include glibc-functions/epoll_create.texi
+@include glibc-functions/epoll_create1.texi
 @include glibc-functions/epoll_ctl.texi
+@include glibc-functions/epoll_pwait.texi
 @include glibc-functions/epoll_wait.texi
+
+@node Glibc sys/eventfd.h
+@section Glibc @code{<sys/eventfd.h>}
+
+@menu
+* eventfd::
+* eventfd_read::
+* eventfd_write::
+@end menu
+
+@include glibc-functions/eventfd.texi
+@include glibc-functions/eventfd_read.texi
+@include glibc-functions/eventfd_write.texi
 
 @node Glibc sys/fanotify.h
 @section Glibc @code{<sys/fanotify.h>}
@@ -5667,6 +5898,21 @@ This list of functions is sorted according to the header that declares them.
 
 @include glibc-functions/monstartup.texi
 
+@node Glibc sys/inotify.h
+@section Glibc @code{<sys/inotify.h>}
+
+@menu
+* inotify_add_watch::
+* inotify_init::
+* inotify_init1::
+* inotify_rm_watch::
+@end menu
+
+@include glibc-functions/inotify_add_watch.texi
+@include glibc-functions/inotify_init.texi
+@include glibc-functions/inotify_init1.texi
+@include glibc-functions/inotify_rm_watch.texi
+
 @node Glibc sys/io.h and sys/perm.h
 @section Glibc @code{<sys/io.h>}, @code{<sys/perm.h>}
 
@@ -5707,14 +5953,28 @@ This list of functions is sorted according to the header that declares them.
 
 @menu
 * madvise::
+* memfd_create::
 * mincore::
+* mlock2::
 * mremap::
+* pkey_alloc::
+* pkey_free::
+* pkey_get::
+* pkey_mprotect::
+* pkey_set::
 * remap_file_pages::
 @end menu
 
 @include glibc-functions/madvise.texi
+@include glibc-functions/memfd_create.texi
 @include glibc-functions/mincore.texi
+@include glibc-functions/mlock2.texi
 @include glibc-functions/mremap.texi
+@include glibc-functions/pkey_alloc.texi
+@include glibc-functions/pkey_free.texi
+@include glibc-functions/pkey_get.texi
+@include glibc-functions/pkey_mprotect.texi
+@include glibc-functions/pkey_set.texi
 @include glibc-functions/remap_file_pages.texi
 
 @node Glibc sys/mount.h
@@ -5778,6 +6038,17 @@ This list of functions is sorted according to the header that declares them.
 
 @include glibc-functions/quotactl.texi
 
+@node Glibc sys/random.h
+@section Glibc @code{<sys/random.h>}
+
+@menu
+* getentropy::
+* getrandom::
+@end menu
+
+@include glibc-functions/getentropy.texi
+@include glibc-functions/getrandom.texi
+
 @node Glibc sys/reboot.h
 @section Glibc @code{<sys/reboot.h>}
 
@@ -5820,6 +6091,15 @@ This list of functions is sorted according to the header that declares them.
 @c @node Glibc sys/shm.h
 @c @section Glibc Extensions to @code{<sys/shm.h>}
 
+@node Glibc sys/signalfd.h
+@section Glibc @code{<sys/signalfd.h>}
+
+@menu
+* signalfd::
+@end menu
+
+@include glibc-functions/signalfd.texi
+
 @node Glibc sys/socket.h
 @section Glibc Extensions to @code{<sys/socket.h>}
 
@@ -5840,9 +6120,11 @@ This list of functions is sorted according to the header that declares them.
 
 @menu
 * lchmod::
+* statx::
 @end menu
 
 @include glibc-functions/lchmod.texi
+@include glibc-functions/statx.texi
 
 @node Glibc sys/statfs.h
 @section Glibc @code{<sys/statfs.h>}
@@ -5937,6 +6219,19 @@ This list of functions is sorted according to the header that declares them.
 @c @node Glibc sys/timeb.h
 @c @section Glibc Extensions to @code{<sys/timeb.h>}
 
+@node Glibc sys/timerfd.h
+@section Glibc @code{<sys/timerfd.h>}
+
+@menu
+* timerfd_create::
+* timerfd_gettime::
+* timerfd_settime::
+@end menu
+
+@include glibc-functions/timerfd_create.texi
+@include glibc-functions/timerfd_gettime.texi
+@include glibc-functions/timerfd_settime.texi
+
 @c @node Glibc sys/times.h
 @c @section Glibc Extensions to @code{<sys/times.h>}
 
@@ -5963,15 +6258,19 @@ This list of functions is sorted according to the header that declares them.
 
 @menu
 * preadv::
+* preadv2::
 * process_vm_readv::
 * process_vm_writev::
 * pwritev::
+* pwritev2::
 @end menu
 
 @include glibc-functions/preadv.texi
+@include glibc-functions/preadv2.texi
 @include glibc-functions/process_vm_readv.texi
 @include glibc-functions/process_vm_writev.texi
 @include glibc-functions/pwritev.texi
+@include glibc-functions/pwritev2.texi
 
 @c @node Glibc sys/un.h
 @c @section Glibc Extensions to @code{<sys/un.h>}
@@ -5997,14 +6296,8 @@ This list of functions is sorted according to the header that declares them.
 
 @include glibc-functions/vlimit.texi
 
-@node Glibc sys/vm86.h
-@section Glibc @code{<sys/vm86.h>}
-
-@menu
-* vm86::
-@end menu
-
-@include glibc-functions/vm86.texi
+@c @node Glibc sys/vm86.h
+@c @section Glibc @code{<sys/vm86.h>}
 
 @node Glibc sys/vtimes.h
 @section Glibc @code{<sys/vtimes.h>}
@@ -6137,8 +6430,10 @@ This list of functions is sorted according to the header that declares them.
 * acct::
 * brk::
 * chroot::
+* copy_file_range::
 * daemon::
 * dup3::
+* eaccess::
 * endusershell::
 * euidaccess::
 * execvpe::
@@ -6149,6 +6444,7 @@ This list of functions is sorted according to the header that declares them.
 * getpass::
 * getresgid::
 * getresuid::
+* gettid::
 * getusershell::
 * group_member::
 * pipe2::
@@ -6171,8 +6467,10 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/acct.texi
 @include glibc-functions/brk.texi
 @include glibc-functions/chroot.texi
+@include glibc-functions/copy_file_range.texi
 @include glibc-functions/daemon.texi
 @include glibc-functions/dup3.texi
+@include glibc-functions/eaccess.texi
 @include glibc-functions/endusershell.texi
 @include glibc-functions/euidaccess.texi
 @include glibc-functions/execvpe.texi
@@ -6183,6 +6481,7 @@ This list of functions is sorted according to the header that declares them.
 @include glibc-functions/getpass.texi
 @include glibc-functions/getresgid.texi
 @include glibc-functions/getresuid.texi
+@include glibc-functions/gettid.texi
 @include glibc-functions/getusershell.texi
 @include glibc-functions/group_member.texi
 @include glibc-functions/pipe2.texi
@@ -6331,6 +6630,7 @@ to POSIX that it can be treated like any other Unix-like platform.
 * Avoiding the year 2038 problem::
 * Windows sockets::
 * Native Windows Support without MSVC Support::
+* Visual Studio Compatibility::
 @end menu
 
 @include windows-libtool.texi
@@ -6347,6 +6647,11 @@ to POSIX that it can be treated like any other Unix-like platform.
 
 @include windows-without-msvc.texi
 
+@include ld-output-def.texi
+
+
+@include multithread.texi
+
 
 @node Particular Modules
 @chapter Particular Modules
@@ -6355,13 +6660,20 @@ to POSIX that it can be treated like any other Unix-like platform.
 * alloca::
 * alloca-opt::
 * Safe Allocation Macros::
+* Attributes::
 * Compile-time Assertions::
+* Non-returning Functions::
 * Integer Properties::
+* static inline::
 * extern inline::
+* Closed standard fds::
+* Container data types::
 * String Functions in C Locale::
+* Recognizing Option Arguments::
 * Quoting::
-* error and progname::
+* progname and getprogname::
 * gcd::
+* Profiling of program phases::
 * Library version handling::
 * Supporting Relocation::
 * func::
@@ -6380,19 +6692,33 @@ to POSIX that it can be treated like any other Unix-like platform.
 
 @include safe-alloc.texi
 
+@include attribute.texi
+
 @include verify.texi
+
+@include noreturn.texi
 
 @include intprops.texi
 
+@include static-inline.texi
+
 @include extern-inline.texi
+
+@include xstdopen.texi
+
+@include containers.texi
 
 @include c-locale.texi
 
+@include argmatch.texi
+
 @include quote.texi
 
-@include error.texi
+@include progname.texi
 
 @include gcd.texi
+
+@include timevar.texi
 
 @include check-version.texi
 
@@ -6443,10 +6769,11 @@ for use with GNU Automake (in particular).
 * Searching for Libraries::
 * Exported Symbols of Shared Libraries::
 * LD Version Scripts::
-* Visual Studio Compatibility::
 * configmake::
 * warnings::
 * manywarnings::
+* Running self-tests under valgrind::
+* VCS To ChangeLog::
 @end menu
 
 @include havelib.texi
@@ -6455,13 +6782,246 @@ for use with GNU Automake (in particular).
 
 @include ld-version-script.texi
 
-@include ld-output-def.texi
-
 @include configmake.texi
 
 @include warnings.texi
 
 @include manywarnings.texi
+
+@include valgrind-tests.texi
+
+@include vcs-to-changelog.texi
+
+
+@node Build Infrastructure Files
+@chapter Build Infrastructure Files
+
+Gnulib contains also a small number of files that are not part of
+modules.  They are meant to be imported into packages by means of
+@samp{gnulib-tool --copy-file}, not @samp{gnulib-tool --import}.  For
+example, the commands to import the files @code{config.guess} and
+@code{config.sub} are
+@smallexample
+for file in config.guess config.sub; do
+  $GNULIB_TOOL --copy-file build-aux/$file \
+    && chmod a+x build-aux/$file \
+    || exit $?
+done
+@end smallexample
+
+Packages that don't use Gnulib can get hold of these files through
+direct download from Gnulib's git repository.  The commands to do this
+look as follows:
+@smallexample
+for file in config.guess config.sub; do
+  echo "$0: getting $file..."
+  wget -q --timeout=5 -O build-aux/$file.tmp "https://git.savannah.gnu.org/gitweb/?p=gnulib.git;a=blob_plain;f=build-aux/$@{file@};hb=HEAD" \
+    && mv build-aux/$file.tmp build-aux/$file \
+    && chmod a+x build-aux/$file
+  retval=$?
+  rm -f build-aux/$file.tmp
+  test $retval -eq 0 || exit $retval
+done
+@end smallexample
+
+@menu
+* Recognizing platforms::
+* Utilities for Makefiles::
+* Developer tools::
+* For building documentation::
+* For building libraries::
+* For running tests::
+@end menu
+
+@node Recognizing platforms
+@section Recognizing platforms
+
+@table @code
+@item build-aux/config.guess
+@itemx build-aux/config.sub
+These files are helper scripts, invoked by the @samp{configure} script.
+@code{config.guess} recognizes the platform on which the script is
+running, and produces a triplet of the form
+@code{@var{cpu-type}-@var{vendor}-@var{operating_system}}.
+@code{config.sub} receives a possibly abbreviated triplet and produces a
+canonical triplet for a platform.  For more information, see
+@ifinfo
+@ref{Configuration,,,standards}.
+@end ifinfo
+@ifnotinfo
+@url{https://www.gnu.org/prep/standards/html_node/Configuration.html}.
+@end ifnotinfo
+@end table
+
+It is important that you always include the newest versions of these two
+files in your tarball, because people who work on emerging platforms
+otherwise have a hard time building your package.
+
+@node Utilities for Makefiles
+@section Utilities for Makefiles
+
+These are a couple of programs that are often useful in Makefiles.  Some
+of them are also described in
+@ifinfo
+@ref{Auxiliary Programs,,,automake}.
+@end ifinfo
+@ifnotinfo
+@url{https://www.gnu.org/software/automake/manual/html_node/Auxiliary-Programs.html}.
+@end ifnotinfo
+
+@table @code
+@item build-aux/ar-lib
+@itemx build-aux/compile
+These two scripts are necessary for supporting portability to native
+Windows with the MSVC compiler.  @code{compile} is a wrapper script that
+invokes the compiler and provides a command-line interface compatible
+with Unix compilers.  Similarly, @code{ar-lib} is a wrapper script that
+provides a command-line interface compatible with Unix @code{ar}.
+@item build-aux/depcomp
+This is a helper script, used by Makefile rules generated by GNU
+Automake.  It generates Makefile dependencies while compiling a file.
+@item build-aux/install-sh
+This is a helper script, used by Makefile rules generated by GNU
+Automake.  It installs files during the @code{make install} phase.  In
+the Makefile, don't use this file directly; always use
+@code{$(INSTALL_PROGRAM)} or @code{$(INSTALL_DATA)} instead.
+@item build-aux/mdate-sh
+This script determines the modification time of a file and pretty-prints
+it.  The typical use is to add a ``Last modified'' line to the
+documentation.
+@item build-aux/mkinstalldirs
+This is a helper script, used by Makefile rules generated by GNU
+Automake.  It creates directories during the @code{make install} phase.
+It is roughly equivalent to @samp{mkdir -p} (except that the latter is
+not portable).  In the Makefile, don't use this file directly; always
+use @code{$(MKDIR_P)} instead.
+@item build-aux/mktempd
+This script creates a temporary directory.  It is roughly equivalent to
+@samp{mktemp -d} (except that the latter is not portable).
+@item build-aux/move-if-change
+This script moves a freshly generated file to a destination file, with a
+special optimization for the case that both files are identical.  In
+this case the freshly generated file is deleted, and the time stamp of
+the destination file is @emph{not} changed.  This is useful when
+updating a file that rarely actually changes and which many Makefile
+targets depend upon.
+@end table
+
+@node Developer tools
+@section Programs for developing in Git checkouts
+
+These are a couple of programs that help when developing in a Git
+checkout.  The maintainer of the package copies these programs into the
+version control of the package, so that co-developers can use these
+tools right away.
+
+@table @code
+@item top/gitsub.sh
+This program manages the subdirectories of a Git checkout that come from
+other packages, including Gnulib.
+@item build-aux/bootstrap
+This program manages the Git submodules, including Gnulib, and is also a
+wrapper around @code{gnulib-tool} and @code{automake}, that generates
+files from other files.@*
+Note: Because this program mixes version control management and
+generation of files in non-obvious ways, it has a number of usability
+issues for the advanced developer.
+@item build-aux/bootstrap.conf
+This is the template configuration file.  After copying it into your
+package, you need to customize it.
+@item build-aux/po/Makefile.in.in
+@itemx build-aux/po/remove-potcdate.sin
+These are auxiliary files used by @code{bootstrap}.  You don't have to
+copy them yourself; @code{bootstrap} will do that.
+@end table
+
+@node For building documentation
+@section Utilities for building documentation
+
+These are auxiliary files for building documentation.
+
+@table @code
+@item build-aux/texinfo.tex
+This file is needed for the conversion of Texinfo-format documentation
+to PDF, PostScript, or DVI formats.  It implements the GNU Texinfo
+commands on top of plain TeX.
+@item build-aux/x-to-1.in
+This file, once processed, gives a program @code{x-to-1}, that produces
+a manual page for a program, by combining a skeleton with the program's
+@code{--help} output.
+@end table
+
+@node For building libraries
+@section Utilities for building libraries
+
+@table @code
+@item build-aux/declared.sh
+This program extracts the declared global symbols of a C header file.
+It is useful when you want to control the set of symbols exported by a
+library.  See @ref{Exported Symbols of Shared Libraries}.
+@end table
+
+@node For running tests
+@section Utilities for running test suites
+
+@table @code
+@item build-aux/run-test
+This file is a test driver that supports running a test under
+@code{valgrind}.
+@item build-aux/test-driver.diff
+This is a patch, against Automake's test driver, that support running a
+test suite on Android.
+@end table
+
+
+@node Release Management Files
+@chapter Release Management Files
+
+Gnulib also contain a few scripts that are useful for the release
+management of a package.  They can be used directly off the Gnulib
+checkout; they don't need to copied first.
+
+@menu
+* For building shared libraries::
+* For uploading releases::
+@end menu
+
+@node For building shared libraries
+@section Tools for releasing packages with shared libraries
+
+@table @code
+@item build-aux/libtool-next-version
+This program is a wizard that helps a maintainer update the libtool
+version of a shared library, without making mistakes in this process.
+For background documentation, see
+@ifinfo
+@ref{Updating version info,,,libtool}.
+@end ifinfo
+@ifnotinfo
+@url{https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html}.
+@end ifnotinfo
+@end table
+
+@node For uploading releases
+@section Tools for uploading release tarballs
+
+@table @code
+@item build-aux/gnupload
+This program is a user-friendly way to upload a release tarball to one of
+the GNU servers (@code{ftp.gnu.org} or @code{alpha.gnu.org}).  It
+implements the interface described in
+@ifinfo
+@ref{Automated FTP Uploads,,,maintain}.
+@end ifinfo
+@ifnotinfo
+@url{https://www.gnu.org/prep/maintain/html_node/Automated-FTP-Uploads.html}.
+@end ifnotinfo
+@item build-aux/ncftpput-ftp
+This is a helper program that mimics the @code{ncftpput} program used by
+@code{gnupload}.  If you want to use @code{gnupload} but don't have
+@code{ncftp} installed, copy this file into your $PATH, renaming it to
+@code{ncftpput}.
+@end table
 
 
 @node GNU Free Documentation License

@@ -10,17 +10,19 @@ m4/backupfile.m4
 
 Depends-on:
 argmatch
+attribute
 closedir
 d-ino
 dirent-safer
-dirfd
 dirname-lgpl
 fcntl
 memcmp
-opendir
-renameat2
+opendirat
 readdir
+renameatu
 stdbool
+stdint
+xalloc-oversized
 
 configure.ac:
 gl_BACKUPFILE
@@ -30,6 +32,9 @@ lib_SOURCES += backupfile.c backup-rename.c
 
 Include:
 "backupfile.h"
+
+Link:
+$(LIB_MBRTOWC)
 
 License:
 GPL

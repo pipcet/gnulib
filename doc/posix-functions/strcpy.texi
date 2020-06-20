@@ -2,7 +2,7 @@
 @section @code{strcpy}
 @findex strcpy
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/strcpy.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcpy.html}
 
 Gnulib module: string
 
@@ -17,3 +17,6 @@ OS X 10.8.
 Portability problems not fixed by Gnulib:
 @itemize
 @end itemize
+
+Note: @code{strcpy (dst, src)} is only safe to use when you can guarantee that
+there are at least @code{strlen (src) + 1} bytes allocated at @code{dst}.

@@ -1,5 +1,5 @@
 /* Test of astrxfrm() function.
-   Copyright (C) 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2010-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -49,6 +49,7 @@ main ()
     ASSERT (transform != NULL);
     ASSERT (strcmp (transform, expected_transform) == 0);
     ASSERT (length == strlen (transform) + 1);
+    free (transform);
   }
 
   /* Test resultbuf != NULL with an initial length = 0.  */
@@ -63,6 +64,7 @@ main ()
     ASSERT (strcmp (transform, expected_transform) == 0);
     ASSERT (length == strlen (transform) + 1);
     ASSERT (buf[0] == '@');
+    free (transform);
   }
 
   /* Test resultbuf != NULL with an initial length that is too small.  */
@@ -77,6 +79,7 @@ main ()
     ASSERT (strcmp (transform, expected_transform) == 0);
     ASSERT (length == strlen (transform) + 1);
     ASSERT (buf[sizeof (buf) - 1] == '@');
+    free (transform);
   }
 
   /* Test resultbuf != NULL with an initial length that is large enough.  */
@@ -92,6 +95,8 @@ main ()
     ASSERT (length == strlen (transform) + 1);
     ASSERT (buf[sizeof (buf) - 1] == '@');
   }
+
+  free (expected_transform);
 
   return 0;
 }

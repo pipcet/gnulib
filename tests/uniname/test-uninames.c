@@ -1,5 +1,5 @@
 /* Test the Unicode character name functions.
-   Copyright (C) 2000-2003, 2005, 2007, 2009-2017 Free Software Foundation,
+   Copyright (C) 2000-2003, 2005, 2007, 2009-2020 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -63,7 +63,7 @@ fill_names (const char *unicodedata_filename)
     {
       char *p;
       char *comment;
-      unsigned int i;
+      unsigned long i;
 
       lineno++;
 
@@ -131,7 +131,7 @@ fill_aliases (const char *namealiases_filename)
     {
       char *p;
       char *comment;
-      unsigned int uc;
+      unsigned long uc;
 
       comment = strchr (line, '#');
       if (comment != NULL)

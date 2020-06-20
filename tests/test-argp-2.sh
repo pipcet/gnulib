@@ -1,6 +1,6 @@
 #! /bin/sh
 # Test suite for argp.
-# Copyright (C) 2006-2017 Free Software Foundation, Inc.
+# Copyright (C) 2006-2020 Free Software Foundation, Inc.
 # This file is part of the GNUlib Library.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 TMP=argp.$$
 
@@ -39,7 +39,7 @@ Usage: test-argp [-tvCSOlp?V] [-f FILE] [-r FILE] [-o[ARG]] [--test]
             [--limerick] [--poem] [--help] [--usage] [--version] ARGS...
 EOT
 
-./test-argp$EXEEXT --usage | func_compare || ERR=1
+${CHECKER} ./test-argp${EXEEXT} --usage | func_compare || ERR=1
 
 ####
 # Test working usage-indent format
@@ -51,7 +51,7 @@ Usage: test-argp [-tvCSOlp?V] [-f FILE] [-r FILE] [-o[ARG]] [--test]
 [--help] [--usage] [--version] ARGS...
 EOT
 
-ARGP_HELP_FMT='usage-indent=0' ./test-argp$EXEEXT --usage | func_compare || ERR=1
+ARGP_HELP_FMT='usage-indent=0' ${CHECKER} ./test-argp${EXEEXT} --usage | func_compare || ERR=1
 
 ####
 # Test --help output
@@ -96,17 +96,17 @@ Report bugs to <>.
 EOT
 
 # Compare --help output, but filter out any bug-reporting email address.
-./test-argp$EXEEXT --help \
+${CHECKER} ./test-argp${EXEEXT} --help \
     | sed 's/^\(Report bugs to \)<[^>]*>.$/\1<>./' | func_compare || ERR=1
 
 ####
 # Test ambiguous option handling
 
-./test-argp$EXEEXT --optio 2>/dev/null && ERR=1
+${CHECKER} ./test-argp${EXEEXT} --optio 2>/dev/null && ERR=1
 
 ####
 # Run built-in tests
-./test-argp$EXEEXT || ERR=1
+${CHECKER} ./test-argp${EXEEXT} || ERR=1
 
 rm $TMP
 

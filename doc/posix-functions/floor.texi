@@ -2,7 +2,7 @@
 @section @code{floor}
 @findex floor
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/floor.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/floor.html}
 
 Gnulib module: floor or floor-ieee
 
@@ -12,10 +12,6 @@ Portability problems fixed by either Gnulib module @code{floor} or @code{floor-i
 
 Portability problems fixed by Gnulib module @code{floor-ieee}:
 @itemize
-@item
-This function returns a positive zero for a minus zero argument
-on some platforms:
-OSF/1 5.1.
 @end itemize
 
 Portability problems not fixed by Gnulib:

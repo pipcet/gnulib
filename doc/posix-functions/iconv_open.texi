@@ -2,7 +2,7 @@
 @section @code{iconv_open}
 @findex iconv_open
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/iconv_open.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/iconv_open.html}
 
 Gnulib module: iconv, iconv_open, iconv_open-utf
 
@@ -20,7 +20,7 @@ Portability problems fixed by Gnulib module @code{iconv_open}:
 @item
 This function recognizes only non-standard aliases for many encodings (not
 the IANA registered encoding names) on many platforms:
-AIX 5.1, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 11 2010-11.
+AIX 5.1, HP-UX 11, IRIX 6.5, Solaris 11 2010-11, z/OS.
 @end itemize
 
 Portability problems fixed by Gnulib module @code{iconv_open-utf}:
@@ -28,14 +28,14 @@ Portability problems fixed by Gnulib module @code{iconv_open-utf}:
 @item
 This function does not support the encodings UTF-16BE, UTF-16LE, UTF-32BE,
 UTF-32LE on many platforms:
-AIX 5.1, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 8.
+AIX 5.1, HP-UX 11, IRIX 6.5.
 @end itemize
 
 Portability problems not fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-Mac OS X 10.5, FreeBSD 6.0, OpenBSD 3.8, Minix 3.1.8, IRIX 5.3, Cygwin, mingw, MSVC 14, BeOS,
+Mac OS X 10.5, FreeBSD 6.0, OpenBSD 3.8, Minix 3.1.8, Cygwin, mingw, MSVC 14, Android 8.1,
 when GNU libiconv is not installed.
 @item
 For some encodings A and B, this function cannot convert directly from A to B,

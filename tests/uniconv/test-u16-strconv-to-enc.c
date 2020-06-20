@@ -1,5 +1,5 @@
 /* Test of conversion from UTF-16 to legacy encodings.
-   Copyright (C) 2007-2017 Free Software Foundation, Inc.
+   Copyright (C) 2007-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
@@ -29,11 +29,11 @@
 int
 main ()
 {
+#if HAVE_ICONV
   static enum iconv_ilseq_handler handlers[] =
     { iconveh_error, iconveh_question_mark, iconveh_escape_sequence };
   size_t h;
 
-#if HAVE_ICONV
   /* Assume that iconv() supports at least the encodings ASCII, ISO-8859-1,
      ISO-8859-2, and UTF-8.  */
 

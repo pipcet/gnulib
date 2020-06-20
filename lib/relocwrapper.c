@@ -1,5 +1,5 @@
 /* Relocating wrapper program.
-   Copyright (C) 2003, 2005-2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005-2007, 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,21 +13,23 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Dependencies:
    relocwrapper
     -> progname
     -> progreloc
+       -> stat
+          -> filename
+          -> pathmax
+          -> verify
        -> areadlink
           -> careadlinkat
              -> allocator
           -> readlink
              -> stat
-                -> dosname
-                -> pathmax
-                -> verify
        -> canonicalize-lgpl
+          -> filename
           -> malloca
           -> lstat
           -> readlink

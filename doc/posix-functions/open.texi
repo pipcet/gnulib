@@ -2,23 +2,23 @@
 @section @code{open}
 @findex open
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/open.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/open.html}
 
 Gnulib module: open, fchdir
 
-Portability problems fixed by the Gnulib module open:
+Portability problems fixed by the Gnulib module @code{open}:
 @itemize
 @item
 Some platforms do not support @code{O_CLOEXEC}:
-Mac OS X 10.5, FreeBSD 6.0, NetBSD 5.0, OpenBSD 3.8, Minix 3.1.8, AIX 5.1, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 10, Cygwin, mingw, MSVC 14, Interix 3.5.
+Mac OS X 10.5, FreeBSD 6.0, NetBSD 5.0, OpenBSD 3.8, Minix 3.1.8, AIX 5.1, HP-UX 11, IRIX 6.5, Solaris 10, Cygwin, mingw, MSVC 14.
 @item
 On platforms where @code{off_t} is a 32-bit type, @code{open} may not work
-correctly with files larger than 2 GB.  (Cf. @code{AC_SYS_LARGEFILE}.)
+correctly with files larger than 2 GB@.  (Cf. @code{AC_SYS_LARGEFILE}.)
 @item
 This function does not fail when the file name argument ends in a slash
 and (without the slash) names a nonexistent file or a file that is not a
 directory, on some platforms:
-FreeBSD 7.2, AIX 7.1, HP-UX 11.00, Solaris 9, Irix 5.3.
+FreeBSD 7.2, AIX 7.1, HP-UX 11.00, Solaris 9.
 @item
 This function does not support the @code{O_NONBLOCK} flag when it is defined
 by the gnulib module @code{nonblocking} on some platforms:
@@ -28,7 +28,7 @@ On Windows platforms (excluding Cygwin), this function does usually not
 recognize the @file{/dev/null} filename.
 @end itemize
 
-Portability problems fixed by the Gnulib module fchdir:
+Portability problems fixed by the Gnulib module @code{fchdir}:
 @itemize
 @item
 On Windows platforms (excluding Cygwin), this function fails to open a

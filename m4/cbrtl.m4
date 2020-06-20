@@ -1,5 +1,5 @@
-# cbrtl.m4 serial 6
-dnl Copyright (C) 2012-2017 Free Software Foundation, Inc.
+# cbrtl.m4 serial 10
+dnl Copyright (C) 2012-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -59,7 +59,7 @@ int main (int argc, char *argv[])
   "C"
   #endif
   long double cbrtl (long double);
-  long double (*my_cbrtl) (long double) = argc ? cbrtl : dummy;
+  long double (* volatile my_cbrtl) (long double) = argc ? cbrtl : dummy;
   long double f;
   /* Test cbrtl(-0.0).
      This test fails on IRIX 6.5.  */
@@ -72,12 +72,14 @@ int main (int argc, char *argv[])
               [gl_cv_func_cbrtl_ieee=yes],
               [gl_cv_func_cbrtl_ieee=no],
               [case "$host_os" in
-                         # Guess yes on glibc systems.
-                 *-gnu*) gl_cv_func_cbrtl_ieee="guessing yes" ;;
-                         # Guess yes on native Windows.
-                 mingw*) gl_cv_func_cbrtl_ieee="guessing yes" ;;
-                         # If we don't know, assume the worst.
-                 *)      gl_cv_func_cbrtl_ieee="guessing no" ;;
+                                # Guess yes on glibc systems.
+                 *-gnu* | gnu*) gl_cv_func_cbrtl_ieee="guessing yes" ;;
+                                # Guess yes on musl systems.
+                 *-musl*)       gl_cv_func_cbrtl_ieee="guessing yes" ;;
+                                # Guess yes on native Windows.
+                 mingw*)        gl_cv_func_cbrtl_ieee="guessing yes" ;;
+                                # If we don't know, obey --enable-cross-guesses.
+                 *)             gl_cv_func_cbrtl_ieee="$gl_cross_guess_normal" ;;
                esac
               ])
             LIBS="$save_LIBS"

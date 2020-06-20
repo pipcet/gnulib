@@ -1,5 +1,5 @@
-# modf.m4 serial 4
-dnl Copyright (C) 2011-2017 Free Software Foundation, Inc.
+# modf.m4 serial 8
+dnl Copyright (C) 2011-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -41,7 +41,7 @@ double zero;
 double minus_one = - 1.0;
 int main (int argc, char *argv[])
 {
-  double (*my_modf) (double, double *) = argc ? modf : dummy;
+  double (* volatile my_modf) (double, double *) = argc ? modf : dummy;
   int result = 0;
   double i;
   double f;
@@ -61,19 +61,21 @@ int main (int argc, char *argv[])
             [gl_cv_func_modf_ieee=yes],
             [gl_cv_func_modf_ieee=no],
             [case "$host_os" in
-                       # Guess yes on glibc systems.
-               *-gnu*) gl_cv_func_modf_ieee="guessing yes" ;;
-                       # Guess yes on MSVC, no on mingw.
-               mingw*) AC_EGREP_CPP([Known], [
+                              # Guess yes on glibc systems.
+               *-gnu* | gnu*) gl_cv_func_modf_ieee="guessing yes" ;;
+                              # Guess yes on musl systems.
+               *-musl*)       gl_cv_func_modf_ieee="guessing yes" ;;
+                              # Guess yes on MSVC, no on mingw.
+               mingw*)        AC_EGREP_CPP([Known], [
 #ifdef _MSC_VER
  Known
 #endif
-                         ],
-                         [gl_cv_func_modf_ieee="guessing yes"],
-                         [gl_cv_func_modf_ieee="guessing no"])
-                       ;;
-                       # If we don't know, assume the worst.
-               *)      gl_cv_func_modf_ieee="guessing no" ;;
+                                ],
+                                [gl_cv_func_modf_ieee="guessing yes"],
+                                [gl_cv_func_modf_ieee="guessing no"])
+                              ;;
+                              # If we don't know, obey --enable-cross-guesses.
+               *)             gl_cv_func_modf_ieee="$gl_cross_guess_normal" ;;
              esac
             ])
           LIBS="$save_LIBS"

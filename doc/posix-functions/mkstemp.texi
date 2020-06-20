@@ -2,7 +2,7 @@
 @section @code{mkstemp}
 @findex mkstemp
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/mkstemp.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/mkstemp.html}
 
 Gnulib module: mkstemp
 
@@ -12,16 +12,8 @@ Portability problems fixed by Gnulib:
 This function is missing on some platforms:
 mingw, MSVC 14.
 @item
-This function is declared in @code{<unistd.h>} instead of @code{<stdlib.h>}
-on some platforms:
-Mac OS X 10.3.
-@item
-On some platforms (HP-UX 10.20, SunOS 4.1.4, Solaris 2.5.1), mkstemp has a silly
-limit that it can create no more than 26 files from a given template.  On
-OSF/1 4.0f, it can create only 32 files per process.
-@item
 On platforms where @code{off_t} is a 32-bit type, @code{mkstemp} may not work
-correctly to create files larger than 2 GB.  (Cf. @code{AC_SYS_LARGEFILE}.)
+correctly to create files larger than 2 GB@.  (Cf. @code{AC_SYS_LARGEFILE}.)
 @item
 On some older platforms, @code{mkstemp} can create a world or group
 writable or readable file, if you haven't set the process umask to

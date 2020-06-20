@@ -13,6 +13,8 @@ stdbool
 wchar
 wctype-h
 iswblank
+iswdigit
+iswxdigit
 wcwidth
 memcmp
 

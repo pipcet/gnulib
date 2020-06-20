@@ -1,5 +1,5 @@
 /* integer_length - find most significant bit in an unsigned integer.
-   Copyright (C) 2011-2017 Free Software Foundation, Inc.
+   Copyright (C) 2011-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2011.  */
 
@@ -36,11 +36,9 @@ extern int integer_length (unsigned int x);
    The result is >= 0, <= sizeof (unsigned long) * CHAR_BIT.  */
 extern int integer_length_l (unsigned long x);
 
-#if HAVE_UNSIGNED_LONG_LONG_INT
 /* Returns the integer length of x.
    The result is >= 0, <= sizeof (unsigned long long) * CHAR_BIT.  */
 extern int integer_length_ll (unsigned long long x);
-#endif
 
 #ifdef __cplusplus
 }

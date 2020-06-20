@@ -8,13 +8,14 @@ m4/savewd.m4
 
 Depends-on:
 assure
+attribute
 chdir
-dosname
 errno
 extern-inline
 fchdir
 fcntl-safer
 fcntl-h
+filename
 raise
 stdbool
 stdlib

@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a hash table with a binary tree.
-   Copyright (C) 2006-2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Common code of gl_avltreehash_list.c and gl_rbtreehash_list.c.  */
 
@@ -61,13 +61,13 @@ gl_tree_search_from_to (gl_list_t list, size_t start_index, size_t end_index,
                         {
                           /* We have to return only the one at the minimal
                              position >= start_index.  */
-                          const void *elt;
+                          const void *nodes_elt;
                           if (gl_oset_search_atleast (nodes,
                                                       compare_position_threshold,
                                                       (void *)(uintptr_t)start_index,
-                                                      &elt))
+                                                      &nodes_elt))
                             {
-                              node = (gl_list_node_t) elt;
+                              node = (gl_list_node_t) nodes_elt;
                               if (end_index == list->root->branch_size
                                   || node_position (node) < end_index)
                                 return node;

@@ -2,7 +2,7 @@
 @section @code{nanosleep}
 @findex nanosleep
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/nanosleep.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/nanosleep.html}
 
 Gnulib module: nanosleep
 
@@ -10,11 +10,7 @@ Portability problems fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-Solaris 2.4, mingw, MSVC 14, Interix 3.5, BeOS.
-@item
-This function reports failure when called with small arguments such as 1 ns
-on some platforms:
-AIX 4.3.2.
+mingw, MSVC 14.
 @item
 This function mishandles large arguments when interrupted by a signal on some
 platforms:

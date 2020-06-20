@@ -1,5 +1,5 @@
-# log1pl.m4 serial 4
-dnl Copyright (C) 2012-2017 Free Software Foundation, Inc.
+# log1pl.m4 serial 8
+dnl Copyright (C) 2012-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -41,7 +41,7 @@ AC_DEFUN([gl_FUNC_LOG1PL],
 static long double dummy (long double x) { return 0; }
 int main (int argc, char *argv[])
 {
-  long double (*my_log1pl) (long double) = argc ? log1pl : dummy;
+  long double (* volatile my_log1pl) (long double) = argc ? log1pl : dummy;
   /* This test fails on AIX 7.1, IRIX 6.5.  */
   long double y = my_log1pl (minus_zerol);
   if (!(y == 0.0L) || (signbitl (minus_zerol) && !signbitl (y)))
@@ -52,12 +52,14 @@ int main (int argc, char *argv[])
               [gl_cv_func_log1pl_ieee=yes],
               [gl_cv_func_log1pl_ieee=no],
               [case "$host_os" in
-                         # Guess yes on glibc systems.
-                 *-gnu*) gl_cv_func_log1pl_ieee="guessing yes" ;;
-                         # Guess yes on native Windows.
-                 mingw*) gl_cv_func_log1pl_ieee="guessing yes" ;;
-                         # If we don't know, assume the worst.
-                 *)      gl_cv_func_log1pl_ieee="guessing no" ;;
+                                # Guess yes on glibc systems.
+                 *-gnu* | gnu*) gl_cv_func_log1pl_ieee="guessing yes" ;;
+                                # Guess yes on musl systems.
+                 *-musl*)       gl_cv_func_log1pl_ieee="guessing yes" ;;
+                                # Guess yes on native Windows.
+                 mingw*)        gl_cv_func_log1pl_ieee="guessing yes" ;;
+                                # If we don't know, obey --enable-cross-guesses.
+                 *)             gl_cv_func_log1pl_ieee="$gl_cross_guess_normal" ;;
                esac
               ])
             LIBS="$save_LIBS"

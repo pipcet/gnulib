@@ -2,7 +2,9 @@
 @subsection @code{getdtablesize}
 @findex getdtablesize
 
-SUSv2 specification: @url{http://pubs.opengroup.org/onlinepubs/7908799/xsh/getdtablesize.html}
+SUSv2 specification: @url{https://pubs.opengroup.org/onlinepubs/7908799/xsh/getdtablesize.html}
+
+Documentation:@* @uref{https://www.kernel.org/doc/man-pages/online/pages/man3/getdtablesize.3.html,,man getdtablesize}
 
 Gnulib module: getdtablesize
 
@@ -10,7 +12,7 @@ Portability problems fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-Android LP64, mingw, MSVC 14.
+Android LP64, mingw, MSVC 14, Android 9.0.
 
 @item
 This function is not declared on some platforms:

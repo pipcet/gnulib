@@ -1,5 +1,5 @@
 # GNU Makefile for gnulib central.
-# Copyright (C) 2006, 2009-2017 Free Software Foundation, Inc.
+# Copyright (C) 2006, 2009-2020 Free Software Foundation, Inc.
 #
 # Copying and distribution of this file, with or without modification,
 # in any medium, are permitted without royalty provided the copyright
@@ -9,7 +9,7 @@
 # that you have tools like git, makeinfo and cppi installed.
 
 # Required for the use of <(...) below.
-SHELL=/bin/bash
+SHELL=bash
 
 # Produce some files that are not stored in the repository.
 all:
@@ -43,7 +43,7 @@ sc_prohibit_leading_TABs:
 
 sc_prohibit_augmenting_PATH_via_TESTS_ENVIRONMENT:
 	@if test -d .git; then						\
-	  url=http://thread.gmane.org/gmane.comp.lib.gnulib.bugs/22874;	\
+	  url=https://lists.gnu.org/r/bug-gnulib/2010-09/msg00064.html; \
 	  git grep '^[	 ]*TESTS_ENVIRONMENT += PATH=' modules		\
 	    && { printf '%s\n' 'Do not augment PATH via TESTS_ENVIRONMENT;' \
 		 "  see <$$url>" 1>&2; exit 1; } || :			\
@@ -95,7 +95,7 @@ allow_AC_LIBOBJ =	\
 allow_AC_LIBOBJ_or := $(shell echo $(allow_AC_LIBOBJ) | tr -s ' ' '|')
 
 sc_prohibit_AC_LIBOBJ_in_m4:
-	@url=http://article.gmane.org/gmane.comp.lib.gnulib.bugs/26995;	\
+	@url=https://lists.gnu.org/r/bug-gnulib/2011-06/msg00051.html; \
 	if test -d .git; then						\
 	  git ls-files m4						\
 	     | grep -Ev '^m4/($(allow_AC_LIBOBJ_or))\.m4$$'		\
@@ -146,9 +146,12 @@ regen: MODULES.html
 
 # MODULES.html is periodically being generated and copied to the web pages at
 # :ext:USER@cvs.savannah.gnu.org:/web/gnulib/gnulib/
-# where it then appears at <http://www.gnu.org/software/gnulib/MODULES.html>.
+# where it then appears at <https://www.gnu.org/software/gnulib/MODULES.html>.
 MODULES.html: MODULES.html.sh
 	./MODULES.html.sh > MODULES.html
+
+# A perl BEGIN block to set Y to the current year number and W to Y-1.
+_year_and_prev = BEGIN{@t=localtime(time); $$y=$$t[5]+1900; $$w=$$y-1}
 
 # Run this rule once per year (usually early in January)
 # to update all FSF copyright year lists here.
@@ -157,10 +160,13 @@ MODULES.html: MODULES.html.sh
 # Also exclude any file that includes the "GENERATED AUTOMATICALLY" comment,
 # being careful not to exclude code that merely generates the comment.
 # Also exclude doc/INSTALL*, since they too are generated.
+# Also adjust template-style files that must start with a single
+# (the current) year number in some places.
+# Also adjust version-etc.c and and gendocs.sh.
 update-copyright:
 	exempt=$$(mktemp);						\
 	grep -v '^#' config/srclist.txt|grep -v '^$$'			\
-	  | while read src dst; do					\
+	  | while read top src dst options; do				\
 	      test -f "$$dst" && { echo "$$dst"; continue; };		\
 	      test -d "$$dst" || continue;				\
 	      echo "$$dst"/$$(basename "$$src");			\
@@ -172,3 +178,10 @@ update-copyright:
 	  | UPDATE_COPYRIGHT_MAX_LINE_LENGTH=79				\
 	    UPDATE_COPYRIGHT_USE_INTERVALS=1				\
 	      xargs build-aux/update-copyright
+	perl -pi -e '$(_year_and_prev) s/(copyright.*)\b$$w\b/$$1$$y/i'	\
+	  lib/version-etc.c doc/gnulib.texi build-aux/gendocs.sh
+	perl -pi -e '$(_year_and_prev) s/ $$w-$$y / $$y /g'		\
+	  doc/gendocs_template* build-aux/gendocs.sh
+	perl -pi -e							\
+          '$(_year_and_prev) s/^(scriptversion=)$$w.*/$$1$$y-01-01.00/i' \
+	  build-aux/gendocs.sh

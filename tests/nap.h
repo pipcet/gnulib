@@ -1,5 +1,5 @@
 /* Assist in file system timestamp tests.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Eric Blake <ebb9@byu.net>, 2009.  */
 
@@ -21,6 +21,8 @@
 
 # include <limits.h>
 # include <stdbool.h>
+
+# include <intprops.h>
 
 /* Name of the witness file.  */
 #define TEMPFILE BASE "nap.tmp"
@@ -38,17 +40,20 @@ diff_timespec (struct timespec a, struct timespec b)
   time_t bs = b.tv_sec;
   int ans = a.tv_nsec;
   int bns = b.tv_nsec;
+  int sdiff;
+
+  ASSERT (0 <= ans && ans < 2000000000);
+  ASSERT (0 <= bns && bns < 2000000000);
 
   if (! (bs < as || (bs == as && bns < ans)))
     return 0;
-  if (as - bs <= INT_MAX / 1000000000)
-    {
-      int sdiff = (as - bs) * 1000000000;
-      int usdiff = ans - bns;
-      if (usdiff < INT_MAX - sdiff)
-        return sdiff + usdiff;
-    }
-  return INT_MAX;
+
+  if (INT_SUBTRACT_WRAPV (as, bs, &sdiff)
+      || INT_MULTIPLY_WRAPV (sdiff, 1000000000, &sdiff)
+      || INT_ADD_WRAPV (sdiff, ans - bns, &sdiff))
+    return INT_MAX;
+
+  return sdiff;
 }
 
 /* If DO_WRITE, bump the modification time of the file designated by NAP_FD.
@@ -59,10 +64,10 @@ nap_get_stat (struct stat *st, int do_write)
   if (do_write)
     {
       ASSERT (write (nap_fd, "\n", 1) == 1);
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
-      /* On native Windows, the modification times are not changed until NAP_FD
+#if defined _WIN32 || defined __CYGWIN__
+      /* On Windows, the modification times are not changed until NAP_FD
          is closed. See
-         https://msdn.microsoft.com/en-us/library/windows/desktop/aa365747(v=vs.85).aspx */
+         <https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-writefile> */
       close (nap_fd);
       nap_fd = open (TEMPFILE, O_RDWR, 0600);
       ASSERT (nap_fd != -1);

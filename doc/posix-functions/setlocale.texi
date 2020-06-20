@@ -2,11 +2,11 @@
 @section @code{setlocale}
 @findex setlocale
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/setlocale.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/setlocale.html}
 
-Gnulib module: setlocale
+Gnulib module: setlocale, setlocale-null
 
-Portability problems fixed by Gnulib:
+Portability problems fixed by Gnulib module @code{setlocale}:
 @itemize
 @item
 On Windows platforms (excluding Cygwin), @code{setlocale(@var{category},NULL)}
@@ -20,6 +20,21 @@ On Windows platforms (excluding Cygwin) and Cygwin 1.5.x,
 On Windows platforms (excluding Cygwin), @code{setlocale} understands different
 locale names, that are not based on ISO 639 language names and ISO 3166 country
 names.
+@item
+On Android 4.3, which which doesn't have locales, the @code{setlocale} function
+always fails.  The replacement, however, supports only the locale names
+@code{"C"} and @code{"POSIX"}.
+@end itemize
+
+Portability problems fixed by Gnulib module @code{setlocale} or @code{setlocale-null}:
+@itemize
+@item
+Invocations of @code{setlocale (..., NULL)} are not multithread-safe on some
+platforms:
+musl libc, macOS, FreeBSD, NetBSD, OpenBSD, AIX, Haiku, Cygwin.
+To make these invocations multithread-safe, you need the Gnulib module
+@code{setlocale}, or you need to change the code to invoke @code{setlocale_null}
+or @code{setlocale_null_r} instead.
 @end itemize
 
 Portability problems not fixed by Gnulib:

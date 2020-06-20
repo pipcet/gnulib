@@ -1,5 +1,5 @@
 /* Test of <stdint.h> substitute.
-   Copyright (C) 2006-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2006.  */
 
@@ -217,12 +217,14 @@ err or;
 /* 7.18.2.4. Limits of integer types capable of holding object pointers */
 
 intptr_t g[3] = { 17, INTPTR_MIN, INTPTR_MAX };
+verify (sizeof (void *) <= sizeof (intptr_t));
 verify (TYPE_MINIMUM (intptr_t) == INTPTR_MIN);
 verify (TYPE_MAXIMUM (intptr_t) == INTPTR_MAX);
 verify_same_types (INTPTR_MIN, (intptr_t) 0 + 0);
 verify_same_types (INTPTR_MAX, (intptr_t) 0 + 0);
 
 uintptr_t h[2] = { 17, UINTPTR_MAX };
+verify (sizeof (void *) <= sizeof (uintptr_t));
 verify (TYPE_MAXIMUM (uintptr_t) == UINTPTR_MAX);
 verify_same_types (UINTPTR_MAX, (uintptr_t) 0 + 0);
 

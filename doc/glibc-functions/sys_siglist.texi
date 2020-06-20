@@ -2,6 +2,14 @@
 @subsection @code{sys_siglist}
 @findex sys_siglist
 
+Documentation:@*
+@ifinfo
+@ref{Signal Messages,,Signal Messages,libc}.
+@end ifinfo
+@ifnotinfo
+@url{https://www.gnu.org/software/libc/manual/html_node/Signal-Messages.html}.
+@end ifnotinfo
+
 Gnulib module: ---
 
 Portability problems fixed by Gnulib:
@@ -12,5 +20,5 @@ Portability problems not fixed by Gnulib:
 @itemize
 @item
 This constant is missing on some platforms:
-Mac OS X 10.5, Minix 3.1.8, HP-UX 11, IRIX 6.5, OSF/1 5.1, Solaris 11 2011-11, Cygwin 1.7.9, mingw, MSVC 14, Interix 3.5.
+Mac OS X 10.5, Minix 3.1.8, HP-UX 11, IRIX 6.5, Solaris 11.4, Cygwin 1.7.9, mingw, MSVC 14.
 @end itemize

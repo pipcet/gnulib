@@ -1,7 +1,7 @@
 @node sys/stat.h
 @section @file{sys/stat.h}
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html}
 
 Gnulib module: sys_stat
 
@@ -39,6 +39,9 @@ On Windows platforms (excluding Cygwin), @code{st_ino} is always 0.
 
 Portability problems not fixed by Gnulib:
 @itemize
+@item
+@xref{time.h}, for general portability problems with the
+@code{time_t} components of @code{struct stat}.
 @item
 The macro @code{S_IFBLK} is missing on some platforms:
 MSVC 14.

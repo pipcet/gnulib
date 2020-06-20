@@ -4,10 +4,10 @@ strtoll() function: convert string to 'long long'.
 Files:
 lib/strtol.c
 lib/strtoll.c
-m4/longlong.m4
 m4/strtoll.m4
 
 Depends-on:
+limits-h
 stdlib
 
 configure.ac:

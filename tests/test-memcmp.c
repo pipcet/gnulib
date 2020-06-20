@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 Free Software Foundation, Inc.
+ * Copyright (C) 2008-2020 Free Software Foundation, Inc.
  * Written by Simon Josefsson
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -28,6 +28,8 @@ SIGNATURE_CHECK (memcmp, int, (void const *, void const *, size_t));
 int
 main (void)
 {
+  int (* volatile memcmp_ptr) (const void *, const void *, size_t) = memcmp;
+
   /* Test equal / not equal distinction.  */
   ASSERT (memcmp (zerosize_ptr (), zerosize_ptr (), 0) == 0);
   ASSERT (memcmp ("foo", "foobar", 2) == 0);
@@ -45,10 +47,13 @@ main (void)
   ASSERT (memcmp ("foobar", "foo", 4) > 0);
 
   /* Some old versions of memcmp were not 8-bit clean.  */
-  ASSERT (memcmp ("\100", "\201", 1) < 0);
-  ASSERT (memcmp ("\201", "\100", 1) > 0);
-  ASSERT (memcmp ("\200", "\201", 1) < 0);
-  ASSERT (memcmp ("\201", "\200", 1) > 0);
+  /* Use the function pointer here, because otherwise this test is sometimes
+     miscompiled by 'clang'.
+     See <https://bugs.llvm.org/show_bug.cgi?id=40063>.  */
+  ASSERT (memcmp_ptr ("\100", "\201", 1) < 0);
+  ASSERT (memcmp_ptr ("\201", "\100", 1) > 0);
+  ASSERT (memcmp_ptr ("\200", "\201", 1) < 0);
+  ASSERT (memcmp_ptr ("\201", "\200", 1) > 0);
 
   /* The Next x86 OpenStep bug shows up only when comparing 16 bytes
      or more and with at least one buffer not starting on a 4-byte boundary.

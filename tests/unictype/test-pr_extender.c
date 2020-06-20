@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include "test-predicate-part1.h"
 
@@ -42,7 +42,9 @@
     { 0xFF70, 0xFF70 },
     { 0x1135D, 0x1135D },
     { 0x115C6, 0x115C8 },
-    { 0x16B42, 0x16B43 }
+    { 0x16B42, 0x16B43 },
+    { 0x16FE0, 0x16FE0 },
+    { 0x1E944, 0x1E946 }
 
 #define PREDICATE(c) uc_is_property_extender (c)
 #include "test-predicate-part2.h"

@@ -1,5 +1,5 @@
-# ceill.m4 serial 16
-dnl Copyright (C) 2007, 2009-2017 Free Software Foundation, Inc.
+# ceill.m4 serial 20
+dnl Copyright (C) 2007, 2009-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -42,7 +42,7 @@ AC_DEFUN([gl_FUNC_CEILL],
 static long double dummy (long double f) { return 0; }
 int main (int argc, char *argv[])
 {
-  long double (*my_ceill) (long double) = argc ? ceill : dummy;
+  long double (* volatile my_ceill) (long double) = argc ? ceill : dummy;
   /* Test whether ceill (-0.3L) is -0.0L.  */
   if (signbitl (minus_zerol) && !signbitl (my_ceill (-0.3L)))
     return 1;
@@ -52,12 +52,14 @@ int main (int argc, char *argv[])
               [gl_cv_func_ceill_ieee=yes],
               [gl_cv_func_ceill_ieee=no],
               [case "$host_os" in
-                         # Guess yes on glibc systems.
-                 *-gnu*) gl_cv_func_ceill_ieee="guessing yes" ;;
-                         # Guess yes on native Windows.
-                 mingw*) gl_cv_func_ceill_ieee="guessing yes" ;;
-                         # If we don't know, assume the worst.
-                 *)      gl_cv_func_ceill_ieee="guessing no" ;;
+                                # Guess yes on glibc systems.
+                 *-gnu* | gnu*) gl_cv_func_ceill_ieee="guessing yes" ;;
+                                # Guess yes on musl systems.
+                 *-musl*)       gl_cv_func_ceill_ieee="guessing yes" ;;
+                                # Guess yes on native Windows.
+                 mingw*)        gl_cv_func_ceill_ieee="guessing yes" ;;
+                                # If we don't know, obey --enable-cross-guesses.
+                 *)             gl_cv_func_ceill_ieee="$gl_cross_guess_normal" ;;
                esac
               ])
             LIBS="$save_LIBS"

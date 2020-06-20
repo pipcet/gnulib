@@ -1,7 +1,7 @@
 @node sched.h
 @section @file{sched.h}
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/basedefs/sched.h.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sched.h.html}
 
 Gnulib module: sched
 
@@ -9,7 +9,7 @@ Portability problems fixed by Gnulib:
 @itemize
 @item
 This header file is missing on some platforms:
-Minix 3.1.8, mingw, MSVC 14, BeOS.
+Minix 3.1.8, mingw, MSVC 14.
 @item
 This header file does not define the type @code{pid_t} on some platforms:
 glibc 2.11, Mac OS X 10.5.

@@ -1,7 +1,7 @@
 #!/bin/sh
 # This use of our DFA-testing helper would fail for grep-2.21.
 
-# Copyright 2014-2017 Free Software Foundation, Inc.
+# Copyright 2014-2020 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 . "${srcdir=.}/init.sh"; path_prepend_ ../src
 
@@ -24,7 +24,7 @@ path_prepend_ .
 fail=0
 
 echo 'dfaerror: invalid character class' > exp
-LC_ALL=C dfa-match-aux '[[:foo:]]' a > out 2>&1
+LC_ALL=C ${CHECKER} dfa-match-aux '[[:foo:]]' a > out 2>&1
 compare exp out || fail=1
 
 Exit $fail

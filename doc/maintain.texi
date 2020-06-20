@@ -5,8 +5,9 @@
 @c For double-sided printing, uncomment:
 @c @setchapternewpage odd
 @c This date is automagically updated when you save this file:
-@set lastupdate July 21, 2016
+@set lastupdate April 24, 2020
 @c %**end of header
+@documentencoding UTF-8
 
 @dircategory GNU organization
 @direntry
@@ -24,7 +25,8 @@ Information for maintainers of GNU software, last updated @value{lastupdate}.
 
 Copyright @copyright{} 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-2010, 2011, 2012, 2013, 2014, 2015, 2016 Free Software Foundation, Inc.
+2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Free Software Foundation,
+Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -66,6 +68,8 @@ Texts.  A copy of the license is included in the section entitled
 * Distributions::
 * Web Pages::
 * Ethical and Philosophical Consideration::
+* Humor::
+* Other Politics::
 * Terminology::
 * Interviews and Speeches::
 * Hosting::
@@ -90,6 +94,9 @@ is essential to follow these guidelines.
 
 In addition to this document, please read and follow the GNU Coding
 Standards (@pxref{Top, , Contents, standards, GNU Coding Standards}).
+You may also usefully check the ``Tips for new GNU maintainers''
+(@url{https://www.gnu.org/software/maintainer-tips}), a list of the
+most important things you will need to do as a new maintainer.
 
 @cindex @code{bug-standards@@gnu.org} email address
 @cindex Savannah repository for @code{gnustandards}
@@ -100,27 +107,28 @@ include suggested new wording if you can.  We prefer a context diff to
 the Texinfo source, but if that's difficult for you, you can make a
 diff for some other version of this document, or propose it in any way
 that makes it clear.  The source repository for this document can be
-found at @url{http://savannah.gnu.org/projects/gnustandards}.
+found at @url{https://savannah.gnu.org/projects/gnustandards}.
 
 @cindex @code{gnustandards-commit@@gnu.org} mailing list
 If you want to receive diffs for every change to these GNU documents,
 join the mailing list @code{gnustandards-commit@@gnu.org}, for
 instance via the web interface at
-@url{http://lists.gnu.org/mailman/listinfo/gnustandards-commit}.
+@url{https://lists.gnu.org/mailman/listinfo/gnustandards-commit}.
 Archives are also available there.
 
 @cindex Piercy, Marge
-This document uses the gender-neutral third-person pronouns ``person'',
-``per'', ``pers'' and ``perself'' which were promoted, and perhaps
-invented, by Marge Piercy in @cite{Woman on the Edge of Time}.  They are
-used just like ``she'', ``her'', ``hers'' and ``herself'', except that
-they apply equally to males and females.  For example, ``Person placed
-per new program under the GNU GPL, to let the public benefit from per
-work, and to enable per to feel person has done the right thing.''
+This document uses the gender-neutral third-person pronouns ``person''
+(which can be shortened to ``perse''), ``per'', ``pers'' and
+``perself.''  These pronouns (aside from ``perse'') were promoted, and
+perhaps invented, by Marge Piercy in @cite{Woman on the Edge of Time}.
+They are used just like ``she'', ``her'', ``hers'' and ``herself'',
+except that they apply regardless of gender.  For example, ``Person
+placed per new program under the GNU GPL, to maintain freedom for all
+users of per work, and this way perse knows perse has done the right
+thing.''
 
 This release of the GNU Maintainer Information was last updated
 @value{lastupdate}.
-
 
 @node Getting Help
 @chapter Getting Help
@@ -139,17 +147,17 @@ The GNU Advisory Committee helps to coordinate activities in the GNU
 project on behalf of RMS (Richard Stallman, the Chief GNUisance).  If
 you have any organizational questions or concerns you can contact the
 committee at @email{gnu-advisory@@gnu.org}.  See
-@url{http://www.gnu.org/contact/gnu-advisory.html} for the current
+@url{https://www.gnu.org/contact/gnu-advisory.html} for the current
 committee members.  Additional information is in
 @file{/gd/gnuorg/advisory}.
 
 @cindex down, when GNU machines are
 @cindex outage, of GNU machines
-@cindex @url{https://pumprock.net/fsfstatus}
+@cindex @url{https://hostux.social/@@fsfstatus}
 If you find that any GNU computer systems (@code{fencepost.gnu.org},
 @code{ftp.gnu.org}, @code{www.gnu.org}, @code{savannah.gnu.org},
 @dots{}) seem to be down, you can check the current status at
-@url{http://pumprock.net/fsfstatus}.  Most likely the problem, if
+@url{https://hostux.social/@@fsfstatus}.  Most likely the problem, if
 it can be alleviated at the FSF end, is already being worked on.
 
 @cindex sysadmin, FSF
@@ -173,16 +181,19 @@ The directory @file{/gd/gnuorg} mentioned throughout this document is
 available on the general GNU server, currently
 @code{fencepost.gnu.org}.  If you are the maintainer of a GNU package,
 you should have an account there.  If you don't have one already, see
-@url{http://www.gnu.org/software/README.accounts.html}.  You can also
-ask for accounts for people who significantly help you in working on
-the package.  Such GNU login accounts include email
-(see @url{http://www.fsf.org/about/systems/sending-mail-via-fencepost}).
+@url{https://www.gnu.org/software/README.accounts.html}.  Such GNU
+login accounts include email (see
+@url{https://www.fsf.org/about/systems/sending-mail-via-fencepost}).
+
+You can request for accounts for people who significantly help you in
+working on the package; we will do this in special cases when there is
+a good reason.
 @end macro
 
 @gdgnuorgtext{}
 
 Other resources available to GNU maintainers are described at
-@url{http://www.gnu.org/software/devel.html}, as well as throughout
+@url{https://www.gnu.org/software/devel.html}, as well as throughout
 this document.  In brief:
 
 @itemize @bullet
@@ -262,7 +273,7 @@ some of your developers as co-maintainers, please contact
 @email{maintainers@@gnu.org}.
 
 We're happy to acknowledge all major contributors to GNU packages on
-the @url{http://www.gnu.org/people/people.html} web page.  Please send
+the @url{https://www.gnu.org/people/people.html} web page.  Please send
 an entry for yourself to @email{webmasters@@gnu.org}, and feel free to
 suggest it to other significant developers on your package.
 
@@ -298,7 +309,7 @@ distribute the package, and the standing to defend its GPL-covered
 status in court if necessary.
 
 GNU packages need not be FSF-copyrighted; this is up to the author(s),
-generally at the time the package is dubbed GNU.  When copyright is
+generally at the time the package is dubbed GNU@.  When copyright is
 assigned to the FSF, the FSF can act to stop GPL violations about the
 package.  Otherwise, legal actions are up to the author(s).  The rest
 of this section is about the case when a package is FSF-copyrighted.
@@ -357,7 +368,7 @@ Once the conversation is under way and the contributor is ready for
 more details, you should send one of the templates that are found in
 the directory @file{/gd/gnuorg/Copyright/}; they are also available
 from the @file{doc/Copyright/} directory of the @code{gnulib} project
-at @url{http://savannah.gnu.org/projects/gnulib}.  This section
+at @url{https://savannah.gnu.org/projects/gnulib}.  This section
 explains which templates you should use in which circumstances.
 @strong{Please don't use any of the templates except for those listed
 here, and please don't change the wording.}
@@ -395,14 +406,12 @@ additional week, please write to @email{maintainers@@gnu.org} about it.
 
 After receiving the necessary form, the contributor needs to sign
 it. Contributors residing in the USA or Italy may use GPG in order to
-sign their assignment.  Contributors located in the USA, Germany, or
-India can print, sign, and then email (or fax) a scanned copy back to
-the FSF. (Specific instructions for both cases are sent with the
-assignment form.)  They may use postal mail, if they
-prefer. Contributors residing outside the USA, Germany or India must
-mail the signed form to the FSF via postal mail.  To emphasize, the
-necessary distinction is between residents and non-residents of these
-countries; citizenship does not matter.
+sign their assignment. Contributors located anywhere else can print,
+sign, and then email (or fax) a scanned copy back to the
+FSF@. (Specific instructions for both cases are sent with the
+assignment form.) They may use postal mail, if they prefer. To
+emphasize, the necessary distinction is between residents and
+non-residents of these countries; citizenship does not matter.
 
 For less common cases, we have template files you should send to the
 contributor.  Be sure to fill in the name of the person and the name
@@ -427,7 +436,7 @@ For a translation of a manual, use @file{assign.translation.manual}.
 For translations of program strings (as used by GNU Gettext, for
 example; @pxref{Internationalization,,, standards, GNU Coding
 Standards}), use @file{disclaim.translation}.  If you make use of the
-Translation Project (@url{http://translationproject.org}) facilities,
+Translation Project (@url{https://translationproject.org}) facilities,
 please check with the TP coordinators that they have sent the
 contributor the papers; if they haven't, then you should send the
 papers.  In any case, you should wait for the confirmation from the
@@ -448,6 +457,18 @@ the collection.  Then you can use the files
 an assignment for a new separate program or manual, unless it is quite
 small, but a disclaimer is acceptable if the contributor insists on
 handling the matter that way.
+
+When a copyright holder has signed an assignment for all future
+changes to the package, and contributes a change made up of new files
+which require no change to any of the old files, we want to avoid any
+uncertainty about whether these files are intended as a change to the
+package and thus covered by that assignment.  The way to do this is to
+ask the contributor to say so in a message to you --- for instance,
+``My modules `frog' and `kangaroo' are intended as changes to the
+program Hoppers.''  Forward the message to @email{assign@@gnu.org},
+who will save it permanently.  A variation on this procedure: the
+contributor who wrote the new files can send copies of the new files
+which contain such a message.
 
 If a contributor wants the FSF to publish only a pseudonym, that is
 ok.  The contributor should say this, and state the desired pseudonym,
@@ -777,6 +798,7 @@ please write @email{licensing@@gnu.org}.
 * Canonical:     Canonical License Sources.
 * Code:          License Notices for Code.
 * Documentation: License Notices for Documentation.
+* Examples:      License Notices for Code Examples.
 * Other:         License Notices for Other Files.
 @end menu
 
@@ -794,7 +816,7 @@ implementations; for example, the GNU C Library.  In such cases, the
 Lesser GPL should be used (again, for the notice wording,
 @pxref{License Notices for Code}).  If a GNU library provides unique
 functionality, however, the GNU GPL should be used.
-@url{http://www.gnu.org/licenses/why-not-lgpl.html} discusses this
+@url{https://www.gnu.org/licenses/why-not-lgpl.html} discusses this
 strategic choice.
 
 Some of these libraries need to work with programs released under
@@ -824,12 +846,12 @@ or both in parallel, as here.
 
 GNU @var{package} is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE@.  See the GNU
 General Public License for more details.
 
 You should have received copies of the GNU General Public License and
 the GNU Lesser General Public License along with this program.  If
-not, see @url{http://www.gnu.org/licenses/}.
+not, see @url{https://www.gnu.org/licenses/}.
 @end smallexample
 
 For small packages, you can use ``This program'' instead of ``GNU
@@ -844,12 +866,12 @@ You can use whichever is the most convenient for you.
 
 @itemize @bullet
 @item
-@uref{http://www.gnu.org/licenses/}.
+@uref{https://www.gnu.org/licenses/}.
 
 @item
 The @code{gnulib} project on @code{savannah.gnu.org}, which you
-can access via anonymous Git or CVS.  See
-@uref{http://savannah.gnu.org/projects/gnulib}.
+can access via anonymous Git or CVS@.  See
+@uref{https://savannah.gnu.org/projects/gnulib}.
 
 @end itemize
 
@@ -876,11 +898,11 @@ License, or (at your option) any later version.
 
 GNU @var{package} is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE@.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see @url{http://www.gnu.org/licenses/}.
+along with this program.  If not, see @url{https://www.gnu.org/licenses/}.
 @end quotation
 
 But in a small program which is just a few files, you can use
@@ -894,17 +916,17 @@ the Free Software Foundation; either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE@.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see @url{http://www.gnu.org/licenses/}.
+along with this program.  If not, see @url{https://www.gnu.org/licenses/}.
 @end quotation
 
 In either case, for those few packages which use the Lesser GPL
 (@pxref{Licensing of GNU Packages}), insert the word ``Lesser'' before
 ``General'' in @emph{all three} places.
-@url{http://@/www.gnu.org/@/licenses/@/gpl-howto.html} discusses application
+@url{https://@/www.gnu.org/@/licenses/@/gpl-howto.html} discusses application
 the GPL in more detail.
 
 
@@ -943,7 +965,7 @@ ask the FSF what to do.
 
 @xref{GNU Sample Texts,,, texinfo, Texinfo}, for a full example in a
 Texinfo manual, and see
-@url{http://www.gnu.org/licenses/fdl-howto.html} for more advice about
+@url{https://www.gnu.org/licenses/fdl-howto.html} for more advice about
 how to use the GNU FDL.
 
 If you write a manual that people might want to buy on paper, please
@@ -963,6 +985,19 @@ section@tie{}6).  However, the printed (@samp{.dvi}, @samp{.pdf},
 set up to be printed and published only together.  Therefore, it is
 usually simplest to include the GFDL in each manual.
 
+@node License Notices for Code Examples
+@subsection License Notices for Code Examples
+
+When a code example in documentation is more than two or three lines,
+and specific enough that people might want to copy and adapt it, we
+suggest putting a copy of the example in a file of code and releasing
+that under some free software license.  That means it will be
+released under two different licenses: in the manual under the GFDL,
+and in the code example file under a software license.
+
+If the example is important and nontrivial, and 40 lines or more, we
+suggest releasing the code copy under the same license as the program
+it pertains to.  Otherwise, we recommend releasing it under the X11 license.
 
 @node License Notices for Other Files
 @subsection License Notices for Other Files
@@ -987,65 +1022,74 @@ used (hence distributed) by third-party packages under possibly
 incompatible licenses, you may also use the above all-permissive
 license for these macros.
 
+These kinds of files can also be put in the public domain.  If
+publishing in the US, it is enough to insert a notice saying so.
+Otherwise, use Creative Commons's CC0---See
+@url{https://creativecommons.org/choose/zero/}.
 
 @node External Libraries
 @section External Libraries
 
-When maintaining an FSF-copyrighted GNU package, you may occasionally
-want to use a general-purpose free software module which offers a
-useful functionality, as a ``library'' facility (though the module is
-not always packaged technically as a library).
+As maintainer of an FSF-copyrighted GNU package, how do you use
+separately-published general-purpose free modules?  (We also call them
+``libraries'' because we are using them as libraries; it doesn't
+matter whether they are packaged as libraries or not.)
 
-Make sure the license of the module is compatible with current @emph{and
-future} GPL versions.  ``GNU GPL version 3 or later'' is good, and
-so is anything which includes permission for use under those GPL
-versions (including ``GNU GPL version 2 or later'', ``LGPL version
-@var{n} or later'', ``LGPL version 2.1'', ``GNU Affero GPL version 3
-or later'').  Lax permissive licenses are ok too, since they are
-compatible with all GPL versions.
+It would be unreasonable to ask their authors to assign copyright to
+the FSF@.  They didn't write those modules as contributions to GNU@.  We
+just happen to want to use them, as any developer might.  It would be
+rude to ask developers, out of the blue, to give the FSF their
+copyright.  Please don't ask for that in cases like these.
+
+The proper way to use those modules is to link your package with them
+and say they are @emph{not} part of your package.  See below for the
+mechanics of this.
+
+To avoid present or future legal trouble, you must make sure the
+license of the module is compatible with current @emph{and future} GPL
+versions.  ``GNU GPL version 3 or later'' is good, and so is anything
+which includes permission for use under those GPL versions (including
+``GNU GPL version 2 or later'', ``LGPL version @var{n} or later'',
+``LGPL version 2.1'', ``GNU Affero GPL version 3 or later'').  Lax
+permissive licenses are ok too, since they are compatible with all GPL
+versions.
 
 ``GPL version 2 only'' is obviously unacceptable because it is
 incompatible with GPL version 3.  ``GPL version 3 only'' and ``GPL
 version 2 or 3 only'' have a subtler problem: they would be incompatible
 with GPL version 4, if we ever make one, so the module would become an
 obstacle to upgrading your package's license to ``GPL version 4 or
-later''.
+later''.  Don't use such modules.
 
-One package you need to avoid is @code{goffice}, since it allows only
+One library you need to avoid is @code{goffice}, since it allows only
 GPL versions 2 and 3.
 
-It would be unreasonable to ask the author of the external module to
-assign its copyright to the FSF.  After all, person did not write
-it specifically as a contribution to your package, so it would be
-impertinent to ask, out of the blue, ``Please give the FSF your
-copyright.''
-
-So make your program use the module but without treating the module as
-a part of your program.  There are two reasonable methods of doing
-this:
+So, here are the mechanics of how to arrange your package to use the
+unrelated free module.
 
 @enumerate
 @item
-Assume the module is already installed on the system, and use it when
-linking your program.  This is only reasonable if the module really has
-the form of a library.
+Assume the module is already installed on the system, and link with it
+when linking your program.  This is only reasonable if the module
+really has the form of a library.
 
 @item
-Include the module in your package, putting the source in a separate
-subdirectory whose @file{README} file says, ``This is not part of the
-GNU FOO program, but is used with GNU FOO.''  Then set up your makefiles
-to build this module and link it into the executable.
+Include the module in your package's distribution, putting the source
+in a separate subdirectory whose @file{README} file says, ``This is
+not part of the GNU FOO program, but is used with GNU FOO.''  Then set
+up your makefiles to build this module and link it into the
+executable.
 
-For this method, it is not necessary to treat the module as a library
-and make a @samp{.a} file from it.  You can link with the @samp{.o}
-files directly in the usual manner.
+With this method, it is not necessary to treat the module as a library
+and make a @samp{.a} file from it.  You can link directly with the
+@samp{.o} files in the usual manner.
 @end enumerate
 
-Both of these methods create an irregularity, and our lawyers have told
-us to minimize the amount of such irregularity.  So consider using these
-methods only for general-purpose modules that were written for other
-programs and released separately for general use.  For anything that was
-written as a contribution to your package, please get papers signed.
+Both of these methods create an irregularity, and our lawyers have
+told us to minimize the amount of such irregularity.  So use these
+methods only for general-purpose modules that were @emph{not} written
+for your package.  For anything that was written as a contribution to
+your package, please get papers signed.
 
 @node Crediting Authors
 @section Crediting Authors
@@ -1128,7 +1172,7 @@ It is important to test the program personally on GNU or GNU/Linux,
 because these are the most important platforms for a GNU package.  If
 you don't have access to one of these platforms, as a GNU maintainer
 you can get access to the general GNU login machine; see
-@url{http://www.gnu.org/software/README.accounts.html}.
+@url{https://www.gnu.org/software/README.accounts.html}.
 
 Supporting other platforms is optional---we do it when that seems like
 a good idea, but we don't consider it obligatory.  If the users don't
@@ -1219,7 +1263,7 @@ default configuration for antispam purposes (see below).
 To create and maintain simple aliases and unmanaged lists, you can
 edit @file{/com/mailer/aliases} on the main GNU server.  If you don't
 have an account there, please read
-@url{http://www.gnu.org/software/README.accounts.html} (@pxref{GNU
+@url{https://www.gnu.org/software/README.accounts.html} (@pxref{GNU
 Accounts and Resources}).
 
 But if you don't want to learn how to do those things, you can ask
@@ -1283,11 +1327,11 @@ Some GNU packages, such as Emacs and GCC, come with advice about how
 to make bug reports useful.  Copying and adapting that could be very
 useful for your package.
 
-@cindex @url{http://bugs.gnu.org}
+@cindex @url{https://bugs.gnu.org}
 @cindex bug reports, email tracker for
 @cindex bug reports, web tracker for
 If you would like to use an email-based bug tracking system, see
-@url{http://bugs.gnu.org}; this can be connected with the regular
+@url{https://bugs.gnu.org}; this can be connected with the regular
 bug-reporting address.  Alternatively, if you would like to use a
 web-based bug tracking system, Savannah supports this (@pxref{Old
 Versions}), but please don't fail to accept bugs by regular email as
@@ -1317,7 +1361,7 @@ The GNU Project provides a server that GNU packages can use
 for source control and other package needs: @code{savannah.gnu.org}.
 Savannah is managed by @email{savannah-hackers@@gnu.org}.  For more
 details on using and contributing to Savannah, see
-@url{http://savannah.gnu.org/maintenance}.
+@url{https://savannah.gnu.org/maintenance}.
 
 It's not an absolute requirement, but all GNU maintainers are strongly
 encouraged to take advantage of Savannah, as sharing such a central
@@ -1329,7 +1373,7 @@ part of the purpose of using Savannah in the first place.
 @cindex @code{savannah-announce@@gnu.org} mailing list
 If you do use Savannah, please subscribe to the
 @email{savannah-announce@@gnu.org} mailing list
-(@url{http://lists.gnu.org/mailman/listinfo/savannah-announce}).  This
+(@url{https://lists.gnu.org/mailman/listinfo/savannah-announce}).  This
 is a very low-volume list to keep Savannah users informed of system
 upgrades, problems, and the like.
 
@@ -1443,7 +1487,7 @@ version, and checking that the result exactly matches the new version.
 @section Binary Distribution for Nonfree Platforms
 
 Some package maintainers release pre-compiled binaries for proprietary
-systems such as Microsoft Windows or MacOS.  It's entirely up to you
+systems such as Microsoft Windows or MacOS@.  It's entirely up to you
 whether to do that; we don't ask you to do it, but we don't object.
 Please do not let anyone make you feel you have an obligation to do
 this.
@@ -1451,7 +1495,7 @@ this.
 If you distribute them, please inform their users prominently that
 those non-free platforms trample their freedom.  It is useful to refer
 them to
-@url{http://www.gnu.org/philosophy/free-software-even-more-important.html}.
+@url{https://www.gnu.org/philosophy/free-software-even-more-important.html}.
 You can say, ``This program respects your freedom, but Windows does
 not.  To have freedom, you need to stop using Windows and other
 software that denies your freedom.''
@@ -1491,7 +1535,7 @@ Once a program gets to be widely used and people expect it to work
 solidly, it is a good idea to do pretest releases before each ``real''
 release.
 
-There are two ways of handling version numbers for pretest versions.
+There are three ways of handling version numbers for pretest versions.
 One method is to treat them as versions preceding the release you are going
 to make.
 
@@ -1502,13 +1546,21 @@ are not enough, after 4.5.99 you could advance to 4.5.990 and so on.
 (You could also use 4.5.100, but 990 has the advantage of sorting in
 the right order.)
 
-The other method is to attach a date to the release number that is
+Another method is to attach a date to the release number that is
 coming.  For a pretest for version 4.6, made on Dec 10, 2002, this
 would be 4.6.20021210.  A second pretest made the same day could be
 4.6.20021210.1.
 
 For development snapshots that are not formal pretests, using just
 the date without the version numbers is ok too.
+
+A third method, if the package uses Git, is to run the script
+@code{build-aux/git-version-gen} from Gnulib to generate test release
+version numbers.  It generates version numbers in the form
+@samp{@var{version}.@var{commits}-@var{commithash}}, where
+@var{version} is the latest version tag, @var{commits} is the number
+of commits since that tag, and @var{commithash} is a hash code for the
+latest commit.
 
 One thing that you should never do is to release a pretest with the same
 version number as the planned real release.  Many people will look only
@@ -1555,9 +1607,9 @@ for your GNU package:
 
 @enumerate
 @item
-Create an account for yourself at @url{http://savannah.gnu.org}, if
+Create an account for yourself at @url{https://savannah.gnu.org}, if
 you don't already have one.  By the way, this is also needed to
-maintain the web pages at @url{http://www.gnu.org} for your project
+maintain the web pages at @url{https://www.gnu.org} for your project
 (@pxref{Web Pages}).
 
 @item
@@ -1572,12 +1624,12 @@ Optional but recommended: Send your key to a GPG public key server:
 @code{gpg --keyserver keys.gnupg.net --send-keys @var{keyid}}, where
 @var{keyid} is the eight hex digits reported by @code{gpg
 --list-public-keys} on the @code{pub} line before the date.  For full
-information about GPG, see @url{http://www.gnu.org/software/gpg}.
+information about GPG, see @url{https://www.gnu.org/software/gpg}.
 
 @item
 Compose a message with the following items in some @var{msgfile}.
 Then GPG-sign it by running @code{gpg --clearsign @var{msgfile}}, and
-finally email the resulting @file{@var{msgfile}.asc} to
+finally email the resulting @file{@var{msgfile}.asc} as an attachment to
 @email{ftp-upload@@gnu.org}.
 
 @enumerate
@@ -1650,7 +1702,7 @@ has been successfully processed.
 One programmatic way to create and transfer the necessary files is to
 use the @code{gnupload} script, which is available from the
 @file{build-aux/} directory of the @code{gnulib} project at
-@url{http://savannah.gnu.org/projects/gnulib}.  Run
+@url{https://savannah.gnu.org/projects/gnulib}.  Run
 @code{gnupload@tie{}--help} for a description and examples.  (With
 @code{gnupload}, you specify a destination such as
 @samp{ftp.gnu.org:}@var{pkgname} rather than using the
@@ -1773,9 +1825,9 @@ After the system authenticates the signatures, the files
 @file{foo-1.0.tar.gz} and @file{foo-1.0.tar.gz.sig} are placed in
 the directory @file{gnu/foo/} on @code{ftp.gnu.org}.  That is, we'll
 have made our release available at
-@indicateurl{http://ftp.gnu.org/gnu/foo/foo-1.0.tar.gz} (and then from
+@indicateurl{https://ftp.gnu.org/gnu/foo/foo-1.0.tar.gz} (and then from
 our many mirrors via
-@indicateurl{http://ftpmirror.gnu.org/foo/foo-1.0.tar.gz}).  Whew.
+@indicateurl{https://ftpmirror.gnu.org/foo/foo-1.0.tar.gz}).  Whew.
 
 A common reason for the upload not succeeding is your GPG signature
 not being registered with the upload system.  There is nothing that
@@ -1882,6 +1934,10 @@ As for the directives described above, the @code{directory} and
 directive remains optional, and the @code{filename} directive is not
 allowed.
 
+The @file{.sig} file should not be explicitly mentioned in a directive.
+When you specify a directive to operate on a file, its corresponding
+@file{.sig} file will be handled automatically.
+
 When uploaded by itself, the name of the directive file is not
 important.  But it must be still be signed, using @samp{gpg
 --clearsign}; the resulting @file{.asc} file is what should be
@@ -1936,7 +1992,7 @@ them to be available, e.g., you uploaded something by mistake.
 
 If all you want to do is reduce how much stuff is in your release
 directory, an alternative is to email @email{sysadmin@@fsf.org} and
-ask them to move old items to the @file{http://ftp.gnu.org/old-gnu/}
+ask them to move old items to the @file{https://ftp.gnu.org/old-gnu/}
 directory; then they will still be available.  In general, however, we
 recommend leaving all official releases in the main release directory.
 
@@ -1992,13 +2048,13 @@ and developers to find the latest GNU releases.  On the other hand,
 please do not announce test releases on @code{info-gnu} unless it's a
 highly unusual situation.
 
-@cindex @url{http://planet.gnu.org}
+@cindex @url{https://planet.gnu.org}
 @cindex Savannah, news area
 Please also post release announcements in the news section of your
 Savannah project site.  Here, it is fine to also write news entries
 for test releases and any other newsworthy events.  The news feeds
 from all GNU projects at savannah are aggregated at
-@url{http://planet.gnu.org} (GNU Planet), unless the text of the entry
+@url{https://planet.gnu.org} (GNU Planet), unless the text of the entry
 contains the string @samp{::noplanet::}.  You can also post items
 directly, or arrange for feeds from other locations; see information
 on the GNU Planet web page.
@@ -2020,14 +2076,14 @@ purpose of your package.
 
 @item
 Your package's web page (normally
-@indicateurl{http://www.gnu.org/software/@var{package}/}).
+@indicateurl{https://www.gnu.org/software/@var{package}/}).
 
 @item
 Your package's download location (normally
-@indicateurl{http://ftp.gnu.org/gnu/@var{package}/}).  It is also
+@indicateurl{https://ftp.gnu.org/gnu/@var{package}/}).  It is also
 useful to mention the mirror list at
-@url{http://www.gnu.org/order/ftp.html}, and that
-@indicateurl{http://ftpmirror.gnu.org/@var{package/}} will automatically
+@url{https://www.gnu.org/order/ftp.html}, and that
+@indicateurl{https://ftpmirror.gnu.org/@var{package/}} will automatically
 redirect to a nearby mirror.
 
 @item
@@ -2038,23 +2094,34 @@ the present release.
 You may find the @file{announce-gen} script useful for creating
 announcements, which is available from the @file{build-aux/} directory
 of the @code{gnulib} project at
-@url{http://savannah.gnu.org/projects/gnulib}.
+@url{https://savannah.gnu.org/projects/gnulib}.
 
 
 @node Web Pages
 @chapter Web Pages
 @cindex web pages
 
-Please write web pages about your package, and install them on
-@code{www.gnu.org}.  They should follow our usual standards for web
-pages (see @url{http://www.gnu.org/server/@/fsf-html-style-sheet.html}).
-The overall goals are to support a wide variety of browsers, to focus
-on information rather than flashy eye candy, and to keep the site
-simple and uniform.
+As soon as a new package is dubbed GNU, its home page
+(@indicateurl{https://www.gnu.org/software/@var{package}/})
+is listed on
+@url{https://www.gnu.org/software/software.html} and
+@url{https://www.gnu.org/manual/manual.html}.  To avoid broken links,
+the webmasters create a temporary home page as follows:
 
-We encourage you to use the standard @code{www.gnu.org} template as
-the basis for your pages:
-@url{http://www.gnu.org/server/@/standards/@/boilerplate-source.html}.
+@itemize @bullet
+@item
+If there is a Savannah project for this package (@pxref{Hosting for
+Web Pages}), the temporary home page redirects to the project's main
+page, @indicateurl{https://savannah.gnu.org/projects/@var{package}},
+where a short description should be available.
+
+@item
+Otherwise, the webmasters make a simple home page containing the short
+description provided with the original submission of the package to GNU.
+@end itemize
+
+This temporary home page ought to be replaced with the real one as soon
+as possible.
 
 Some GNU packages have just simple web pages, but the more information
 you provide, the better.  So please write as much as you usefully can,
@@ -2063,8 +2130,21 @@ databases (including mail archives and bug tracking) are an exception;
 set them up on whatever site is convenient for you, and make the pages
 on @code{www.gnu.org} link to that site.
 
+Your web pages should follow our usual standards (see
+@url{https://www.gnu.org/server/@/fsf-html-style-sheet.html}). The
+overall goals are to support a wide variety of browsers, to focus on
+information rather than visual adornments, and to keep gnu.org/software/
+consistent on certain important points.
+
+We encourage you to use the standard @code{www.gnu.org} template as
+the basis for your pages:
+@url{https://www.gnu.org/server/@/standards/@/boilerplate-source.html}.
+This template changes slightly from time to time for various reasons. If
+a change affects existing web pages, the webmasters will inform you;
+then you can make the change or they can.
+
 Please follow the best practices of accessibility in your web pages
-(see @url{http://www.gnu.org/accessibility/accessibility.html}).
+(see @url{https://www.gnu.org/accessibility/accessibility.html}).
 
 @menu
 * Hosting for Web Pages::
@@ -2081,7 +2161,7 @@ The best way to maintain the web pages for your project is to register
 the project on @code{savannah.gnu.org}.  Then you can edit the pages
 using CVS, using the separate ``web pages repository'' available on
 Savannah, which corresponds to
-@indicateurl{http://www.gnu.org/software/@var{package}/}.  You can
+@indicateurl{https://www.gnu.org/software/@var{package}/}.  You can
 keep your source files there too (using any of a variety of version
 control systems), but you can use @code{savannah.gnu.org} only for
 your gnu.org web pages if you wish; simply register a ``web-only''
@@ -2092,10 +2172,14 @@ If you don't want to use that method, please talk with
 instance, you can mail them pages to install, if necessary.  But that
 is more work for them, so please use Savannah if you can.
 
+Please note that the GNU webmasters may fix technical details in your
+web pages (HTML, CSS, obvious typos, broken links in the footer, etc.)
+and inform you of the change afterwards.
+
 If you use Savannah, you can use a special file named @file{.symlinks}
 in order to create symbolic links, which are not supported in CVS.
 For details, see
-@url{http://www.gnu.org/server/standards/README.webmastering.html#symlinks}.
+@url{https://www.gnu.org/server/standards/README.webmastering.html#symlinks}.
 
 
 @node Freedom for Web Pages
@@ -2115,15 +2199,20 @@ Please don't link to a site that is about your package, which the
 public might perceive as connected with it and reflecting the position
 of its developers, unless it follows that criterion.
 
+Please make sure it is possible to use the web site fully using the
+Lynx browser, and with the IceCat browser with LibreJS enabled.  It
+should work both with Tor and without Tor.  Of course, it is desirable
+for the site to support as many other browsers as possible.
+
 Historically, web pages for GNU packages did not include GIF images,
 because of patent problems (@pxref{Ethical and Philosophical
 Consideration}).  Although the GIF patents expired in 2006, using GIF
 images is still not recommended, as the PNG and JPEG formats are
-generally superior.  See @url{http://www.gnu.org/philosophy/gif.html}.
+generally superior.  See @url{https://www.gnu.org/philosophy/gif.html}.
 
 Please make sure that any Javascript code in your web pages is covered
 by a free license, and has its license indicated in a way LibreJS can
-recognize.  See @url{http://gnu.org/philosophy/javascript-trap.html}.
+recognize.  See @url{https://gnu.org/philosophy/javascript-trap.html}.
 If the Javascript in the page is minified, or for any other reason is
 not the source code, it must point to its source code as described
 there.
@@ -2152,7 +2241,7 @@ See the section below for details on a script to make the job of
 creating all these different formats and index pages easier.
 
 We would like to list all GNU manuals on the page
-@url{http://www.gnu.org/manual}, so if yours isn't there, please send
+@url{https://www.gnu.org/manual}, so if yours isn't there, please send
 mail to @code{webmasters@@gnu.org}, asking them to add yours, and they
 will do so based on the contents of your @file{manual} directory.
 
@@ -2174,14 +2263,14 @@ for the HTML index pages.  Both are available from the Gnulib
 development:
 
 @smallformat
-@uref{http://git.savannah.gnu.org/cgit/gnulib.git/tree/build-aux/gendocs.sh}
-@uref{http://git.savannah.gnu.org/cgit/gnulib.git/tree/doc/gendocs_template}
+@uref{https://git.savannah.gnu.org/cgit/gnulib.git/tree/build-aux/gendocs.sh}
+@uref{https://git.savannah.gnu.org/cgit/gnulib.git/tree/doc/gendocs_template}
 @end smallformat
 
 There is also a minimalistic template, available from:
 
 @smallformat
-@uref{http://git.savannah.gnu.org/cgit/gnulib.git/tree/doc/gendocs_template_min}
+@uref{https://git.savannah.gnu.org/cgit/gnulib.git/tree/doc/gendocs_template_min}
 @end smallformat
 
 Invoke the script like this, in the directory containing the Texinfo
@@ -2286,7 +2375,7 @@ cvs add -ko @var{file1} @var{file2} ...
 @c The CVS manual is now built with numeric references and no nonsplit
 @c form, so it's not worth trying to give a direct link.
 See the ``Keyword Substitution'' section in the CVS manual, available
-from @url{http://cvs.nongnu.org}.
+from @url{https://cvs.nongnu.org}.
 
 In Texinfo source, the recommended way to literally specify a
 ``dollar'' keyword is:
@@ -2320,14 +2409,22 @@ write to @email{licensing@@gnu.org}, and we will try to help you get
 advice from a lawyer.
 
 Sometimes the GNU project takes a strong stand against a particular
-patented technology in order to encourage society to reject it.
+patented technology in order to encourage society to reject it.  That
+is why we rejected MP3 audio format in favor of the unpatented Ogg
+Vorbis format.  These patents have reportedly expired, but we still
+prefer Ogg formats to MP3 formats.  Please support this campaign by
+making Ogg Vorbis the preferred format for audio distribution
+in GNU packages and their web sites.
 
-For example, the MP3 audio format is covered by a software patent in
-the USA and some other countries.  A patent holder has threatened
-lawsuits against the developers of free programs (these are not GNU
-programs) to produce and play MP3, and some GNU/Linux distributors are
-afraid to include them.  Development of the programs continues, but we
-campaign for the rejection of MP3 format in favor of Ogg Vorbis format.
+We will consider using Ogg Opus at some point in the future.
+It is fine to distribute Ogg Opus files @emph{also}, but please
+continue distributing Ogg Vorbis, so as not to hurry users to change
+the software with which they listen to audio.
+
+We are unable to find a modern compressed video format that is truly
+safe from patents, so we use the Ogg Theora and WebM formats for which
+no licensing consortium has been set up.  GNU programs and their web
+sites should not distribute video in MPEG-2 or MPEG 4 formats.
 
 A GNU package should not recommend use of any non-free program, nor
 should it require a non-free program (such as a non-free compiler or
@@ -2343,9 +2440,8 @@ software, including JavaScript, for the coordination of its
 development.  For example, please don't use Transifex for translation
 of your software because it requires your translators to use non-free,
 JavaScript-based editing tools.  Instead, a service without any
-ethical concerns should be used, such as GNU's Pootle instance
-(@url{https://chapters.gnu.org/pootle}) or The Translation Project
-(@url{http://translationproject.org}).
+ethical concerns should be used, such as The Translation Project
+(@url{https://translationproject.org}).
 
 A GNU package should not refer the user to any non-free documentation
 for free software.  The need for free documentation to come with free
@@ -2371,6 +2467,54 @@ frequently.  We ask that GNU maintainers, at least on matters that
 pertain specifically to their package, stand with the rest of the GNU
 project when such issues come up.
 
+@node Humor
+@chapter Humor and GNU
+
+In GNU, we appreciate humor in our work.
+
+GNU is a project of hackers, and
+@uref{https://stallman.org/articles/on-hacking.html,,hacking means
+playful cleverness}.  Even the name ``GNU'' is an example of playful
+cleverness---it is a
+@uref{https://gnu.org/gnu/the-gnu-project.html,,recursive acronym for
+``GNU's Not Unix.''}
+
+In that spirit, we prize occasional doses of humor in GNU packages.
+Humor is not mandatory in a GNU package; we do not tell maintainers,
+``Make users smile, or else!''  But when maintainers do that, we too
+smile.
+
+Nowadays, our humor-positive approach occasionally encounters direct,
+blanket opposition.  Some people advocate, and even demand, removal of
+jokes from software packages simply because they are jokes.  We shrug
+off that point of view.
+
+Jokes are subject to the same sorts of issues and criticism as other
+writing.  Sometimes there is a valid objection to text which is
+humorous, so we do not defend every joke obtusely to the bitter end.
+But @emph{the fact that it is a joke} is not a valid objection.
+
+There are people who frown on anything that is slightly risqué or
+controversial, including jokes.  It would be a terrible shame for that
+attitude to prevail, so our policy is that the occasional risqué joke
+is ok.  GNU is a 21st century project, not a 19th.
+
+@node Other Politics
+@chapter Other Politics
+
+The GNU Project supports the cause of software freedom, that the users
+of computing should have control of their computing activities.  This
+requires that they have control of their software that does those
+activities, which in turn requires that they do these activities
+with free software and have the possibility of replacing any shared
+copies with their own copies.
+
+It also supports basic human rights in computing including use of the
+internet; opposing censorship, for instance.
+
+A GNU package should not seriously advocate any other political
+causes.  Not that the GNU Project opposes those other causes.  Rather,
+it is neutral on them, and GNU packages should be neutral too.
 
 @node Terminology
 @chapter Terminology Issues
@@ -2399,7 +2543,7 @@ idealistic, and raises issues of freedom, ethics, principle and what
 makes for a good society.  The term open source, initiated in 1998, is
 associated with a philosophy which studiously avoids such questions.
 For a detailed explanation, see
-@url{http://www.gnu.org/philosophy/open-source-misses-the-point.html}.
+@url{https://www.gnu.org/philosophy/open-source-misses-the-point.html}.
 
 The GNU Project is aligned with the free software movement.  This
 doesn't mean that all GNU contributors and maintainers have to agree;
@@ -2423,7 +2567,7 @@ well.
 @cindex GNU/Linux
 
 The GNU Project was formed to develop a free Unix-like operating system,
-GNU.  The existence of this system is our major accomplishment.
+GNU@.  The existence of this system is our major accomplishment.
 However, the widely used version of the GNU system, in which Linux is
 used as the kernel, is often called simply ``Linux''.  As a result, most
 users don't know about the GNU Project's major accomplishment---or more
@@ -2443,7 +2587,7 @@ Please make this distinction consistently in GNU software releases, GNU
 documentation, and announcements and articles that you publish in your
 role as the maintainer of a GNU package.  If you want to explain the
 terminology and its reasons, you can refer to the URL
-@url{http://www.gnu.org/gnu/linux-and-gnu.html}.
+@url{https://www.gnu.org/gnu/linux-and-gnu.html}.
 
 To make it clear that Linux is a kernel, not an operating system,
 please take care to avoid using the term ``Linux system'' in those
@@ -2466,7 +2610,7 @@ of the GNU kernel, please call it ``the Hurd'' or ``the GNU Hurd''.
 Note that this uses a space, not a slash.
 
 For more about this point, see
-@url{http://www.gnu.org/gnu/gnu-linux-faq.html}.
+@url{https://www.gnu.org/gnu/gnu-linux-faq.html}.
 
 @node Interviews and Speeches
 @chapter Interviews and Speeches
@@ -2479,7 +2623,7 @@ itself (@pxref{Terminology}).  Likewise, avoid promoting nonfree
 programs (@pxref{References,,, standards, GNU Coding
 Standards}) as you would in the package itself.
 
-Many GNU users have erroneous ideas about GNU.  Outside of our
+Many GNU users have erroneous ideas about GNU@.  Outside of our
 community, most people think it is Linux.  Please use your opportunity
 to set them straight.  Start the presentation with the answers to
 these basic questions:
@@ -2487,16 +2631,16 @@ these basic questions:
 @itemize @bullet
 @item
 What GNU is (an operating system developed to be Unix-like and totally
-free software).  It is good to mention @url{http://www.gnu.org}.
+free software).  It is good to mention @url{https://www.gnu.org}.
 
 @item
 What free software is (the users control it, so it doesn't control
 them).  It is good to state the four freedoms and/or refer to
-@url{http://www.gnu.org/philosophy/free-sw.html}.
+@url{https://www.gnu.org/philosophy/free-sw.html}.
 
 @item
 What GNU/Linux is (Linux filled the last gap in GNU).  It is useful to
-refer to @url{http://www.gnu.org/gnu/linux-and-gnu.html}.
+refer to @url{https://www.gnu.org/gnu/linux-and-gnu.html}.
 
 @item
 What the GNU Project is (the project to develop GNU).
@@ -2568,10 +2712,10 @@ The programs <list of them> hosted here are free software packages
 of the GNU Project, not products of <company name>.  We call them
 "free software" because you are free to copy and redistribute them,
 following the rules stated in the license of each package.  For more
-information, see http://www.gnu.org/philosophy/free-sw.html.
+information, see https://www.gnu.org/philosophy/free-sw.html.
 
 If you are looking for service or support for GNU software, see
-http://www.gnu.org/gethelp/ for suggestions of where to ask.
+https://www.gnu.org/gethelp/ for suggestions of where to ask.
 
 If you would like to contribute to the development of one of these
 packages, contact the package maintainer or the bug-reporting address
@@ -2633,7 +2777,7 @@ want to propose that for your project, write to
 spending of these funds.
 
 Of course, it is also good to encourage people to join the FSF
-(@url{http://www.fsf.org}) or make a general donation, either instead
+(@url{https://www.fsf.org}) or make a general donation, either instead
 of or as well as package-specific donations.
 
 
@@ -2645,7 +2789,7 @@ of or as well as package-specific donations.
 The Free Software Directory aims to be a complete list of free
 software packages, within certain criteria.  Every GNU package should
 be listed there, so please see
-@url{http://www.gnu.org/help/directory.html#adding-entries} for
+@url{https://www.gnu.org/help/directory.html#adding-entries} for
 information on how to write an entry for your package.  Contact
 @email{bug-directory@@gnu.org} with any questions or suggestions for
 the Free Software Directory.
@@ -2723,10 +2867,10 @@ When you get enough volunteers, send another message to the list saying
 @bye
 
 Local variables:
-eval: (add-hook 'write-file-hooks 'time-stamp)
-time-stamp-start: "@set lastupdate "
+eval: (add-hook 'before-save-hook 'time-stamp)
 time-stamp-start: "@set lastupdate "
 time-stamp-end: "$"
 time-stamp-format: "%:b %:d, %:y"
 compile-command: "make -C work.m"
+coding: utf-8
 End:

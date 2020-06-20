@@ -1,5 +1,5 @@
 /* Test of getting user name.
-   Copyright (C) 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2010-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible and Paul Eggert.  */
 
@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+#if !(defined _WIN32 && !defined __CYGWIN__)
 # include <pwd.h>
 #endif
 
@@ -55,7 +55,7 @@ test_getlogin_result (const char *buf, int err)
     }
 
   /* Compare against the value from the environment.  */
-#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+#if !(defined _WIN32 && !defined __CYGWIN__)
   /* Unix platform */
   {
     struct stat stat_buf;
@@ -79,7 +79,7 @@ test_getlogin_result (const char *buf, int err)
     ASSERT (pwd->pw_uid == stat_buf.st_uid);
   }
 #endif
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
   /* Native Windows platform.
      Note: This test would fail on Cygwin in an ssh session, because sshd
      sets USERNAME=SYSTEM.  */

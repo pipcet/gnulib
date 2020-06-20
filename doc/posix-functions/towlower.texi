@@ -2,15 +2,12 @@
 @section @code{towlower}
 @findex towlower
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/towlower.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/towlower.html}
 
 Gnulib module: wctype-h
 
 Portability problems fixed by Gnulib:
 @itemize
-@item
-This function is missing on some platforms:
-IRIX 5.3, Solaris 2.5.1.
 @item
 This function returns values of which the upper 16 bits are incorrect
 on some platforms:
@@ -24,6 +21,6 @@ OS X 10.8.
 Portability problems not fixed by Gnulib:
 @itemize
 @item
-On AIX and Windows platforms, @code{wchar_t} is a 16-bit type and therefore cannot
+On Windows and 32-bit AIX platforms, @code{wchar_t} is a 16-bit type and therefore cannot
 accommodate all Unicode characters.
 @end itemize

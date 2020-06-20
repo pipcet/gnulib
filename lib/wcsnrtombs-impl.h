@@ -1,5 +1,5 @@
 /* Convert wide string to string.
-   Copyright (C) 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2008-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,15 +13,15 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 size_t
-wcsnrtombs (char *dest, const wchar_t **srcp, size_t srclen, size_t len, mbstate_t *ps)
+FUNC (char *dest, const SCHAR_T **srcp, size_t srclen, size_t len, mbstate_t *ps)
 {
   if (ps == NULL)
-    ps = &_gl_wcsrtombs_state;
+    ps = &INTERNAL_STATE;
   {
-    const wchar_t *src = *srcp;
+    const SCHAR_T *src = *srcp;
     size_t cur_max = MB_CUR_MAX;
     char buf[64];
 
@@ -34,8 +34,8 @@ wcsnrtombs (char *dest, const wchar_t **srcp, size_t srclen, size_t len, mbstate
 
         for (; srclen > 0 && len > 0; src++, srclen--)
           {
-            wchar_t wc = *src;
-            size_t ret = wcrtomb (len >= cur_max ? destptr : buf, wc, ps);
+            SCHAR_T wc = *src;
+            size_t ret = WCRTOMB (len >= cur_max ? destptr : buf, wc, ps);
 
             if (ret == (size_t)(-1))
               goto bad_input;
@@ -66,8 +66,8 @@ wcsnrtombs (char *dest, const wchar_t **srcp, size_t srclen, size_t len, mbstate
 
         for (; srclen > 0; src++, srclen--)
           {
-            wchar_t wc = *src;
-            size_t ret = wcrtomb (buf, wc, &state);
+            SCHAR_T wc = *src;
+            size_t ret = WCRTOMB (buf, wc, &state);
 
             if (ret == (size_t)(-1))
               goto bad_input2;

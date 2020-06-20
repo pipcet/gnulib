@@ -1,5 +1,5 @@
 /* Test of calloc function.
-   Copyright (C) 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2010-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -36,20 +36,26 @@ int
 main ()
 {
   /* Check that calloc (0, 0) is not a NULL pointer.  */
-  void *p = calloc (0, 0);
-  if (p == NULL)
-    return 1;
-  free (p);
+  {
+    void * volatile p = calloc (0, 0);
+    if (p == NULL)
+      return 1;
+    free (p);
+  }
 
   /* Check that calloc fails when requested to allocate a block of memory
      larger than SIZE_MAX bytes.
-     We use eight (), not 8, to avoid a compiler warning from GCC 7.  */
-  p = calloc ((size_t) -1 / 8 + 1, eight ());
-  if (p != NULL)
-    {
-      free (p);
-      return 1;
-    }
+     We use eight (), not 8, to avoid a compiler warning from GCC 7.
+     'volatile' is needed to defeat an incorrect optimization by clang 10,
+     see <https://bugs.llvm.org/show_bug.cgi?id=46055>.  */
+  {
+    void * volatile p = calloc ((size_t) -1 / 8 + 1, eight ());
+    if (p != NULL)
+      {
+        free (p);
+        return 2;
+      }
+  }
 
   return 0;
 }

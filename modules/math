@@ -237,8 +237,10 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''REPLACE_COSF''@|$(REPLACE_COSF)|g' \
 	      -e 's|@''REPLACE_COSHF''@|$(REPLACE_COSHF)|g' \
 	      -e 's|@''REPLACE_EXPF''@|$(REPLACE_EXPF)|g' \
+	      -e 's|@''REPLACE_EXPL''@|$(REPLACE_EXPL)|g' \
 	      -e 's|@''REPLACE_EXPM1''@|$(REPLACE_EXPM1)|g' \
 	      -e 's|@''REPLACE_EXPM1F''@|$(REPLACE_EXPM1F)|g' \
+	      -e 's|@''REPLACE_EXPM1L''@|$(REPLACE_EXPM1L)|g' \
 	      -e 's|@''REPLACE_EXP2''@|$(REPLACE_EXP2)|g' \
 	      -e 's|@''REPLACE_EXP2L''@|$(REPLACE_EXP2L)|g' \
 	      -e 's|@''REPLACE_FABSL''@|$(REPLACE_FABSL)|g' \
@@ -260,6 +262,7 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''REPLACE_HYPOTL''@|$(REPLACE_HYPOTL)|g' \
 	      -e 's|@''REPLACE_ILOGB''@|$(REPLACE_ILOGB)|g' \
 	      -e 's|@''REPLACE_ILOGBF''@|$(REPLACE_ILOGBF)|g' \
+	      -e 's|@''REPLACE_ILOGBL''@|$(REPLACE_ILOGBL)|g' \
 	      -e 's|@''REPLACE_ISFINITE''@|$(REPLACE_ISFINITE)|g' \
 	      -e 's|@''REPLACE_ISINF''@|$(REPLACE_ISINF)|g' \
 	      -e 's|@''REPLACE_ISNAN''@|$(REPLACE_ISNAN)|g' \
@@ -287,6 +290,7 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''REPLACE_REMAINDER''@|$(REPLACE_REMAINDER)|g' \
 	      -e 's|@''REPLACE_REMAINDERF''@|$(REPLACE_REMAINDERF)|g' \
 	      -e 's|@''REPLACE_REMAINDERL''@|$(REPLACE_REMAINDERL)|g' \
+	      -e 's|@''REPLACE_RINTL''@|$(REPLACE_RINTL)|g' \
 	      -e 's|@''REPLACE_ROUND''@|$(REPLACE_ROUND)|g' \
 	      -e 's|@''REPLACE_ROUNDF''@|$(REPLACE_ROUNDF)|g' \
 	      -e 's|@''REPLACE_ROUNDL''@|$(REPLACE_ROUNDL)|g' \

@@ -1,5 +1,5 @@
 /* Decomposition of Unicode characters.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -13,14 +13,14 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 /* Specification.  */
 #include "uninorm.h"
 
-#include "decomposition-table.h"
+#include "uninorm/decomposition-table.h"
 
 int
 uc_decomposition (ucs4_t uc, int *decomp_tag, ucs4_t *decomposition)
@@ -29,7 +29,7 @@ uc_decomposition (ucs4_t uc, int *decomp_tag, ucs4_t *decomposition)
     {
       /* Hangul syllable.  See Unicode standard, chapter 3, section
          "Hangul Syllable Decomposition",  See also the clarification at
-         <http://www.unicode.org/versions/Unicode5.1.0/>, section
+         <https://www.unicode.org/versions/Unicode5.1.0/>, section
          "Clarification of Hangul Jamo Handling".  */
       unsigned int t;
 

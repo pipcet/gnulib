@@ -1,5 +1,5 @@
-# wctob.m4 serial 11
-dnl Copyright (C) 2008-2017 Free Software Foundation, Inc.
+# wctob.m4 serial 12
+dnl Copyright (C) 2008-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -17,7 +17,7 @@ AC_DEFUN([gl_FUNC_WCTOB],
 
     dnl Solaris 9 has the wctob() function but it does not work.
     dnl Cygwin 1.7.2 has the wctob() function but it clobbers caller-owned
-    dnl registers, see <http://cygwin.com/ml/cygwin/2010-05/msg00015.html>.
+    dnl registers, see <https://cygwin.com/ml/cygwin/2010-05/msg00015.html>.
     AC_REQUIRE([AC_PROG_CC])
     AC_REQUIRE([gt_LOCALE_FR])
     AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
@@ -74,6 +74,7 @@ int main ()
           AC_RUN_IFELSE(
             [AC_LANG_SOURCE([[
 #include <locale.h>
+#include <stdlib.h>
 #include <string.h>
 /* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
    <wchar.h>.

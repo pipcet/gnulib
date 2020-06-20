@@ -1,5 +1,5 @@
 /* Test of parse_datetime() function.
-   Copyright (C) 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2008-2020 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Simon Josefsson <simon@josefsson.org>, 2008.  */
 
@@ -123,7 +123,7 @@ main (int argc _GL_UNUSED, char **argv)
   /* Set the time zone to US Eastern time with the 2012 rules.  This
      should disable any leap second support.  Otherwise, there will be
      a problem with glibc on sites that default to leap seconds; see
-     <http://bugs.gnu.org/12206>.  */
+     <https://bugs.gnu.org/12206>.  */
   setenv ("TZ", "EST5EDT,M3.2.0,M11.1.0", 1);
 
   gmtoff = gmt_offset (ref_time);

@@ -2,6 +2,19 @@
 @subsection @code{argz_add_sep}
 @findex argz_add_sep
 
+Documentation:
+@itemize
+@item
+@ifinfo
+@ref{Argz Functions,,Argz Functions,libc},
+@end ifinfo
+@ifnotinfo
+@url{https://www.gnu.org/software/libc/manual/html_node/Argz-Functions.html},
+@end ifnotinfo
+@item
+@uref{https://www.kernel.org/doc/man-pages/online/pages/man3/argz_add_sep.3.html,,man argz_add_sep}.
+@end itemize
+
 Gnulib module: argz
 
 Portability problems fixed by Gnulib:
@@ -9,7 +22,7 @@ Portability problems fixed by Gnulib:
 @item
 This function is missing on some platforms:
 Mac OS X 10.5, FreeBSD 6.0, NetBSD 5.0, OpenBSD 3.8, Minix 3.1.8, AIX 5.1, HP-UX 11,
-IRIX 6.5, OSF/1 5.1, Solaris 11 2011-11, mingw, MSVC 14, Interix 3.5, BeOS.
+IRIX 6.5, Solaris 11.4, mingw, MSVC 14, Android 9.0.
 
 @item
 This function is broken on some platforms:

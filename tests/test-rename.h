@@ -1,5 +1,5 @@
 /* Test of rename() function.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* This file is designed to test both rename(a,b) and
    renameat(AT_FDCWD,a,AT_FDCWD,b).  FUNC is the function to test.
@@ -339,12 +339,14 @@ test_rename (int (*func) (char const *, char const *), bool print)
         errno = 0;
         ASSERT (func (BASE "dir2", BASE "dir/.") == -1);
         ASSERT (errno == EINVAL || errno == EBUSY || errno == EISDIR
-                || errno == ENOTEMPTY || errno == EEXIST);
+                || errno == ENOTEMPTY || errno == EEXIST
+                || errno == ENOENT /* WSL */);
       }
       {
         errno = 0;
         ASSERT (func (BASE "dir2/.", BASE "dir") == -1);
-        ASSERT (errno == EINVAL || errno == EBUSY || errno == EEXIST);
+        ASSERT (errno == EINVAL || errno == EBUSY || errno == EEXIST
+                || errno == ENOENT /* WSL */);
       }
       ASSERT (rmdir (BASE "dir") == 0);
       /* Files present here:
@@ -366,12 +368,14 @@ test_rename (int (*func) (char const *, char const *), bool print)
         errno = 0;
         ASSERT (func (BASE "dir2", BASE "dir/.//") == -1);
         ASSERT (errno == EINVAL || errno == EBUSY || errno == EISDIR
-                || errno == ENOTEMPTY || errno == EEXIST);
+                || errno == ENOTEMPTY || errno == EEXIST
+                || errno == ENOENT /* WSL */);
       }
       {
         errno = 0;
         ASSERT (func (BASE "dir2/.//", BASE "dir") == -1);
-        ASSERT (errno == EINVAL || errno == EBUSY || errno == EEXIST);
+        ASSERT (errno == EINVAL || errno == EBUSY || errno == EEXIST
+                || errno == ENOENT /* WSL */);
       }
       ASSERT (rmdir (BASE "dir2") == 0);
       /* Files present here:

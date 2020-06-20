@@ -8,7 +8,9 @@ m4/tm_gmtoff.m4
 m4/nstrftime.m4
 
 Depends-on:
+attribute
 extensions
+intprops
 stdbool
 time_rz
 

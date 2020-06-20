@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a linked list.
-   Copyright (C) 2006-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Common code of gl_linked_list.c and gl_linkedhash_list.c.  */
 
@@ -76,11 +76,11 @@ gl_linked_nx_create_empty (gl_list_implementation_t implementation,
 
 static gl_list_t
 gl_linked_nx_create (gl_list_implementation_t implementation,
-                  gl_listelement_equals_fn equals_fn,
-                  gl_listelement_hashcode_fn hashcode_fn,
-                  gl_listelement_dispose_fn dispose_fn,
-                  bool allow_duplicates,
-                  size_t count, const void **contents)
+                     gl_listelement_equals_fn equals_fn,
+                     gl_listelement_hashcode_fn hashcode_fn,
+                     gl_listelement_dispose_fn dispose_fn,
+                     bool allow_duplicates,
+                     size_t count, const void **contents)
 {
   struct gl_list_impl *list =
     (struct gl_list_impl *) malloc (sizeof (struct gl_list_impl));
@@ -170,13 +170,15 @@ gl_linked_size (gl_list_t list)
 }
 
 static const void * _GL_ATTRIBUTE_PURE
-gl_linked_node_value (gl_list_t list, gl_list_node_t node)
+gl_linked_node_value (gl_list_t list _GL_ATTRIBUTE_MAYBE_UNUSED,
+                      gl_list_node_t node)
 {
   return node->value;
 }
 
 static int
-gl_linked_node_nx_set_value (gl_list_t list, gl_list_node_t node,
+gl_linked_node_nx_set_value (gl_list_t list _GL_ATTRIBUTE_MAYBE_UNUSED,
+                             gl_list_node_t node,
                              const void *elt)
 {
 #if WITH_HASHTABLE
@@ -1021,7 +1023,7 @@ gl_linked_iterator_next (gl_list_iterator_t *iterator,
 }
 
 static void
-gl_linked_iterator_free (gl_list_iterator_t *iterator)
+gl_linked_iterator_free (gl_list_iterator_t *iterator _GL_ATTRIBUTE_MAYBE_UNUSED)
 {
 }
 

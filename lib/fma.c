@@ -1,5 +1,5 @@
 /* Fused multiply-add.
-   Copyright (C) 2007, 2009, 2011-2017 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009, 2011-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2011.  */
 
@@ -23,6 +23,7 @@
 /* Specification.  */
 #include <math.h>
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -84,7 +85,7 @@
      Sylvie Boldo, Guillaume Melquiond:
      Emulation of FMA and correctly-rounded sums: proved algorithms using
      rounding to odd.
-     <http://www.lri.fr/~melquion/doc/08-tc.pdf>
+     <https://www.lri.fr/~melquion/doc/08-tc.pdf>
    But is it complicated.
    Here we take the simpler (and probably slower) approach of doing
    multi-precision arithmetic.  */
@@ -720,7 +721,7 @@ FUNC (DOUBLE x, DOUBLE y, DOUBLE z)
                   roundoff_bits = sum_bits - keep_bits; /* > 0, <= sum_bits */
                   {
 #if HAVE_FEGETROUND && defined FE_TOWARDZERO
-                    /* Cf. <http://pubs.opengroup.org/onlinepubs/9699919799/functions/fegetround.html> */
+                    /* Cf. <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fegetround.html> */
                     int rounding_mode = fegetround ();
                     if (rounding_mode == FE_TOWARDZERO)
                       round_up = 0;
@@ -729,7 +730,7 @@ FUNC (DOUBLE x, DOUBLE y, DOUBLE z)
                     else if (rounding_mode == FE_UPWARD)
                       round_up = !sign;
 #else
-                    /* Cf. <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/float.h.html> */
+                    /* Cf. <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/float.h.html> */
                     int rounding_mode = FLT_ROUNDS;
                     if (rounding_mode == 0) /* toward zero */
                       round_up = 0;

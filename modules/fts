@@ -8,6 +8,7 @@ lib/fts-cycle.c
 m4/fts.m4
 
 Depends-on:
+attribute
 closedir
 cycle-check
 d-ino
@@ -15,16 +16,16 @@ d-type
 fchdir
 fcntl
 fcntl-h
-fdopendir
 flexmember
 fstat
 hash
 i-ring
 lstat
 memmove
+open
 openat-h
-openat-safer
 opendir
+opendirat
 readdir
 stdalign
 stdbool

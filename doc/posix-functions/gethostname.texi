@@ -2,7 +2,7 @@
 @section @code{gethostname}
 @findex gethostname
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/gethostname.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/gethostname.html}
 
 Gnulib module: gethostname
 
@@ -18,7 +18,7 @@ Portability problems not fixed by Gnulib:
 @item
 This function's second argument type is @code{int} instead of @code{size_t}
 on some platforms:
-OSF/1 5.1, Solaris 10.
+Solaris 10.
 @item
 If the given buffer is too small for the host name, some implementations
 fail with @code{EINVAL}, instead of returning a truncated host name.

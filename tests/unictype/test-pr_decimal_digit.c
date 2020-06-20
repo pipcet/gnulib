@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include "test-predicate-part1.h"
 
@@ -60,14 +60,17 @@
     { 0x11136, 0x1113F },
     { 0x111D0, 0x111D9 },
     { 0x112F0, 0x112F9 },
+    { 0x11450, 0x11459 },
     { 0x114D0, 0x114D9 },
     { 0x11650, 0x11659 },
     { 0x116C0, 0x116C9 },
     { 0x11730, 0x11739 },
     { 0x118E0, 0x118E9 },
+    { 0x11C50, 0x11C59 },
     { 0x16A60, 0x16A69 },
     { 0x16B50, 0x16B59 },
-    { 0x1D7CE, 0x1D7FF }
+    { 0x1D7CE, 0x1D7FF },
+    { 0x1E950, 0x1E959 }
 
 #define PREDICATE(c) uc_is_property_decimal_digit (c)
 #include "test-predicate-part2.h"

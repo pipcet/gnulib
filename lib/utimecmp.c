@@ -1,6 +1,6 @@
 /* utimecmp.c -- compare file timestamps
 
-   Copyright (C) 2004-2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2004-2007, 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
 
@@ -21,17 +21,19 @@
 
 #include "utimecmp.h"
 
+#include <fcntl.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
+#include "dirname.h"
 #include "hash.h"
 #include "intprops.h"
 #include "stat-time.h"
-#include "utimens.h"
 #include "verify.h"
 
 #ifndef MAX
@@ -45,9 +47,9 @@
    no greater than 1 billion.  */
 #if HAVE_UTIMENSAT
 enum { SYSCALL_RESOLUTION = 1 };
-#elif (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#elif defined _WIN32 && ! defined __CYGWIN__
 /* On native Windows, file times have 100 ns resolution. See
-   <https://msdn.microsoft.com/en-us/library/ms724284.aspx>  */
+   <https://docs.microsoft.com/en-us/windows/desktop/api/minwinbase/ns-minwinbase-filetime>  */
 enum { SYSCALL_RESOLUTION = 100 };
 #elif ((HAVE_FUTIMESAT || HAVE_WORKING_UTIMES)                  \
        && (defined HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC             \
@@ -103,7 +105,8 @@ dev_info_compare (void const *x, void const *y)
   return a->dev == b->dev;
 }
 
-/* Return -1, 0, 1 based on whether the destination file (with name
+/* Return -1, 0, 1 based on whether the destination file (relative
+   to openat-like directory file descriptor DFD with name
    DST_NAME and status DST_STAT) is older than SRC_STAT, the same age
    as SRC_STAT, or newer than SRC_STAT, respectively.
 
@@ -121,6 +124,15 @@ utimecmp (char const *dst_name,
           struct stat const *dst_stat,
           struct stat const *src_stat,
           int options)
+{
+  return utimecmpat (AT_FDCWD, dst_name, dst_stat, src_stat, options);
+}
+
+int
+utimecmpat (int dfd, char const *dst_name,
+            struct stat const *dst_stat,
+            struct stat const *src_stat,
+            int options)
 {
   /* Things to watch out for:
 
@@ -216,7 +228,24 @@ utimecmp (char const *dst_name,
       /* If the system will tell us the resolution, we're set!  */
       if (! dst_res->exact)
         {
-          res = pathconf (dst_name, _PC_TIMESTAMP_RESOLUTION);
+          res = -1;
+          if (dfd == AT_FDCWD)
+            res = pathconf (dst_name, _PC_TIMESTAMP_RESOLUTION);
+          else
+            {
+              char *dstdir = mdir_name (dst_name);
+              if (dstdir)
+                {
+                  int destdirfd = openat (dfd, dstdir,
+                                          O_SEARCH | O_CLOEXEC | O_DIRECTORY);
+                  if (0 <= destdirfd)
+                    {
+                      res = fpathconf (destdirfd, _PC_TIMESTAMP_RESOLUTION);
+                      close (destdirfd);
+                    }
+                  free (dstdir);
+                }
+            }
           if (0 < res)
             {
               dst_res->resolution = res;
@@ -311,19 +340,13 @@ utimecmp (char const *dst_name,
               timespec[1].tv_sec = dst_m_s | (res == 2 * BILLION);
               timespec[1].tv_nsec = dst_m_ns + res / 9;
 
-              /* Set the modification time.  But don't try to set the
-                 modification time of symbolic links; on many hosts this sets
-                 the time of the pointed-to file.  */
-              if ((S_ISLNK (dst_stat->st_mode)
-                   ? lutimens (dst_name, timespec)
-                   : utimens (dst_name, timespec)) != 0)
+              if (utimensat (dfd, dst_name, timespec, AT_SYMLINK_NOFOLLOW))
                 return -2;
 
               /* Read the modification time that was set.  */
               {
-                int stat_result = (S_ISLNK (dst_stat->st_mode)
-                                   ? lstat (dst_name, &dst_status)
-                                   : stat (dst_name, &dst_status));
+                int stat_result
+                  = fstatat (dfd, dst_name, &dst_status, AT_SYMLINK_NOFOLLOW);
 
                 if (stat_result
                     | (dst_status.st_mtime ^ dst_m_s)
@@ -333,10 +356,7 @@ utimecmp (char const *dst_name,
                        it changed.  Change it back as best we can.  */
                     timespec[1].tv_sec = dst_m_s;
                     timespec[1].tv_nsec = dst_m_ns;
-                    if (S_ISLNK (dst_stat->st_mode))
-                      lutimens (dst_name, timespec);
-                    else
-                      utimens (dst_name, timespec);
+                    utimensat (dfd, dst_name, timespec, AT_SYMLINK_NOFOLLOW);
                   }
 
                 if (stat_result != 0)

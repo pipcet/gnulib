@@ -1,6 +1,6 @@
 /* hash-pjw-bare.c -- compute a hash value from a provided buffer.
 
-   Copyright (C) 2012-2017 Free Software Foundation, Inc.
+   Copyright (C) 2012-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
@@ -13,7 +13,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -24,7 +24,7 @@
 #define SIZE_BITS (sizeof (size_t) * CHAR_BIT)
 
 /* Return a hash of the N bytes of X using the method described by
-   Bruno Haible in http://www.haible.de/bruno/hashfunc.html.
+   Bruno Haible in https://www.haible.de/bruno/hashfunc.html.
    Note that while many hash functions reduce their result via modulo
    to a 0..table_size-1 range, this function does not do that.  */
 

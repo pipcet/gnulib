@@ -2,7 +2,7 @@
 @section @code{hypotf}
 @findex hypotf
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/hypotf.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/hypotf.html}
 
 Gnulib module: hypotf or hypotf-ieee
 
@@ -21,7 +21,7 @@ Portability problems fixed by Gnulib module @code{hypot-ieee}:
 @item
 When the arguments are mixed NaN and Infinity, this function returns a wrong
 value on some platforms:
-OSF/1 5.1, mingw, MSVC 14.
+mingw, MSVC 14.
 @end itemize
 
 Portability problems not fixed by Gnulib:

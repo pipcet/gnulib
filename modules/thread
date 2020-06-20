@@ -10,6 +10,7 @@ Depends-on:
 threadlib
 extern-inline
 lock
+windows-thread  [test $gl_threads_api = windows]
 pthread_sigmask [test $gl_threads_api = posix]
 
 configure.ac:
@@ -22,7 +23,7 @@ Include:
 "glthread/thread.h"
 
 Link:
-$(LTLIBMULTITHREAD) when linking with libtool, $(LIBMULTITHREAD) otherwise
+$(LIBMULTITHREAD)
 
 License:
 LGPLv2+

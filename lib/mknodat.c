@@ -1,5 +1,5 @@
 /* Create an inode relative to an open directory.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,13 +12,16 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* written by Eric Blake */
 
 #include <config.h>
 
+/* Specification.  */
 #include <sys/stat.h>
+
+#include <stdlib.h>
 
 #if !HAVE_MKNOD
 
@@ -34,7 +37,7 @@ mknodat (int fd _GL_UNUSED, char const *path _GL_UNUSED,
   return -1;
 }
 
-#else /* HAVE_MKFIFO */
+#else
 
 /* Create a file system node FILE relative to directory FD, with
    access permissions and file type in MODE, and device type in DEV.
@@ -54,4 +57,4 @@ mknodat (int fd _GL_UNUSED, char const *path _GL_UNUSED,
 # undef AT_FUNC_POST_FILE_PARAM_DECLS
 # undef AT_FUNC_POST_FILE_ARGS
 
-#endif /* HAVE_MKFIFO */
+#endif

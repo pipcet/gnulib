@@ -8,7 +8,7 @@ lib/xfreopen.h
 Depends-on:
 error
 exitfail
-freopen-safer
+freopen
 quote
 
 configure.ac:
@@ -18,6 +18,9 @@ lib_SOURCES += xfreopen.c xfreopen.h
 
 Include:
 "xfreopen.h"
+
+Link:
+$(LIB_MBRTOWC)
 
 License:
 GPL

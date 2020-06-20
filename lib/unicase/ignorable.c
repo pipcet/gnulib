@@ -1,5 +1,5 @@
 /* Test whether a Unicode character is case-ignorable.
-   Copyright (C) 2002, 2006-2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006-2007, 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -26,7 +26,7 @@
      its General_Category is one of Nonspacing_Mark (Mn), Enclosing_Mark (Me),
      Format (Cf), Modifier_Letter (Lm), or Modifier_Symbol (Sk).
    The text marked in braces was added in Unicode 5.1.0, see
-   <http://www.unicode.org/versions/Unicode5.1.0/> section "Update of
+   <https://www.unicode.org/versions/Unicode5.1.0/> section "Update of
    Definition of case-ignorable".   */
 /* Since this predicate is only used for the "Before C" and "After C"
    conditions of FINAL_SIGMA, we exclude the "cased" characters here.

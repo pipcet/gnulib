@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a hash table with a binary tree.
-   Copyright (C) 2006-2007, 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Common code of gl_avltreehash_list.c and gl_rbtreehash_list.c.  */
 
@@ -28,17 +28,7 @@ struct gl_multiple_nodes
    gl_list_node_impl.  */
 #define MULTIPLE_NODES_MAGIC  (void *) -1
 
-/* Resize the hash table if needed, after list->count was incremented.  */
-static void
-hash_resize_after_add (gl_list_t list)
-{
-  size_t count = (list->root != 0 ? list->root->branch_size : 0);
-  size_t estimate = xsum (count, count / 2); /* 1.5 * count */
-  if (estimate > list->table_size)
-    hash_resize (list, estimate);
-}
-
-/* Return the position of the given node in the tree.  */
+/* Returns the position of the given node in the tree.  */
 static size_t
 node_position (gl_list_node_t node)
 {
@@ -86,7 +76,7 @@ compare_position_threshold (const void *x, const void *threshold)
   return (position >= (uintptr_t)threshold);
 }
 
-/* Return the first element of a non-empty ordered set of nodes.  */
+/* Returns the first element of a non-empty ordered set of nodes.  */
 static gl_list_node_t
 gl_oset_first (gl_oset_t set)
 {
@@ -99,7 +89,7 @@ gl_oset_first (gl_oset_t set)
   return (gl_list_node_t) first;
 }
 
-/* Add a node to the hash table structure.
+/* Adds a node to the hash table structure.
    If duplicates are allowed, this function performs in average time
    O((log n)^2): gl_oset_nx_add may need to add an element to an ordered set
    of size O(n), needing O(log n) comparison function calls.  The comparison
@@ -188,7 +178,7 @@ add_to_bucket (gl_list_t list, gl_list_node_t new_node)
 #define add_to_bucket(list,node) \
     __builtin_expect ((add_to_bucket) (list, node), 0)
 
-/* Remove a node from the hash table structure.
+/* Removes a node from the hash table structure.
    If duplicates are allowed, this function performs in average time
    O((log n)^2): gl_oset_remove may need to remove an element from an ordered
    set of size O(n), needing O(log n) comparison function calls.  The
@@ -267,9 +257,9 @@ remove_from_bucket (gl_list_t list, gl_list_node_t old_node)
     }
 }
 
-/* Build up the hash table during initialization: Store all the nodes of
+/* Builds up the hash table during initialization: Stores all the nodes of
    list->root in the hash table.
-   Return 0 upon success, -1 upon out-of-memory.  */
+   Returns 0 upon success, -1 upon out-of-memory.  */
 static int
 add_nodes_to_buckets (gl_list_t list)
 {

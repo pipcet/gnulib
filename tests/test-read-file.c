@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2007, 2010-2017 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2007, 2010-2020 Free Software Foundation, Inc.
  * Written by Simon Josefsson
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -23,11 +23,13 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include "macros.h"
+
 #define FILE1 "/etc/resolv.conf"
 #define FILE2 "/dev/null"
 
-int
-main (void)
+static int
+test_read_file (int flags)
 {
   struct stat statbuf;
   int err = 0;
@@ -37,7 +39,7 @@ main (void)
   if (stat (FILE1, &statbuf) >= 0)
     {
       size_t len;
-      char *out = read_file (FILE1, &len);
+      char *out = read_file (FILE1, flags, &len);
 
       if (!out)
         {
@@ -80,7 +82,7 @@ main (void)
   if (stat (FILE2, &statbuf) >= 0)
     {
       size_t len;
-      char *out = read_file (FILE2, &len);
+      char *out = read_file (FILE2, flags, &len);
 
       if (!out)
         {
@@ -108,4 +110,15 @@ main (void)
     }
 
   return err;
+}
+
+int
+main (void)
+{
+  ASSERT (!test_read_file (0));
+  ASSERT (!test_read_file (RF_BINARY));
+  ASSERT (!test_read_file (RF_SENSITIVE));
+  ASSERT (!test_read_file (RF_BINARY | RF_SENSITIVE));
+
+  return 0;
 }

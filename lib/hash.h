@@ -1,5 +1,5 @@
 /* hash - hashing table processing.
-   Copyright (C) 1998-1999, 2001, 2003, 2009-2017 Free Software Foundation,
+   Copyright (C) 1998-1999, 2001, 2003, 2009-2020 Free Software Foundation,
    Inc.
    Written by Jim Meyering <meyering@ascend.com>, 1998.
 
@@ -14,7 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* A generic hash table package.  */
 
@@ -26,24 +26,6 @@
 
 # include <stdio.h>
 # include <stdbool.h>
-
-/* The __attribute__ feature is available in gcc versions 2.5 and later.
-   The warn_unused_result attribute appeared first in gcc-3.4.0.  */
-# if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
-#  define _GL_ATTRIBUTE_WUR __attribute__ ((__warn_unused_result__))
-# else
-#  define _GL_ATTRIBUTE_WUR /* empty */
-# endif
-
-# ifndef _GL_ATTRIBUTE_DEPRECATED
-/* The __attribute__((__deprecated__)) feature
-   is available in gcc versions 3.1 and newer.  */
-#  if __GNUC__ < 3 || (__GNUC__ == 3 && __GNUC_MINOR__ < 1)
-#   define _GL_ATTRIBUTE_DEPRECATED /* empty */
-#  else
-#   define _GL_ATTRIBUTE_DEPRECATED __attribute__ ((__deprecated__))
-#  endif
-# endif
 
 typedef size_t (*Hash_hasher) (const void *, size_t);
 typedef bool (*Hash_comparator) (const void *, const void *);
@@ -88,13 +70,17 @@ size_t hash_string (const char *, size_t) _GL_ATTRIBUTE_PURE;
 void hash_reset_tuning (Hash_tuning *);
 Hash_table *hash_initialize (size_t, const Hash_tuning *,
                              Hash_hasher, Hash_comparator,
-                             Hash_data_freer) _GL_ATTRIBUTE_WUR;
+                             Hash_data_freer) _GL_ATTRIBUTE_NODISCARD;
+Hash_table *hash_xinitialize (size_t, const Hash_tuning *,
+                              Hash_hasher, Hash_comparator,
+                              Hash_data_freer) _GL_ATTRIBUTE_NODISCARD;
 void hash_clear (Hash_table *);
 void hash_free (Hash_table *);
 
 /* Insertion and deletion.  */
-bool hash_rehash (Hash_table *, size_t) _GL_ATTRIBUTE_WUR;
-void *hash_insert (Hash_table *, const void *) _GL_ATTRIBUTE_WUR;
+bool hash_rehash (Hash_table *, size_t) _GL_ATTRIBUTE_NODISCARD;
+void *hash_insert (Hash_table *, const void *) _GL_ATTRIBUTE_NODISCARD;
+void *hash_xinsert (Hash_table *, const void *);
 
 int hash_insert_if_absent (Hash_table *table, const void *entry,
                            const void **matched_ent);

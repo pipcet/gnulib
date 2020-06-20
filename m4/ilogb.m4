@@ -1,5 +1,5 @@
-# ilogb.m4 serial 2
-dnl Copyright (C) 2010-2017 Free Software Foundation, Inc.
+# ilogb.m4 serial 4
+dnl Copyright (C) 2010-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -57,7 +57,15 @@ AC_DEFUN([gl_FUNC_ILOGB_WORKS],
 #include <limits.h>
 #include <math.h>
 /* Provide FP_ILOGB0, FP_ILOGBNAN, like in math.in.h.  */
-#if !(defined FP_ILOGB0 && defined FP_ILOGBNAN)
+#if defined FP_ILOGB0 && defined FP_ILOGBNAN
+# if defined __HAIKU__
+  /* Haiku: match what ilogb() does */
+#  undef FP_ILOGB0
+#  undef FP_ILOGBNAN
+#  define FP_ILOGB0   (- 2147483647 - 1) /* INT_MIN */
+#  define FP_ILOGBNAN (- 2147483647 - 1) /* INT_MIN */
+# endif
+#else
 # if defined __NetBSD__ || defined __sgi
   /* NetBSD, IRIX 6.5: match what ilogb() does */
 #  define FP_ILOGB0   INT_MIN
@@ -77,7 +85,7 @@ static double zero;
 static int dummy (double x) { return 0; }
 int main (int argc, char *argv[])
 {
-  int (*my_ilogb) (double) = argc ? ilogb : dummy;
+  int (* volatile my_ilogb) (double) = argc ? ilogb : dummy;
   int result = 0;
   /* This test fails on OpenBSD 4.9, AIX 5.1.  */
   {

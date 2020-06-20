@@ -1,5 +1,5 @@
 /* Provide relocatable packages.
-   Copyright (C) 2003-2006, 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2003-2006, 2008-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 
 /* Tell glibc's <stdio.h> to provide a prototype for getline().
@@ -42,7 +42,7 @@
 # include "xalloc.h"
 #endif
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 #endif
@@ -65,6 +65,12 @@
 # include <libintl.h>
 #endif
 
+#if defined _WIN32 && !defined __CYGWIN__
+/* Don't assume that UNICODE is not defined.  */
+# undef GetModuleFileName
+# define GetModuleFileName GetModuleFileNameA
+#endif
+
 /* Faked cheap 'bool'.  */
 #undef bool
 #undef false
@@ -74,22 +80,22 @@
 #define true 1
 
 /* Pathname support.
-   ISSLASH(C)           tests whether C is a directory separator character.
-   IS_PATH_WITH_DIR(P)  tests whether P contains a directory specification.
+   ISSLASH(C)                tests whether C is a directory separator character.
+   IS_FILE_NAME_WITH_DIR(P)  tests whether P contains a directory specification.
  */
-#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
+#if (defined _WIN32 && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
   /* Native Windows, OS/2, DOS */
 # define ISSLASH(C) ((C) == '/' || (C) == '\\')
 # define HAS_DEVICE(P) \
     ((((P)[0] >= 'A' && (P)[0] <= 'Z') || ((P)[0] >= 'a' && (P)[0] <= 'z')) \
      && (P)[1] == ':')
-# define IS_PATH_WITH_DIR(P) \
+# define IS_FILE_NAME_WITH_DIR(P) \
     (strchr (P, '/') != NULL || strchr (P, '\\') != NULL || HAS_DEVICE (P))
 # define FILE_SYSTEM_PREFIX_LEN(P) (HAS_DEVICE (P) ? 2 : 0)
 #else
   /* Unix */
 # define ISSLASH(C) ((C) == '/')
-# define IS_PATH_WITH_DIR(P) (strchr (P, '/') != NULL)
+# define IS_FILE_NAME_WITH_DIR(P) (strchr (P, '/') != NULL)
 # define FILE_SYSTEM_PREFIX_LEN(P) 0
 #endif
 
@@ -99,7 +105,7 @@
    platforms, see below.  Therefore we enable it by default only on native
    Windows platforms.  */
 #ifndef ENABLE_COSTLY_RELOCATABLE
-# if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+# if defined _WIN32 && !defined __CYGWIN__
 #  define ENABLE_COSTLY_RELOCATABLE 1
 # else
 #  define ENABLE_COSTLY_RELOCATABLE 0
@@ -256,7 +262,7 @@ compute_curr_prefix (const char *orig_installprefix,
             /* Do case-insensitive comparison if the file system is always or
                often case-insensitive.  It's better to accept the comparison
                if the difference is only in case, rather than to fail.  */
-#if defined _WIN32 || defined __WIN32__ || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
+#if defined _WIN32 || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
             /* Native Windows, Cygwin, OS/2, DOS - case insignificant file system */
             if ((*rpi >= 'a' && *rpi <= 'z' ? *rpi - 'a' + 'A' : *rpi)
                 != (*cpi >= 'a' && *cpi <= 'z' ? *cpi - 'a' + 'A' : *cpi))
@@ -268,7 +274,7 @@ compute_curr_prefix (const char *orig_installprefix,
           }
         if (!same)
           break;
-        /* The last pathname component was the same.  opi and cpi now point
+        /* The last pathname component was the same.  rpi and cpi now point
            to the slash before it.  */
         rp = rpi;
         cp = cpi;
@@ -282,23 +288,23 @@ compute_curr_prefix (const char *orig_installprefix,
       }
 
     {
-      size_t curr_prefix_len = cp - curr_installdir;
-      char *curr_prefix;
+      size_t computed_curr_prefix_len = cp - curr_installdir;
+      char *computed_curr_prefix;
 
-      curr_prefix = (char *) xmalloc (curr_prefix_len + 1);
+      computed_curr_prefix = (char *) xmalloc (computed_curr_prefix_len + 1);
 #ifdef NO_XMALLOC
-      if (curr_prefix == NULL)
+      if (computed_curr_prefix == NULL)
         {
           free (curr_installdir);
           return NULL;
         }
 #endif
-      memcpy (curr_prefix, curr_installdir, curr_prefix_len);
-      curr_prefix[curr_prefix_len] = '\0';
+      memcpy (computed_curr_prefix, curr_installdir, computed_curr_prefix_len);
+      computed_curr_prefix[computed_curr_prefix_len] = '\0';
 
       free (curr_installdir);
 
-      return curr_prefix;
+      return computed_curr_prefix;
     }
   }
 }
@@ -310,12 +316,12 @@ compute_curr_prefix (const char *orig_installprefix,
 /* Full pathname of shared library, or NULL.  */
 static char *shared_library_fullname;
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
 /* Native Windows only.
    On Cygwin, it is better to use the Cygwin provided /proc interface, than
    to use native Windows API and cygwin_conv_to_posix_path, because it
    supports longer file names
-   (see <http://cygwin.com/ml/cygwin/2011-01/msg00410.html>).  */
+   (see <https://cygwin.com/ml/cygwin/2011-01/msg00410.html>).  */
 
 /* Determine the full pathname of the shared library when it is loaded.  */
 
@@ -333,7 +339,7 @@ DllMain (HINSTANCE module_handle, DWORD event, LPVOID reserved)
         /* Shouldn't happen.  */
         return FALSE;
 
-      if (!IS_PATH_WITH_DIR (location))
+      if (!IS_FILE_NAME_WITH_DIR (location))
         /* Shouldn't happen.  */
         return FALSE;
 
@@ -445,8 +451,7 @@ find_shared_library_fullname ()
 static char *
 get_shared_library_fullname ()
 {
-#if (!((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) \
-     && !defined __EMX__)
+#if !(defined _WIN32 && !defined __CYGWIN__) && !defined __EMX__
   static bool tried_find_shared_library_fullname;
   if (!tried_find_shared_library_fullname)
     {

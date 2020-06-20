@@ -2,7 +2,7 @@
 @section @code{log10f}
 @findex log10f
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/log10f.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/log10f.html}
 
 Gnulib module: log10f or log10f-ieee
 
@@ -14,9 +14,6 @@ Minix 3.1.8, AIX 5.1, Solaris 9.
 @item
 This function is only defined as a macro with arguments on some platforms:
 MSVC 14.
-@item
-This function returns a wrong value for a minus zero argument on some platforms:
-OSF/1 5.1.
 @end itemize
 
 Portability problems fixed by Gnulib module @code{log10f-ieee}:

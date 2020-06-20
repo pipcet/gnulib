@@ -6,8 +6,8 @@ tests/test-quotearg.sh
 tests/test-quotearg.c
 tests/test-quotearg.h
 tests/macros.h
-tests/locale/fr/LC_MESSAGES/test-quotearg.po
-tests/locale/fr/LC_MESSAGES/test-quotearg.mo
+tests/testlocale/fr/LC_MESSAGES/test-quotearg.po
+tests/testlocale/fr/LC_MESSAGES/test-quotearg.mo
 m4/locale-fr.m4
 m4/codeset.m4
 
@@ -27,4 +27,4 @@ Makefile.am:
 TESTS += test-quotearg.sh
 TESTS_ENVIRONMENT += LOCALE_FR='@LOCALE_FR@' LOCALE_FR_UTF8='@LOCALE_FR_UTF8@'
 check_PROGRAMS += test-quotearg
-test_quotearg_LDADD = $(LDADD) @LIBINTL@
+test_quotearg_LDADD = $(LDADD) $(LIB_SETLOCALE) @LIBINTL@ $(LIB_MBRTOWC)

@@ -36,7 +36,7 @@ Include:
 "propername.h"
 
 Link:
-$(LTLIBICONV) when linking with libtool, $(LIBICONV) otherwise
+$(LIB_MBRTOWC)
 
 License:
 GPL

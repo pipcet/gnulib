@@ -2,7 +2,7 @@
 @section @code{wmemchr}
 @findex wmemchr
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/wmemchr.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/wmemchr.html}
 
 Gnulib module: wmemchr
 
@@ -10,12 +10,12 @@ Portability problems fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-HP-UX 11.00, IRIX 6.5, Solaris 2.6, MSVC 14, Interix 3.5.
+HP-UX 11.00, IRIX 6.5, MSVC 14.
 @end itemize
 
 Portability problems not fixed by Gnulib:
 @itemize
 @item
-On AIX and Windows platforms, @code{wchar_t} is a 16-bit type and therefore cannot
+On Windows and 32-bit AIX platforms, @code{wchar_t} is a 16-bit type and therefore cannot
 accommodate all Unicode characters.
 @end itemize

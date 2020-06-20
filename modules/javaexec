@@ -17,6 +17,7 @@ xmalloca
 error
 gettext-h
 javaexec-script
+sh-filename
 
 configure.ac:
 
@@ -26,6 +27,9 @@ lib_SOURCES += javaexec.h javaexec.c
 
 Include:
 "javaexec.h"
+
+Link:
+$(LIB_MBRTOWC)
 
 License:
 GPL

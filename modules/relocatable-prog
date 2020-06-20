@@ -5,6 +5,7 @@ properly when copied to an arbitrary directory.
 Files:
 build-aux/config.libpath
 build-aux/reloc-ldflags
+build-aux/libtool-reloc
 doc/relocatable.texi
 lib/relocatable.h
 lib/relocatable.c
@@ -19,6 +20,7 @@ progname
 canonicalize-lgpl
 xalloc
 xreadlink
+open
 stdbool
 unistd
 memcmp
@@ -45,8 +47,9 @@ uninstall-relocwrapper:
 		       uninstall ;; \
 	  esac; \
 	fi
-.PHONY: uninstall-relocwrapper
 endif
+## Automake warns about conditionally added dependencies to unconditionally defined targets.
+.PHONY: uninstall-relocwrapper
 
 Include:
 "relocatable.h"

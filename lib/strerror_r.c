@@ -1,6 +1,6 @@
 /* strerror_r.c --- POSIX compatible system error routine
 
-   Copyright (C) 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2010-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -61,7 +61,7 @@ int __xpg_strerror_r (int errnum, char *buf, size_t buflen);
 
 # define USE_SYSTEM_STRERROR 1
 
-# if defined __NetBSD__ || defined __hpux || ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __sgi || (defined __sun && !defined _LP64) || defined __CYGWIN__
+# if defined __NetBSD__ || defined __hpux || (defined _WIN32 && !defined __CYGWIN__) || defined __sgi || (defined __sun && !defined _LP64) || defined __CYGWIN__
 
 /* No locking needed.  */
 
@@ -129,22 +129,13 @@ static int
 safe_copy (char *buf, size_t buflen, const char *msg)
 {
   size_t len = strlen (msg);
-  int ret;
+  size_t moved = len < buflen ? len : buflen - 1;
 
-  if (len < buflen)
-    {
-      /* Although POSIX allows memcpy() to corrupt errno, we don't
-         know of any implementation where this is a real problem.  */
-      memcpy (buf, msg, len + 1);
-      ret = 0;
-    }
-  else
-    {
-      memcpy (buf, msg, buflen - 1);
-      buf[buflen - 1] = '\0';
-      ret = ERANGE;
-    }
-  return ret;
+  /* Although POSIX lets memmove corrupt errno, we don't
+     know of any implementation where this is a real problem.  */
+  memmove (buf, msg, moved);
+  buf[moved] = '\0';
+  return len < buflen ? 0 : ERANGE;
 }
 
 
@@ -212,13 +203,16 @@ strerror_r (int errnum, char *buf, size_t buflen)
 # else
     ret = strerror_r (errnum, buf, buflen);
 
-    /* Some old implementations may return (-1, EINVAL) instead of EINVAL.  */
+    /* Some old implementations may return (-1, EINVAL) instead of EINVAL.
+       But on Haiku, valid error numbers are negative.  */
+#  if !defined __HAIKU__
     if (ret < 0)
       ret = errno;
+#  endif
 # endif
 
-# ifdef _AIX
-    /* AIX returns 0 rather than ERANGE when truncating strings; try
+# if defined _AIX || defined __HAIKU__
+    /* AIX and Haiku return 0 rather than ERANGE when truncating strings; try
        again until we are sure we got the entire string.  */
     if (!ret && strlen (buf) == buflen - 1)
       {
@@ -255,7 +249,7 @@ strerror_r (int errnum, char *buf, size_t buflen)
     /* Try to do what strerror (errnum) does, but without clobbering the
        buffer used by strerror().  */
 
-# if defined __NetBSD__ || defined __hpux || ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __CYGWIN__ /* NetBSD, HP-UX, native Windows, Cygwin */
+# if defined __NetBSD__ || defined __hpux || (defined _WIN32 && !defined __CYGWIN__) || defined __CYGWIN__ /* NetBSD, HP-UX, native Windows, Cygwin */
 
     /* NetBSD:         sys_nerr, sys_errlist are declared through _NETBSD_SOURCE
                        and <errno.h> above.
@@ -332,7 +326,7 @@ strerror_r (int errnum, char *buf, size_t buflen)
 
 #endif
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
     /* MSVC 14 defines names for many error codes in the range 100..140,
        but _sys_errlist contains strings only for the error codes
        < _sys_nerr = 43.  */
@@ -442,7 +436,14 @@ strerror_r (int errnum, char *buf, size_t buflen)
 #endif
 
     if (ret == EINVAL && !*buf)
-      snprintf (buf, buflen, "Unknown error %d", errnum);
+      {
+#if defined __HAIKU__
+        /* For consistency with perror().  */
+        snprintf (buf, buflen, "Unknown Application Error (%d)", errnum);
+#else
+        snprintf (buf, buflen, "Unknown error %d", errnum);
+#endif
+      }
 
     errno = saved_errno;
     return ret;

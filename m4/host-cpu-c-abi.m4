@@ -1,5 +1,5 @@
-# host-cpu-c-abi.m4 serial 7
-dnl Copyright (C) 2002-2017 Free Software Foundation, Inc.
+# host-cpu-c-abi.m4 serial 13
+dnl Copyright (C) 2002-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -46,7 +46,7 @@ dnl   - Speed of execution of the common instruction set is reasonable across
 dnl     the entire family of CPUs. If you have assembly language source files
 dnl     that are optimized for particular CPU types (like GNU gmp has), you
 dnl     will need to make the distinction.
-dnl   See <http://en.wikipedia.org/wiki/X86_instruction_listings>.
+dnl   See <https://en.wikipedia.org/wiki/X86_instruction_listings>.
 AC_DEFUN([gl_HOST_CPU_C_ABI],
 [
   AC_REQUIRE([AC_CANONICAL_HOST])
@@ -55,7 +55,7 @@ AC_DEFUN([gl_HOST_CPU_C_ABI],
     [case "$host_cpu" in
 
 changequote(,)dnl
-       i[4567]86 )
+       i[34567]86 )
 changequote([,])dnl
          gl_cv_host_cpu_c_abi=i386
          ;;
@@ -68,14 +68,23 @@ changequote([,])dnl
          #   with native Windows (mingw, MSVC).
          # - 64-bit instruction set, 32-bit pointers, 32-bit 'long': x86_64-x32.
          # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': i386.
-         AC_EGREP_CPP([yes],
-           [#if defined __x86_64__ || defined __amd64__ || defined _M_X64 || defined _M_AMD64
-            yes
-            #endif],
-           [AC_EGREP_CPP([yes],
-              [#if defined __ILP32__ || defined _ILP32
-               yes
-               #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if (defined __x86_64__ || defined __amd64__ \
+                     || defined _M_X64 || defined _M_AMD64)
+                 int ok;
+                #else
+                 error fail
+                #endif
+              ]])],
+           [AC_COMPILE_IFELSE(
+              [AC_LANG_SOURCE(
+                 [[#if defined __ILP32__ || defined _ILP32
+                    int ok;
+                   #else
+                    error fail
+                   #endif
+                 ]])],
               [gl_cv_host_cpu_c_abi=x86_64-x32],
               [gl_cv_host_cpu_c_abi=x86_64])],
            [gl_cv_host_cpu_c_abi=i386])
@@ -94,14 +103,22 @@ changequote([,])dnl
          # - aarch64 instruction set, 64-bit pointers, 64-bit 'long': arm64.
          # - aarch64 instruction set, 32-bit pointers, 32-bit 'long': arm64-ilp32.
          # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': arm or armhf.
-         AC_EGREP_CPP([yes],
-           [#if defined __aarch64__
-            yes
-            #endif],
-           [AC_EGREP_CPP([yes],
-              [#if defined __ILP32__ || defined _ILP32
-               yes
-               #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#ifdef __aarch64__
+                 int ok;
+                #else
+                 error fail
+                #endif
+              ]])],
+           [AC_COMPILE_IFELSE(
+              [AC_LANG_SOURCE(
+                [[#if defined __ILP32__ || defined _ILP32
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
               [gl_cv_host_cpu_c_abi=arm64-ilp32],
               [gl_cv_host_cpu_c_abi=arm64])],
            [# Don't distinguish little-endian and big-endian arm, since they
@@ -118,7 +135,7 @@ changequote([,])dnl
             echo 'double ddd; void func (double dd) { ddd = dd; }' > conftest.c
             # Look for a reference to the register d0 in the .s file.
             AC_TRY_COMMAND(${CC-cc} $CFLAGS $CPPFLAGS $gl_c_asm_opt conftest.c) >/dev/null 2>&1
-            if LC_ALL=C grep -E 'd0,' conftest.$gl_asmext >/dev/null; then
+            if LC_ALL=C grep 'd0,' conftest.$gl_asmext >/dev/null; then
               gl_cv_host_cpu_c_abi=armhf
             else
               gl_cv_host_cpu_c_abi=arm
@@ -130,10 +147,14 @@ changequote([,])dnl
        hppa1.0 | hppa1.1 | hppa2.0* | hppa64 )
          # On hppa, the C compiler may be generating 32-bit code or 64-bit
          # code. In the latter case, it defines _LP64 and __LP64__.
-         AC_EGREP_CPP([yes],
-           [#if defined(__LP64__)
-            yes
-            #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#ifdef __LP64__
+                 int ok;
+                #else
+                 error fail
+                #endif
+              ]])],
            [gl_cv_host_cpu_c_abi=hppa64],
            [gl_cv_host_cpu_c_abi=hppa])
          ;;
@@ -141,10 +162,14 @@ changequote([,])dnl
        ia64* )
          # On ia64 on HP-UX, the C compiler may be generating 64-bit code or
          # 32-bit code. In the latter case, it defines _ILP32.
-         AC_EGREP_CPP([yes],
-           [#if defined _ILP32
-            yes
-            #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#ifdef _ILP32
+                 int ok;
+                #else
+                 error fail
+                #endif
+              ]])],
            [gl_cv_host_cpu_c_abi=ia64-ilp32],
            [gl_cv_host_cpu_c_abi=ia64])
          ;;
@@ -152,19 +177,27 @@ changequote([,])dnl
        mips* )
          # We should also check for (_MIPS_SZPTR == 64), but gcc keeps this
          # at 32.
-         AC_EGREP_CPP([yes],
-           [#if defined _MIPS_SZLONG && (_MIPS_SZLONG == 64)
-            yes
-            #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if defined _MIPS_SZLONG && (_MIPS_SZLONG == 64)
+                 int ok;
+                #else
+                 error fail
+                #endif
+              ]])],
            [gl_cv_host_cpu_c_abi=mips64],
            [# In the n32 ABI, _ABIN32 is defined, _ABIO32 is not defined (but
             # may later get defined by <sgidefs.h>), and _MIPS_SIM == _ABIN32.
             # In the 32 ABI, _ABIO32 is defined, _ABIN32 is not defined (but
             # may later get defined by <sgidefs.h>), and _MIPS_SIM == _ABIO32.
-            AC_EGREP_CPP([yes],
-              [#if (_MIPS_SIM == _ABIN32)
-               yes
-               #endif],
+            AC_COMPILE_IFELSE(
+              [AC_LANG_SOURCE(
+                 [[#if (_MIPS_SIM == _ABIN32)
+                    int ok;
+                   #else
+                    error fail
+                   #endif
+                 ]])],
               [gl_cv_host_cpu_c_abi=mipsn32],
               [gl_cv_host_cpu_c_abi=mips])])
          ;;
@@ -176,16 +209,24 @@ changequote([,])dnl
          # On powerpc64 systems, the C compiler may still be generating
          # 32-bit code. And on powerpc-ibm-aix systems, the C compiler may
          # be generating 64-bit code.
-         AC_EGREP_CPP([yes],
-           [#if defined __powerpc64__ || defined _ARCH_PPC64
-            yes
-            #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if defined __powerpc64__ || defined _ARCH_PPC64
+                 int ok;
+                #else
+                 error fail
+                #endif
+              ]])],
            [# On powerpc64, there are two ABIs on Linux: The AIX compatible
             # one and the ELFv2 one. The latter defines _CALL_ELF=2.
-            AC_EGREP_CPP([yes],
-              [#if defined _CALL_ELF && _CALL_ELF == 2
-               yes
-               #endif],
+            AC_COMPILE_IFELSE(
+              [AC_LANG_SOURCE(
+                 [[#if defined _CALL_ELF && _CALL_ELF == 2
+                    int ok;
+                   #else
+                    error fail
+                   #endif
+                 ]])],
               [gl_cv_host_cpu_c_abi=powerpc64-elfv2],
               [gl_cv_host_cpu_c_abi=powerpc64])
            ],
@@ -196,13 +237,71 @@ changequote([,])dnl
          gl_cv_host_cpu_c_abi=powerpc
          ;;
 
+       riscv32 | riscv64 )
+         # There are 2 architectures (with variants): rv32* and rv64*.
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if __riscv_xlen == 64
+                  int ok;
+                #else
+                  error fail
+                #endif
+              ]])],
+           [cpu=riscv64],
+           [cpu=riscv32])
+         # There are 6 ABIs: ilp32, ilp32f, ilp32d, lp64, lp64f, lp64d.
+         # Size of 'long' and 'void *':
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if defined __LP64__
+                  int ok;
+                #else
+                  error fail
+                #endif
+              ]])],
+           [main_abi=lp64],
+           [main_abi=ilp32])
+         # Float ABIs:
+         # __riscv_float_abi_double:
+         #   'float' and 'double' are passed in floating-point registers.
+         # __riscv_float_abi_single:
+         #   'float' are passed in floating-point registers.
+         # __riscv_float_abi_soft:
+         #   No values are passed in floating-point registers.
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if defined __riscv_float_abi_double
+                  int ok;
+                #else
+                  error fail
+                #endif
+              ]])],
+           [float_abi=d],
+           [AC_COMPILE_IFELSE(
+              [AC_LANG_SOURCE(
+                 [[#if defined __riscv_float_abi_single
+                     int ok;
+                   #else
+                     error fail
+                   #endif
+                 ]])],
+              [float_abi=f],
+              [float_abi=''])
+           ])
+         gl_cv_host_cpu_c_abi="${cpu}-${main_abi}${float_abi}"
+         ;;
+
        s390* )
          # On s390x, the C compiler may be generating 64-bit (= s390x) code
          # or 31-bit (= s390) code.
-         AC_EGREP_CPP([yes],
-           [#if defined(__LP64__) || defined(__s390x__)
-            yes
-            #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if defined __LP64__ || defined __s390x__
+                  int ok;
+                #else
+                  error fail
+                #endif
+              ]])],
            [gl_cv_host_cpu_c_abi=s390x],
            [gl_cv_host_cpu_c_abi=s390])
          ;;
@@ -210,10 +309,14 @@ changequote([,])dnl
        sparc | sparc64 )
          # UltraSPARCs running Linux have `uname -m` = "sparc64", but the
          # C compiler still generates 32-bit code.
-         AC_EGREP_CPP([yes],
-           [#if defined __sparcv9 || defined __arch64__
-            yes
-            #endif],
+         AC_COMPILE_IFELSE(
+           [AC_LANG_SOURCE(
+              [[#if defined __sparcv9 || defined __arch64__
+                 int ok;
+                #else
+                 error fail
+                #endif
+              ]])],
            [gl_cv_host_cpu_c_abi=sparc64],
            [gl_cv_host_cpu_c_abi=sparc])
          ;;
@@ -300,6 +403,39 @@ EOF
 #ifndef __powerpc64_elfv2__
 #undef __powerpc64_elfv2__
 #endif
+#ifndef __riscv32__
+#undef __riscv32__
+#endif
+#ifndef __riscv64__
+#undef __riscv64__
+#endif
+#ifndef __riscv32_ilp32__
+#undef __riscv32_ilp32__
+#endif
+#ifndef __riscv32_ilp32f__
+#undef __riscv32_ilp32f__
+#endif
+#ifndef __riscv32_ilp32d__
+#undef __riscv32_ilp32d__
+#endif
+#ifndef __riscv64_ilp32__
+#undef __riscv64_ilp32__
+#endif
+#ifndef __riscv64_ilp32f__
+#undef __riscv64_ilp32f__
+#endif
+#ifndef __riscv64_ilp32d__
+#undef __riscv64_ilp32d__
+#endif
+#ifndef __riscv64_lp64__
+#undef __riscv64_lp64__
+#endif
+#ifndef __riscv64_lp64f__
+#undef __riscv64_lp64f__
+#endif
+#ifndef __riscv64_lp64d__
+#undef __riscv64_lp64d__
+#endif
 #ifndef __s390__
 #undef __s390__
 #endif
@@ -317,4 +453,223 @@ EOF
 #endif
 ])
 
+])
+
+
+dnl Sets the HOST_CPU_C_ABI_32BIT variable to 'yes' if the C language ABI
+dnl (application binary interface) is a 32-bit one, to 'no' if it is a 64-bit
+dnl one, or to 'unknown' if unknown.
+dnl This is a simplified variant of gl_HOST_CPU_C_ABI.
+AC_DEFUN([gl_HOST_CPU_C_ABI_32BIT],
+[
+  AC_REQUIRE([AC_CANONICAL_HOST])
+  AC_CACHE_CHECK([32-bit host C ABI], [gl_cv_host_cpu_c_abi_32bit],
+    [if test -n "$gl_cv_host_cpu_c_abi"; then
+       case "$gl_cv_host_cpu_c_abi" in
+         i386 | x86_64-x32 | arm | armhf | arm64-ilp32 | hppa | ia64-ilp32 | mips | mipsn32 | powerpc | riscv*-ilp32* | s390 | sparc)
+           gl_cv_host_cpu_c_abi_32bit=yes ;;
+         x86_64 | alpha | arm64 | hppa64 | ia64 | mips64 | powerpc64 | powerpc64-elfv2 | riscv*-lp64* | s390x | sparc64 )
+           gl_cv_host_cpu_c_abi_32bit=no ;;
+         *)
+           gl_cv_host_cpu_c_abi_32bit=unknown ;;
+       esac
+     else
+       case "$host_cpu" in
+
+         # CPUs that only support a 32-bit ABI.
+         arc \
+         | bfin \
+         | cris* \
+         | csky \
+         | epiphany \
+         | ft32 \
+         | h8300 \
+         | m68k \
+         | microblaze | microblazeel \
+         | nds32 | nds32le | nds32be \
+         | nios2 | nios2eb | nios2el \
+         | or1k* \
+         | or32 \
+         | sh | sh[1234] | sh[1234]e[lb] \
+         | tic6x \
+         | xtensa* )
+           gl_cv_host_cpu_c_abi_32bit=yes
+           ;;
+
+         # CPUs that only support a 64-bit ABI.
+changequote(,)dnl
+         alpha | alphaev[4-8] | alphaev56 | alphapca5[67] | alphaev6[78] \
+         | mmix )
+changequote([,])dnl
+           gl_cv_host_cpu_c_abi_32bit=no
+           ;;
+
+changequote(,)dnl
+         i[34567]86 )
+changequote([,])dnl
+           gl_cv_host_cpu_c_abi_32bit=yes
+           ;;
+
+         x86_64 )
+           # On x86_64 systems, the C compiler may be generating code in one of
+           # these ABIs:
+           # - 64-bit instruction set, 64-bit pointers, 64-bit 'long': x86_64.
+           # - 64-bit instruction set, 64-bit pointers, 32-bit 'long': x86_64
+           #   with native Windows (mingw, MSVC).
+           # - 64-bit instruction set, 32-bit pointers, 32-bit 'long': x86_64-x32.
+           # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': i386.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#if (defined __x86_64__ || defined __amd64__ \
+                       || defined _M_X64 || defined _M_AMD64) \
+                      && !(defined __ILP32__ || defined _ILP32)
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         arm* | aarch64 )
+           # Assume arm with EABI.
+           # On arm64 systems, the C compiler may be generating code in one of
+           # these ABIs:
+           # - aarch64 instruction set, 64-bit pointers, 64-bit 'long': arm64.
+           # - aarch64 instruction set, 32-bit pointers, 32-bit 'long': arm64-ilp32.
+           # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': arm or armhf.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#if defined __aarch64__ && !(defined __ILP32__ || defined _ILP32)
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         hppa1.0 | hppa1.1 | hppa2.0* | hppa64 )
+           # On hppa, the C compiler may be generating 32-bit code or 64-bit
+           # code. In the latter case, it defines _LP64 and __LP64__.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#ifdef __LP64__
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         ia64* )
+           # On ia64 on HP-UX, the C compiler may be generating 64-bit code or
+           # 32-bit code. In the latter case, it defines _ILP32.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#ifdef _ILP32
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=yes],
+             [gl_cv_host_cpu_c_abi_32bit=no])
+           ;;
+
+         mips* )
+           # We should also check for (_MIPS_SZPTR == 64), but gcc keeps this
+           # at 32.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#if defined _MIPS_SZLONG && (_MIPS_SZLONG == 64)
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         powerpc* )
+           # Different ABIs are in use on AIX vs. Mac OS X vs. Linux,*BSD.
+           # No need to distinguish them here; the caller may distinguish
+           # them based on the OS.
+           # On powerpc64 systems, the C compiler may still be generating
+           # 32-bit code. And on powerpc-ibm-aix systems, the C compiler may
+           # be generating 64-bit code.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#if defined __powerpc64__ || defined _ARCH_PPC64
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         rs6000 )
+           gl_cv_host_cpu_c_abi_32bit=yes
+           ;;
+
+         riscv32 | riscv64 )
+           # There are 6 ABIs: ilp32, ilp32f, ilp32d, lp64, lp64f, lp64d.
+           # Size of 'long' and 'void *':
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#if defined __LP64__
+                    int ok;
+                  #else
+                    error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         s390* )
+           # On s390x, the C compiler may be generating 64-bit (= s390x) code
+           # or 31-bit (= s390) code.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#if defined __LP64__ || defined __s390x__
+                    int ok;
+                  #else
+                    error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         sparc | sparc64 )
+           # UltraSPARCs running Linux have `uname -m` = "sparc64", but the
+           # C compiler still generates 32-bit code.
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[#if defined __sparcv9 || defined __arch64__
+                   int ok;
+                  #else
+                   error fail
+                  #endif
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+           ;;
+
+         *)
+           gl_cv_host_cpu_c_abi_32bit=unknown
+           ;;
+       esac
+     fi
+    ])
+
+  HOST_CPU_C_ABI_32BIT="$gl_cv_host_cpu_c_abi_32bit"
 ])

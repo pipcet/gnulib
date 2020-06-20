@@ -1,5 +1,5 @@
 /* Case related properties of Unicode characters.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -13,13 +13,13 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <stdbool.h>
 #include "unitypes.h"
 
 /* Determine whether a character is "cased" according to the Unicode Standard,
-   <http://www.unicode.org/versions/Unicode5.0.0/ch03.pdf>, section 3.13,
+   <https://www.unicode.org/versions/Unicode5.0.0/ch03.pdf>, section 3.13,
    definition D120.  */
 extern bool
        uc_is_cased (ucs4_t uc)
@@ -27,7 +27,7 @@ extern bool
 
 /* Determine whether a character is "case-ignorable"
    according to the Unicode Standard,
-   <http://www.unicode.org/versions/Unicode5.0.0/ch03.pdf>, section 3.13,
+   <https://www.unicode.org/versions/Unicode5.0.0/ch03.pdf>, section 3.13,
    definition D121.  */
 extern bool
        uc_is_case_ignorable (ucs4_t uc)

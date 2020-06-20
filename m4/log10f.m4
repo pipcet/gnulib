@@ -1,5 +1,5 @@
-# log10f.m4 serial 8
-dnl Copyright (C) 2011-2017 Free Software Foundation, Inc.
+# log10f.m4 serial 12
+dnl Copyright (C) 2011-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -56,7 +56,7 @@ numeric_equal (float x, float y)
 static float dummy (float x) { return 0; }
 int main (int argc, char *argv[])
 {
-  float (*my_log10f) (float) = argc ? log10f : dummy;
+  float (* volatile my_log10f) (float) = argc ? log10f : dummy;
   /* Test log10f(negative).
      This test fails on NetBSD 5.1.  */
   float y = my_log10f (-1.0f);
@@ -68,12 +68,14 @@ int main (int argc, char *argv[])
               [gl_cv_func_log10f_ieee=yes],
               [gl_cv_func_log10f_ieee=no],
               [case "$host_os" in
-                         # Guess yes on glibc systems.
-                 *-gnu*) gl_cv_func_log10f_ieee="guessing yes" ;;
-                         # Guess yes on native Windows.
-                 mingw*) gl_cv_func_log10f_ieee="guessing yes" ;;
-                         # If we don't know, assume the worst.
-                 *)      gl_cv_func_log10f_ieee="guessing no" ;;
+                                # Guess yes on glibc systems.
+                 *-gnu* | gnu*) gl_cv_func_log10f_ieee="guessing yes" ;;
+                                # Guess yes on musl systems.
+                 *-musl*)       gl_cv_func_log10f_ieee="guessing yes" ;;
+                                # Guess yes on native Windows.
+                 mingw*)        gl_cv_func_log10f_ieee="guessing yes" ;;
+                                # If we don't know, obey --enable-cross-guesses.
+                 *)             gl_cv_func_log10f_ieee="$gl_cross_guess_normal" ;;
                esac
               ])
             LIBS="$save_LIBS"

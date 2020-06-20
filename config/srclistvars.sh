@@ -1,7 +1,7 @@
 # Variables for srclist-update and srclist.txt.
 # Will likely change for each user.
 
-# Copyright 2002-2017 Free Software Foundation, Inc.
+# Copyright 2002-2020 Free Software Foundation, Inc.
 
 # This file is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -14,29 +14,25 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # per-user overrides.
 case $LOGNAME in
 karl)
-  : ${ACLOCAL=/usr/local/gnu/share/aclocal}
-  : ${GETTEXT=$HOME/gnu/src/gettext}
-  : ${GNUBIN=/usr/local/gnu/bin}
   : ${GNUORG=$HOME/gnu/gnuorg}
   : ${GNUWWWLICENSES=$HOME/gnu/www/www/licenses}
-  : ${TEXMFROOT=/usr/local/texmf/texmf-dist}
   ;;
 esac
 
 # Default to sibling (of parent) directories.
 : ${AUTOCONF=../autoconf}
 : ${AUTOMAKE=../automake}
-: ${GETTEXT=../gettext}
 : ${GNUCONFIG=../config}
 : ${GNULIBSRC=../gnulib}
 : ${GNUORG=../gnuorg}
 : ${GNUSTANDARDS=../gnustandards}
-: ${GNUWWWLICENSES=$GNUORG}
+: ${GNUWWWLICENSES=../www/www/licenses}
 : ${LIBCSRC=../libc}
+: ${LIBGCRYPT=../libgcrypt}
 : ${LIBTOOL=../libtool}
-: ${TEXINFOSRC=../texinfo}
+: ${TEXINFOTEX=../../ftp.gnu.org/gnu/texinfo}

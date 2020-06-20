@@ -35,14 +35,17 @@ here in a platform-specific way:
 
 @itemize
 @item
-On GNU/Linux, it adds a linker option (@option{-rpath}) that causes
-the dynamic linker to search for libraries in a directory relative to
-the location of the invoked executable.
+On most operating systems, it adds a linker option (@option{-rpath}) that
+causes the dynamic linker to search for libraries in a directory relative
+to the location of the invoked executable.  This works on GNU/Linux and
+modern versions of GNU/Hurd, GNU/kFreeBSD, macOS, FreeBSD, NetBSD, OpenBSD,
+Solaris, Haiku.
 
 @item
-On other Unix systems, it installs a wrapper executable.  The wrapper
+On other Unix systems, it installs a trampoline executable.  The trampoline
 sets the environment variable that controls shared library searching
 (usually @env{LD_LIBRARY_PATH}) and then invokes the real executable.
+This applies to operating systems such as AIX, HP-UX, or Minix.
 
 @item
 On Windows, the executable's own directory is searched for libraries,
@@ -55,7 +58,12 @@ You can make your program relocatable by following these steps:
 @enumerate
 @item
 Import the @code{relocatable-prog} module.  For libraries, use the
-@code{relocatable-lib} or @code{relocatable-lib-lgpl} module.
+@code{relocatable-lib} or @code{relocatable-lib-lgpl} module, if
+the libraries are independent.  For installing multiple libraries,
+at least one of which depends on another one, use the @code{relocatable-prog}
+module.
+If you need more than one module, or you need to use them with different
+settings, you will need multiple copies of gnulib (@pxref{Multiple instances}).
 
 @item
 In every program, add to @code{main} as the first statement (even
@@ -118,10 +126,14 @@ If your package installs shell scripts, also import the
 @code{relocatable-script} module.  Then, near the beginning of each
 shell script that your package installs, add the following:
 
-@example
+@smallexample
 @@relocatable_sh@@
+
+prefix="@@prefix@@"
+exec_prefix="@@exec_prefix@@"   # usually needs $prefix.
+datarootdir="@@datarootdir@@"   # usually needs $prefix.
+
 if test "@@RELOCATABLE@@" = yes; then
-  exec_prefix="@@exec_prefix@@"
   bindir="@@bindir@@"
   orig_installdir="$bindir" # see Makefile.am's *_SCRIPTS variables
   func_find_curr_installdir # determine curr_installdir
@@ -138,9 +150,10 @@ else
 fi
 
 # Get some relocated directory names.
-sysconfdir=`relocate "@@sysconfdir@@"`
-some_datadir=`relocate "@@datadir@@/something"`
-@end example
+sysconfdir=`relocate "@@sysconfdir@@"`          # usually needs $prefix.
+some_datadir=`relocate "@@datadir@@/something"` # usually needs $datarootdir.
+bindir=`relocate "@@bindir@@"`       # usually needs $exec_prefix, hence $prefix.
+@end smallexample
 
 You must adapt the definition of @code{orig_installdir}, depending on
 where the script gets installed.  Also, at the end, instead of
@@ -152,13 +165,16 @@ If your package installs Perl scripts, also import the
 @code{relocatable-perl} module.  Then, near the beginning of each
 Perl script that your package installs, add the following:
 
-@example
+@smallexample
 @@relocatable_pl@@
 if ("@@RELOCATABLE@@" eq "yes") @{
   my $exec_prefix = "@@exec_prefix@@";
   my $orig_installdir = "@@bindir@@"; # see Makefile.am's *_SCRIPTS variables
-  my ($orig_installprefix, $curr_installprefix) = find_prefixes($orig_installdir, find_curr_installdir());
-  sub relocate @{ # the subroutine is defined whether or not the enclosing block is executed
+  my ($orig_installprefix, $curr_installprefix) =
+    find_prefixes($orig_installdir, find_curr_installdir());
+
+  # the subroutine is defined whether or not the enclosing block is executed
+  sub relocate @{
     my ($dir) = @@_;
     if ("@@RELOCATABLE@@" eq "yes") @{
       $dir =~ s%^$orig_installprefix/%$curr_installprefix/%;
@@ -172,7 +188,7 @@ if ("@@RELOCATABLE@@" eq "yes") @{
 # (The gnulib module 'configmake' can help with this.)
 $sysconfdir = relocate("@@sysconfdir@@");
 $some_datadir = relocate(@@datadir@@/something");
-@end example
+@end smallexample
 
 You must adapt the definition of @code{$orig_installdir}, depending on
 where the script gets installed.  Also, at the end, instead of
@@ -190,29 +206,54 @@ foo_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 endif
 @end example
 
-Also in @file{Makefile.am}, for each library @code{libfoo}, you add:
+When building gnulib to use with a relocatable library, you need to
+define the preprocessor symbol @code{IN_LIBRARY}.
+You may also want to build with @code{ENABLE_COSTLY_RELOCATABLE}, in which case
+you will also need to define @code{INSTALLDIR}.
+The following fragment can be added to an override @code{Makefile.am} used
+to build gnulib (@pxref{Modified build rules}).
 
 @example
-libfoo_la_CPPFLAGS = -DIN_LIBRARY
+AM_CPPFLAGS += -DIN_LIBRARY -DENABLE_COSTLY_RELOCATABLE
+
+if SHLIBS_IN_BINDIR
+AM_CPPFLAGS += -DINSTALLDIR=\"$(bindir)\"
+else
+AM_CPPFLAGS += -DINSTALLDIR=\"$(libdir)\"
+endif
 @end example
 
-(Adjust the suffix @code{la} as necessary if you are not using libtool.)
+@code{SHLIBS_IN_BINDIR} is defined in @file{configure.ac} as follows:
+
+@smallexample
+AM_CONDITIONAL([SHLIBS_IN_BINDIR],
+               [case "$host_os" in mingw* | cygwin*) true;; *) false;; esac])
+@end smallexample
 
 @item
-You may also need to add a couple of variable assignments to your
-@file{configure.ac}.
+In your @file{Makefile.am}, for every library @command{libfoo} that gets
+installed in, say, @file{$(libdir)}, you add:
+
+@example
+if RELOCATABLE_VIA_LD
+libfoo_la_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(libdir)`
+endif
+@end example
+
+@item
+Add a couple of variable assignments to your @file{Makefile.am}.
 
 If your package (or any package you rely on, e.g.@: gettext-runtime)
 will be relocated together with a set of installed shared libraries,
-then set @var{RELOCATABLE_LIBRARY_PATH} to a colon-separated list
+then set @code{RELOCATABLE_LIBRARY_PATH} to a colon-separated list
 of those libraries' directories, e.g.
 @example
-RELOCATABLE_LIBRARY_PATH='$(libdir)'
+RELOCATABLE_LIBRARY_PATH = $(libdir)
 @end example
 
 If your @file{config.h} is not in @file{$(top_builddir)}, then set
-@var{RELOCATABLE_CONFIG_H_DIR} to its directory, e.g.
+@code{RELOCATABLE_CONFIG_H_DIR} to its directory, e.g.
 @example
-RELOCATABLE_CONFIG_H_DIR='$(top_builddir)/src'
+RELOCATABLE_CONFIG_H_DIR = $(top_builddir)/src
 @end example
 @end enumerate

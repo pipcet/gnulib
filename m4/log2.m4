@@ -1,5 +1,5 @@
-# log2.m4 serial 4
-dnl Copyright (C) 2010-2017 Free Software Foundation, Inc.
+# log2.m4 serial 10
+dnl Copyright (C) 2010-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -67,9 +67,9 @@ numeric_equal (double x, double y)
 static double dummy (double x) { return 0; }
 int main (int argc, char *argv[])
 {
-  double (*my_log2) (double) = argc ? log2 : dummy;
+  double (* volatile my_log2) (double) = argc ? log2 : dummy;
   /* Test log2(negative).
-     This test fails on NetBSD 5.1 and Solaris 11 2011-11.  */
+     This test fails on NetBSD 5.1 and Solaris 10/x86_64.  */
   double y = my_log2 (-1.0);
   if (numeric_equal (y, y))
     return 1;
@@ -79,12 +79,14 @@ int main (int argc, char *argv[])
               [gl_cv_func_log2_ieee=yes],
               [gl_cv_func_log2_ieee=no],
               [case "$host_os" in
-                         # Guess yes on glibc systems.
-                 *-gnu*) gl_cv_func_log2_ieee="guessing yes" ;;
-                         # Guess yes on native Windows.
-                 mingw*) gl_cv_func_log2_ieee="guessing yes" ;;
-                         # If we don't know, assume the worst.
-                 *)      gl_cv_func_log2_ieee="guessing no" ;;
+                                # Guess yes on glibc systems.
+                 *-gnu* | gnu*) gl_cv_func_log2_ieee="guessing yes" ;;
+                                # Guess yes on musl systems.
+                 *-musl*)       gl_cv_func_log2_ieee="guessing yes" ;;
+                                # Guess yes on native Windows.
+                 mingw*)        gl_cv_func_log2_ieee="guessing yes" ;;
+                                # If we don't know, obey --enable-cross-guesses.
+                 *)             gl_cv_func_log2_ieee="$gl_cross_guess_normal" ;;
                esac
               ])
             LIBS="$save_LIBS"

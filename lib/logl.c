@@ -11,7 +11,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -26,7 +26,7 @@ logl (long double x)
   return log (x);
 }
 
-#elif HAVE_LOGL
+#elif 0 /* was: HAVE_LOGL */
 
 long double
 logl (long double x)

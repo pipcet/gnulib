@@ -1,5 +1,5 @@
 /* arctwo.c --- The RC2 cipher as described in RFC 2268.
- * Copyright (C) 2003-2006, 2008-2017 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2006, 2008-2020 Free Software Foundation, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -12,7 +12,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this file; if not, see <http://www.gnu.org/licenses/>.
+ * along with this file; if not, see <https://www.gnu.org/licenses/>.
  */
 
 /* Code from GnuTLS/Libgcrypt adapted for gnulib by Simon Josefsson. */

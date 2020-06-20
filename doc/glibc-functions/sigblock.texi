@@ -2,6 +2,19 @@
 @subsection @code{sigblock}
 @findex sigblock
 
+Documentation:
+@itemize
+@item
+@ifinfo
+@ref{BSD Signal Handling,,BSD Signal Handling,libc},
+@end ifinfo
+@ifnotinfo
+@url{https://www.gnu.org/software/libc/manual/html_node/BSD-Signal-Handling.html},
+@end ifnotinfo
+@item
+@uref{https://www.kernel.org/doc/man-pages/online/pages/man3/sigblock.3.html,,man sigblock}.
+@end itemize
+
 Gnulib module: ---
 
 Portability problems fixed by Gnulib:
@@ -12,5 +25,5 @@ Portability problems not fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-Minix 3.1.8, Solaris 11 2011-11, Cygwin, mingw, MSVC 14, BeOS.
+Minix 3.1.8, Solaris 11.4, Cygwin, mingw, MSVC 14.
 @end itemize

@@ -1,5 +1,5 @@
 Description:
-realpath, canonical_file_name: Provide canonical absolute file name
+realpath, canonicalize_file_name: Provide canonical absolute file name
 
 Files:
 lib/canonicalize-lgpl.c
@@ -12,6 +12,7 @@ stdlib
 nocrash
 alloca-opt      [test $HAVE_CANONICALIZE_FILE_NAME = 0 || test $REPLACE_CANONICALIZE_FILE_NAME = 1]
 errno           [test $HAVE_CANONICALIZE_FILE_NAME = 0 || test $REPLACE_CANONICALIZE_FILE_NAME = 1]
+filename        [test $HAVE_CANONICALIZE_FILE_NAME = 0 || test $REPLACE_CANONICALIZE_FILE_NAME = 1]
 lstat           [test $HAVE_CANONICALIZE_FILE_NAME = 0 || test $REPLACE_CANONICALIZE_FILE_NAME = 1]
 malloca         [test $HAVE_CANONICALIZE_FILE_NAME = 0 || test $REPLACE_CANONICALIZE_FILE_NAME = 1]
 memmove         [test $HAVE_CANONICALIZE_FILE_NAME = 0 || test $REPLACE_CANONICALIZE_FILE_NAME = 1]

@@ -1,5 +1,5 @@
 /* Memory allocation with expensive empty allocations.
-   Copyright (C) 2003, 2008, 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2008, 2010-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003,
    based on prior work by Jim Meyering.
 
@@ -14,7 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _EEALLOC_H
 #define _EEALLOC_H
@@ -37,19 +37,6 @@
 _GL_INLINE_HEADER_BEGIN
 #ifndef EEALLOC_INLINE
 # define EEALLOC_INLINE _GL_INLINE
-#endif
-
-#if __GNUC__ >= 3
-# define _GL_ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
-#else
-# define _GL_ATTRIBUTE_MALLOC
-#endif
-
-#if ! defined __clang__ && \
-    (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
-# define _GL_ATTRIBUTE_ALLOC_SIZE(args) __attribute__ ((__alloc_size__ args))
-#else
-# define _GL_ATTRIBUTE_ALLOC_SIZE(args)
 #endif
 
 #if MALLOC_0_IS_NONNULL

@@ -3,6 +3,7 @@ tests/test-regex.c
 tests/macros.h
 
 Depends-on:
+gettext-h
 localcharset
 
 configure.ac:
@@ -10,4 +11,4 @@ configure.ac:
 Makefile.am:
 TESTS += test-regex
 check_PROGRAMS += test-regex
-test_regex_LDADD = $(LDADD) @LIBINTL@ $(LIBTHREAD) $(LIB_PTHREAD)
+test_regex_LDADD = $(LDADD) $(LIB_SETLOCALE) $(LIB_MBRTOWC) @LIBINTL@ $(LIBTHREAD)

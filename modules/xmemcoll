@@ -13,12 +13,16 @@ quotearg
 exitfail
 
 configure.ac:
+AC_REQUIRE([AC_C_RESTRICT])
 
 Makefile.am:
 lib_SOURCES += xmemcoll.h xmemcoll.c
 
 Include:
 "xmemcoll.h"
+
+Link:
+$(LIB_MBRTOWC)
 
 License:
 GPL

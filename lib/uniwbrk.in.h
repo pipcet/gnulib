@@ -1,5 +1,5 @@
 /* Word breaks in Unicode strings.
-   Copyright (C) 2001-2003, 2005-2017 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2005-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _UNIWBRK_H
 #define _UNIWBRK_H
@@ -31,7 +31,7 @@ extern "C" {
 /* ========================================================================= */
 
 /* Property defined in Unicode Standard Annex #29, section "Word Boundaries"
-   <http://www.unicode.org/reports/tr29/#Word_Boundaries>  */
+   <https://www.unicode.org/reports/tr29/#Word_Boundaries>  */
 
 /* Possible values of the Word_Break property.
    This enumeration may be extended in the future.  */
@@ -53,7 +53,12 @@ enum
   WBP_RI           = 13,
   WBP_DQ           = 14,
   WBP_SQ           = 15,
-  WBP_HL           = 16
+  WBP_HL           = 16,
+  WBP_ZWJ          = 17,
+  WBP_EB           = 18,
+  WBP_EM           = 19,
+  WBP_GAZ          = 20,
+  WBP_EBG          = 21
 };
 
 /* Return the Word_Break property of a Unicode character.  */
@@ -76,7 +81,7 @@ extern void
 extern void
        u32_wordbreaks (const uint32_t *s, size_t n, char *p);
 extern void
-       ulc_wordbreaks (const char *s, size_t n, char *p);
+       ulc_wordbreaks (const char *s, size_t n, char *_UC_RESTRICT p);
 
 /* ========================================================================= */
 

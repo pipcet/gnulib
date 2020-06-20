@@ -2,7 +2,6 @@ Description:
 Detection of OpenMP support.
 
 Files:
-m4/openmp.m4
 
 Depends-on:
 
@@ -12,6 +11,9 @@ AC_OPENMP
 Makefile.am:
 
 Include:
+#ifdef _OPENMP
+# include <omp.h>
+#endif
 
 Link:
 $(OPENMP_CFLAGS)

@@ -1,5 +1,5 @@
 /* Test of sequential list data type implementation.
-   Copyright (C) 2006-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -43,7 +43,7 @@ string_equals (const void *x1, const void *x2)
 
 /* A hash function for NUL-terminated char* strings using
    the method described by Bruno Haible.
-   See http://www.haible.de/bruno/hashfunc.html.  */
+   See https://www.haible.de/bruno/hashfunc.html.  */
 static size_t
 string_hash (const void *x)
 {
@@ -120,7 +120,7 @@ main (int argc, char *argv[])
 
     for (repeat = 0; repeat < 10000; repeat++)
       {
-        unsigned int operation = RANDOM (16);
+        unsigned int operation = RANDOM (18);
         switch (operation)
           {
           case 0:
@@ -351,7 +351,25 @@ main (int argc, char *argv[])
                 ASSERT (gl_list_size (list1) == n - 1);
               }
             break;
-          case 11: case 12: /* remove 1 element */
+          case 11: /* remove first element */
+            {
+              size_t n = gl_list_size (list1);
+              bool removed1 = gl_list_remove_first (list1);
+              ASSERT (gl_list_remove_first (list2) == removed1);
+              ASSERT (gl_list_remove_first (list3) == removed1);
+              ASSERT (gl_list_size (list1) == n - (int) removed1);
+            }
+            break;
+          case 12: /* remove last element */
+            {
+              size_t n = gl_list_size (list1);
+              bool removed1 = gl_list_remove_last (list1);
+              ASSERT (gl_list_remove_last (list2) == removed1);
+              ASSERT (gl_list_remove_last (list3) == removed1);
+              ASSERT (gl_list_size (list1) == n - (int) removed1);
+            }
+            break;
+          case 13: case 14: /* remove 1 element */
             if (gl_list_size (list1) > 0)
               {
                 size_t n = gl_list_size (list1);
@@ -362,7 +380,7 @@ main (int argc, char *argv[])
                 ASSERT (gl_list_size (list1) == n - 1);
               }
             break;
-          case 13:
+          case 15:
             if (gl_list_size (list1) > 0)
               {
                 size_t n = gl_list_size (list1);
@@ -373,7 +391,7 @@ main (int argc, char *argv[])
                 ASSERT (gl_list_size (list1) == n);
               }
             break;
-          case 14:
+          case 16:
             {
               size_t n = gl_list_size (list1);
               gl_list_iterator_t iter1, iter2, iter3;
@@ -398,7 +416,7 @@ main (int argc, char *argv[])
               gl_list_iterator_free (&iter3);
             }
             break;
-          case 15:
+          case 17:
             {
               size_t end = RANDOM (gl_list_size (list1) + 1);
               size_t start = RANDOM (end + 1);

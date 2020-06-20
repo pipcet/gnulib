@@ -1,5 +1,5 @@
 /* Test of file timestamp modification functions.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include "test-utimens-common.h"
 
@@ -27,7 +27,7 @@ test_utimens (int (*func) (char const *, struct timespec const *), bool print)
   struct stat st2;
 
   ASSERT (close (creat (BASE "file", 0600)) == 0);
-  /* If utimens truncates to less resolution than the file system
+  /* If utimens truncates to worse resolution than the file system
      supports, then time can appear to go backwards between now and a
      follow-up utimens with UTIME_NOW or a NULL timespec.  Use
      UTIMECMP_TRUNCATE_SOURCE to compensate, with st1 as the

@@ -1,5 +1,5 @@
 /* Convert wide string to string.
-   Copyright (C) 2008, 2010-2017 Free Software Foundation, Inc.
+   Copyright (C) 2008, 2010-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -51,6 +51,10 @@ rpl_wcsrtombs (char *dest, const wchar_t **srcp, size_t len, mbstate_t *ps)
 # include <stdlib.h>
 # include <string.h>
 
+# define FUNC wcsrtombs
+# define SCHAR_T wchar_t
+# define INTERNAL_STATE _gl_wcsrtombs_state
+# define WCRTOMB wcrtomb
 # include "wcsrtombs-impl.h"
 
 #endif

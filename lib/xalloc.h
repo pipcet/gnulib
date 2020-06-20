@@ -1,6 +1,6 @@
 /* xalloc.h -- malloc with out-of-memory checking
 
-   Copyright (C) 1990-2000, 2003-2004, 2006-2017 Free Software Foundation, Inc.
+   Copyright (C) 1990-2000, 2003-2004, 2006-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef XALLOC_H_
 #define XALLOC_H_
@@ -36,25 +36,12 @@ extern "C" {
 #endif
 
 
-#if __GNUC__ >= 3
-# define _GL_ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
-#else
-# define _GL_ATTRIBUTE_MALLOC
-#endif
-
-#if ! defined __clang__ && \
-    (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
-# define _GL_ATTRIBUTE_ALLOC_SIZE(args) __attribute__ ((__alloc_size__ args))
-#else
-# define _GL_ATTRIBUTE_ALLOC_SIZE(args)
-#endif
-
 /* This function is always triggered when memory is exhausted.
    It must be defined by the application, either explicitly
    or by using gnulib's xalloc-die module.  This is the
    function to call when one wants the program to die because of a
    memory allocation failure.  */
-extern _Noreturn void xalloc_die (void);
+/*extern*/ _Noreturn void xalloc_die (void);
 
 void *xmalloc (size_t s)
       _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_ALLOC_SIZE ((1));

@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004-2017 Free Software Foundation, Inc.
+   Copyright (C) 2004-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /*
  * Copyright (c) 1989, 1993
@@ -149,16 +149,14 @@ typedef struct {
      dirent.d_type data.  */
 # define FTS_DEFER_STAT         0x0400
 
-# define FTS_NOATIME    0x0800          /* use O_NOATIME during traversal */
-
   /* Use this flag to disable stripping of trailing slashes
      from input path names during fts_open initialization.  */
-# define FTS_VERBATIM   0x1000
+# define FTS_VERBATIM   0x0800
 
-# define FTS_OPTIONMASK 0x1fff          /* valid user option mask */
+# define FTS_OPTIONMASK 0x0fff          /* valid user option mask */
 
-# define FTS_NAMEONLY   0x2000          /* (private) child names only */
-# define FTS_STOP       0x4000          /* (private) unrecoverable error */
+# define FTS_NAMEONLY   0x1000          /* (private) child names only */
+# define FTS_STOP       0x2000          /* (private) unrecoverable error */
         int fts_options;                /* fts_open options, global flags */
 
         /* Map a directory's device number to a boolean.  The boolean is
@@ -221,11 +219,6 @@ typedef struct _ftsent {
 
         size_t fts_namelen;             /* strlen(fts_name) */
 
-        /* If not (nlink_t) -1, an upper bound on the number of
-           remaining subdirectories of interest.  If this becomes
-           zero, some work can be avoided.  */
-        nlink_t fts_n_dirs_remaining;
-
 # define FTS_D           1              /* preorder directory */
 # define FTS_DC          2              /* directory that causes cycles */
 # define FTS_DEFAULT     3              /* none of the above */
@@ -256,30 +249,13 @@ typedef struct _ftsent {
         char fts_name[__FLEXIBLE_ARRAY_MEMBER]; /* file name */
 } FTSENT;
 
-#ifndef __GNUC_PREREQ
-# if defined __GNUC__ && defined __GNUC_MINOR__
-#  define __GNUC_PREREQ(maj, min) \
-         ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
-# else
-#  define __GNUC_PREREQ(maj, min) 0
-# endif
-#endif
-
-#if __GNUC_PREREQ (3,4)
-# undef __attribute_warn_unused_result__
-# define __attribute_warn_unused_result__ \
-   __attribute__ ((__warn_unused_result__))
-#else
-# define __attribute_warn_unused_result__ /* empty */
-#endif
-
 __BEGIN_DECLS
-FTSENT  *fts_children (FTS *, int) __THROW __attribute_warn_unused_result__;
-int      fts_close (FTS *) __THROW __attribute_warn_unused_result__;
+FTSENT  *fts_children (FTS *, int) __THROW _GL_ATTRIBUTE_NODISCARD;
+int      fts_close (FTS *) __THROW _GL_ATTRIBUTE_NODISCARD;
 FTS     *fts_open (char * const *, int,
                    int (*)(const FTSENT **, const FTSENT **))
-  __THROW __attribute_warn_unused_result__;
-FTSENT  *fts_read (FTS *) __THROW __attribute_warn_unused_result__;
+  __THROW _GL_ATTRIBUTE_NODISCARD;
+FTSENT  *fts_read (FTS *) __THROW _GL_ATTRIBUTE_NODISCARD;
 int      fts_set (FTS *, FTSENT *, int) __THROW;
 __END_DECLS
 

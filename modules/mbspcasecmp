@@ -17,6 +17,9 @@ lib_SOURCES += mbspcasecmp.c
 Include:
 <string.h>
 
+Link:
+$(LIB_MBRTOWC)
+
 License:
 LGPL
 

@@ -1,5 +1,5 @@
 /* Test of compatibility decomposition of Unicode characters.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2009.  */
 
@@ -161,7 +161,7 @@ main ()
 
   /* HANGUL SYLLABLE GEUL */
   ret = uc_compat_decomposition (0xAE00, decomposed);
-  /* See the clarification at <http://www.unicode.org/versions/Unicode5.1.0/>,
+  /* See the clarification at <https://www.unicode.org/versions/Unicode5.1.0/>,
      section "Clarification of Hangul Jamo Handling".  */
 #if 1
   ASSERT (ret == 2);

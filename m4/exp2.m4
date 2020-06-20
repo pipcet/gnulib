@@ -1,5 +1,5 @@
-# exp2.m4 serial 2
-dnl Copyright (C) 2010-2017 Free Software Foundation, Inc.
+# exp2.m4 serial 3
+dnl Copyright (C) 2010-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -26,7 +26,7 @@ AC_DEFUN([gl_FUNC_EXP2],
              "C"
              #endif
              double exp2 (double);
-             double (*funcptr) (double) = exp2;
+             double (* volatile funcptr) (double) = exp2;
              double x;]],
            [[return funcptr (x) > 1.5
                     || exp2 (x) > 1.5;]])],
@@ -50,7 +50,7 @@ AC_DEFUN([gl_FUNC_EXP2],
                "C"
                #endif
                double exp2 (double);
-               double (*funcptr) (double) = exp2;
+               double (* volatile funcptr) (double) = exp2;
                double x;]],
              [[return funcptr (x) > 1.5
                       || exp2 (x) > 1.5;]])],

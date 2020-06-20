@@ -1,5 +1,5 @@
 /* Test of duplicating a locale object.
-   Copyright (C) 2009-2017 Free Software Foundation, Inc.
+   Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
@@ -20,13 +20,15 @@
 
 #include <locale.h>
 
-#if HAVE_DUPLOCALE && HAVE_MONETARY_H
+#if HAVE_WORKING_DUPLOCALE
 
 #include "signature.h"
 SIGNATURE_CHECK (duplocale, locale_t, (locale_t));
 
 #include <langinfo.h>
-#include <monetary.h>
+#if HAVE_MONETARY_H
+# include <monetary.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 
@@ -34,7 +36,9 @@ SIGNATURE_CHECK (duplocale, locale_t, (locale_t));
 
 struct locale_dependent_values
 {
+#if HAVE_MONETARY_H
   char monetary[100];
+#endif
   char numeric[100];
   char time[100];
 };
@@ -42,17 +46,20 @@ struct locale_dependent_values
 static void
 get_locale_dependent_values (struct locale_dependent_values *result)
 {
+#if HAVE_MONETARY_H
   strfmon (result->monetary, sizeof (result->monetary),
            "%n", 123.75);
   /* result->monetary is usually "$123.75" */
+#endif
   snprintf (result->numeric, sizeof (result->numeric),
             "%g", 3.5);
   /* result->numeric is usually "3,5" */
-  strcpy (result->time, nl_langinfo (MON_1));
+  strncpy (result->time, nl_langinfo (MON_1), sizeof result->time - 1);
+  result->time[sizeof result->time - 1] = '\0';
   /* result->time is usually "janvier" */
 }
 
-#if HAVE_USELOCALE
+#if HAVE_WORKING_USELOCALE
 
 static int
 test_with_uselocale (void)
@@ -97,7 +104,9 @@ test_with_uselocale (void)
   {
     struct locale_dependent_values results;
     get_locale_dependent_values (&results);
+# if HAVE_MONETARY_H
     ASSERT (strcmp (results.monetary, expected_results.monetary) == 0);
+# endif
     ASSERT (strcmp (results.numeric, expected_results.numeric) == 0);
     ASSERT (strcmp (results.time, expected_results.time) == 0);
   }
@@ -109,12 +118,15 @@ test_with_uselocale (void)
   {
     struct locale_dependent_values results;
     get_locale_dependent_values (&results);
+# if HAVE_MONETARY_H
     ASSERT (strcmp (results.monetary, expected_results.monetary) == 0);
+# endif
     ASSERT (strcmp (results.numeric, expected_results.numeric) == 0);
     ASSERT (strcmp (results.time, expected_results.time) == 0);
   }
 
   setlocale (LC_ALL, "C");
+  uselocale (LC_GLOBAL_LOCALE);
   freelocale (mixed1);
   freelocale (mixed2);
   freelocale (perthread);
@@ -123,7 +135,7 @@ test_with_uselocale (void)
 
 #endif
 
-#if HAVE_STRFMON_L || HAVE_SNPRINTF_L || HAVE_NL_LANGINFO_L
+#if HAVE_STRFMON_L || HAVE_SNPRINTF_L || (HAVE_NL_LANGINFO_L && HAVE_WORKING_USELOCALE)
 
 static void
 get_locale_dependent_values_from (struct locale_dependent_values *result, locale_t locale)
@@ -138,7 +150,7 @@ get_locale_dependent_values_from (struct locale_dependent_values *result, locale
               "%g", 3.5);
   /* result->numeric is usually "3,5" */
 #endif
-#if HAVE_NL_LANGINFO_L
+#if HAVE_NL_LANGINFO_L && HAVE_WORKING_USELOCALE
   strcpy (result->time, nl_langinfo_l (MON_1, locale));
   /* result->time is usually "janvier" */
 #endif
@@ -189,7 +201,7 @@ test_with_locale_parameter (void)
 #if HAVE_SNPRINTF_L
     ASSERT (strcmp (results.numeric, expected_results.numeric) == 0);
 #endif
-#if HAVE_NL_LANGINFO_L
+#if HAVE_NL_LANGINFO_L && HAVE_WORKING_USELOCALE
     ASSERT (strcmp (results.time, expected_results.time) == 0);
 #endif
   }
@@ -205,10 +217,10 @@ int
 main ()
 {
   int skipped = 0;
-#if HAVE_USELOCALE
+#if HAVE_WORKING_USELOCALE
   skipped |= test_with_uselocale ();
 #endif
-#if HAVE_STRFMON_L || HAVE_SNPRINTF_L || HAVE_NL_LANGINFO_L
+#if HAVE_STRFMON_L || HAVE_SNPRINTF_L || (HAVE_NL_LANGINFO_L && HAVE_WORKING_USELOCALE)
   skipped |= test_with_locale_parameter ();
 #endif
 

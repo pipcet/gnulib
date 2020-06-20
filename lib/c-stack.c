@@ -1,6 +1,6 @@
 /* Stack overflow handling.
 
-   Copyright (C) 2002, 2004, 2006, 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006, 2008-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
 
@@ -34,12 +34,6 @@
    No attempt has been made to deal with multithreaded applications.  */
 
 #include <config.h>
-
-#ifndef __attribute__
-# if __GNUC__ < 3
-#  define __attribute__(x)
-# endif
-#endif
 
 #include "gettext.h"
 #define _(msgid) gettext (msgid)
@@ -71,6 +65,10 @@ typedef struct sigaltstack stack_t;
 
 #include <unistd.h>
 
+#if DEBUG
+# include <stdio.h>
+#endif
+
 #if HAVE_LIBSIGSEGV
 # include <sigsegv.h>
 #endif
@@ -91,7 +89,7 @@ typedef struct sigaltstack stack_t;
 
 /* The user-specified action to take when a SEGV-related program error
    or stack overflow occurs.  */
-static void (* volatile segv_action) (int);
+static _GL_ASYNC_SAFE void (* volatile segv_action) (int);
 
 /* Translated messages for program errors and stack overflow.  Do not
    translate them in the signal handler, since gettext is not
@@ -99,11 +97,17 @@ static void (* volatile segv_action) (int);
 static char const * volatile program_error_message;
 static char const * volatile stack_overflow_message;
 
+#if ((HAVE_LIBSIGSEGV && ! HAVE_XSI_STACK_OVERFLOW_HEURISTIC) \
+     || (HAVE_SIGALTSTACK && HAVE_DECL_SIGALTSTACK            \
+         && HAVE_STACK_OVERFLOW_HANDLING))
+
 /* Output an error message, then exit with status EXIT_FAILURE if it
    appears to have been a stack overflow, or with a core dump
    otherwise.  This function is async-signal-safe.  */
 
-static _Noreturn void
+static char const * volatile progname;
+
+static _GL_ASYNC_SAFE _Noreturn void
 die (int signo)
 {
   char const *message;
@@ -115,7 +119,7 @@ die (int signo)
 #endif /* !SIGINFO_WORKS && !HAVE_LIBSIGSEGV */
   segv_action (signo);
   message = signo ? program_error_message : stack_overflow_message;
-  ignore_value (write (STDERR_FILENO, getprogname (), strlen (getprogname ())));
+  ignore_value (write (STDERR_FILENO, progname, strlen (progname)));
   ignore_value (write (STDERR_FILENO, ": ", 2));
   ignore_value (write (STDERR_FILENO, message, strlen (message)));
   ignore_value (write (STDERR_FILENO, "\n", 1));
@@ -124,6 +128,7 @@ die (int signo)
   raise (signo);
   abort ();
 }
+#endif
 
 #if (HAVE_SIGALTSTACK && HAVE_DECL_SIGALTSTACK \
      && HAVE_STACK_OVERFLOW_HANDLING) || HAVE_LIBSIGSEGV
@@ -141,8 +146,8 @@ static union
   void *p;
 } alternate_signal_stack;
 
-static void
-null_action (int signo __attribute__ ((unused)))
+static _GL_ASYNC_SAFE void
+null_action (int signo _GL_UNUSED)
 {
 }
 
@@ -159,14 +164,16 @@ static volatile int segv_handler_missing;
 /* Handle a segmentation violation and exit if it cannot be stack
    overflow.  This function is async-signal-safe.  */
 
-static int segv_handler (void *address __attribute__ ((unused)),
-                         int serious)
+static _GL_ASYNC_SAFE int
+segv_handler (void *address _GL_UNUSED, int serious)
 {
 # if DEBUG
   {
     char buf[1024];
+    int saved_errno = errno;
     sprintf (buf, "segv_handler serious=%d\n", serious);
-    write (STDERR_FILENO, buf, strlen (buf));
+    ignore_value (write (STDERR_FILENO, buf, strlen (buf)));
+    errno = saved_errno;
   }
 # endif
 
@@ -180,16 +187,15 @@ static int segv_handler (void *address __attribute__ ((unused)),
 /* Handle a segmentation violation that is likely to be a stack
    overflow and exit.  This function is async-signal-safe.  */
 
-static _Noreturn void
-overflow_handler (int emergency,
-                  stackoverflow_context_t context __attribute__ ((unused)))
+static _GL_ASYNC_SAFE _Noreturn void
+overflow_handler (int emergency, stackoverflow_context_t context _GL_UNUSED)
 {
 # if DEBUG
   {
     char buf[1024];
     sprintf (buf, "overflow_handler emergency=%d segv_handler_missing=%d\n",
              emergency, segv_handler_missing);
-    write (STDERR_FILENO, buf, strlen (buf));
+    ignore_value (write (STDERR_FILENO, buf, strlen (buf)));
   }
 # endif
 
@@ -197,11 +203,12 @@ overflow_handler (int emergency,
 }
 
 int
-c_stack_action (void (*action) (int))
+c_stack_action (_GL_ASYNC_SAFE void (*action) (int))
 {
   segv_action = action ? action : null_action;
   program_error_message = _("program error");
   stack_overflow_message = _("stack overflow");
+  progname = getprogname ();
 
   /* Always install the overflow handler.  */
   if (stackoverflow_install_handler (overflow_handler,
@@ -224,9 +231,8 @@ c_stack_action (void (*action) (int))
 /* Handle a segmentation violation and exit.  This function is
    async-signal-safe.  */
 
-static _Noreturn void
-segv_handler (int signo, siginfo_t *info,
-              void *context __attribute__ ((unused)))
+static _GL_ASYNC_SAFE _Noreturn void
+segv_handler (int signo, siginfo_t *info, void *context _GL_UNUSED)
 {
   /* Clear SIGNO if it seems to have been a stack overflow.  */
 #  if ! HAVE_XSI_STACK_OVERFLOW_HEURISTIC
@@ -262,7 +268,7 @@ segv_handler (int signo, siginfo_t *info,
                  "segv_handler fault=%p base=%p size=%lx page=%lx signo=%d\n",
                  faulting_address, stack_base, (unsigned long) stack_size,
                  (unsigned long) page_size, signo);
-        write (STDERR_FILENO, buf, strlen (buf));
+        ignore_value (write (STDERR_FILENO, buf, strlen (buf)));
       }
 #   endif
     }
@@ -273,7 +279,7 @@ segv_handler (int signo, siginfo_t *info,
 # endif
 
 int
-c_stack_action (void (*action) (int))
+c_stack_action (_GL_ASYNC_SAFE void (*action) (int))
 {
   int r;
   stack_t st;
@@ -295,6 +301,7 @@ c_stack_action (void (*action) (int))
   segv_action = action ? action : null_action;
   program_error_message = _("program error");
   stack_overflow_message = _("stack overflow");
+  progname = getprogname ();
 
   sigemptyset (&act.sa_mask);
 
@@ -320,7 +327,7 @@ c_stack_action (void (*action) (int))
              && HAVE_STACK_OVERFLOW_HANDLING) || HAVE_LIBSIGSEGV) */
 
 int
-c_stack_action (void (*action) (int)  __attribute__ ((unused)))
+c_stack_action (_GL_ASYNC_SAFE void (*action) (int)  _GL_UNUSED)
 {
   errno = ENOTSUP;
   return -1;

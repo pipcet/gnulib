@@ -1,15 +1,15 @@
 @node fnmatch.h
 @section @file{fnmatch.h}
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/basedefs/fnmatch.h.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/fnmatch.h.html}
 
-Gnulib module: fnmatch-posix or fnmatch-gnu
+Gnulib module: fnmatch-h
 
 Portability problems fixed by Gnulib:
 @itemize
 @item
 This header file is missing on some platforms:
-mingw, MSVC 14, BeOS.
+mingw, MSVC 14.
 @end itemize
 
 Portability problems not fixed by Gnulib:

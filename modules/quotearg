@@ -10,6 +10,7 @@ m4/mbrtowc.m4
 m4/quotearg.m4
 
 Depends-on:
+attribute
 c-strcaseeq
 extensions
 gettext-h
@@ -33,6 +34,9 @@ lib_SOURCES += quotearg.c
 
 Include:
 "quotearg.h"
+
+Link:
+$(LIB_MBRTOWC)
 
 License:
 GPL

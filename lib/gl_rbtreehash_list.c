@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a hash table with a binary tree.
-   Copyright (C) 2006, 2008-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2008-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,22 +13,18 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 /* Specification.  */
 #include "gl_rbtreehash_list.h"
 
-#include <stdint.h> /* for SIZE_MAX */
+#include <stdint.h> /* for uintptr_t, SIZE_MAX */
 #include <stdlib.h>
 
 #include "gl_rbtree_oset.h"
 #include "xsize.h"
-
-#ifndef uintptr_t
-# define uintptr_t unsigned long
-#endif
 
 #define WITH_HASHTABLE 1
 
@@ -38,13 +34,16 @@
 /* -------------------------- gl_list_t Data Type -------------------------- */
 
 /* Generic hash-table code: Type definitions.  */
-#include "gl_anyhash_list1.h"
+#include "gl_anyhash1.h"
 
 /* Generic red-black tree code: Type definitions.  */
 #include "gl_anyrbtree_list1.h"
 
 /* Generic hash-table code: Low-level code.  */
-#include "gl_anyhash_list2.h"
+#define CONTAINER_T gl_list_t
+#define CONTAINER_COUNT(list) \
+  ((list)->root != NULL ? (list)->root->branch_size : 0)
+#include "gl_anyhash2.h"
 
 /* Generic binary tree code: Type definitions.  */
 #include "gl_anytree_list1.h"

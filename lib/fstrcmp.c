@@ -1,5 +1,5 @@
 /* Functions to make fuzzy comparisons between strings
-   Copyright (C) 1988-1989, 1992-1993, 1995, 2001-2003, 2006, 2008-2017 Free
+   Copyright (C) 1988-1989, 1992-1993, 1995, 2001-2003, 2006, 2008-2020 Free
    Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 
 #include <config.h>
@@ -72,6 +72,21 @@ keys_init (void)
 
 /* Ensure that keys_init is called once only.  */
 gl_once_define(static, keys_init_once)
+
+void
+fstrcmp_free_resources (void)
+{
+  ptrdiff_t *buffer;
+
+  gl_once (keys_init_once, keys_init);
+  buffer = gl_tls_get (buffer_key);
+  if (buffer != NULL)
+    {
+      gl_tls_set (buffer_key, NULL);
+      gl_tls_set (bufmax_key, (void *) (uintptr_t) 0);
+      free (buffer);
+    }
+}
 
 
 /* In the code below, branch probabilities were measured by Ralf Wildenhues,

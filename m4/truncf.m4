@@ -1,5 +1,5 @@
-# truncf.m4 serial 10
-dnl Copyright (C) 2007, 2010-2017 Free Software Foundation, Inc.
+# truncf.m4 serial 15
+dnl Copyright (C) 2007, 2010-2020 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -21,8 +21,9 @@ AC_DEFUN([gl_FUNC_TRUNCF],
            # define __NO_MATH_INLINES 1 /* for glibc */
            #endif
            #include <math.h>
+           float (*funcptr) (float) = truncf;
            float x;]],
-         [[x = truncf(x);]])],
+         [[x = funcptr(x) + truncf(x);]])],
       [TRUNCF_LIBM=])
     if test "$TRUNCF_LIBM" = "?"; then
       save_LIBS="$LIBS"
@@ -33,8 +34,9 @@ AC_DEFUN([gl_FUNC_TRUNCF],
              # define __NO_MATH_INLINES 1 /* for glibc */
              #endif
              #include <math.h>
+             float (*funcptr) (float) = truncf;
              float x;]],
-           [[x = truncf(x);]])],
+           [[x = funcptr(x) + truncf(x);]])],
         [TRUNCF_LIBM="-lm"])
       LIBS="$save_LIBS"
     fi
@@ -60,7 +62,7 @@ AC_DEFUN([gl_FUNC_TRUNCF],
 static float dummy (float f) { return 0; }
 int main (int argc, char *argv[])
 {
-  float (*my_truncf) (float) = argc ? truncf : dummy;
+  float (* volatile my_truncf) (float) = argc ? truncf : dummy;
   /* Test whether truncf (-0.0f) is -0.0f.  */
   if (signbitf (minus_zerof) && !signbitf (my_truncf (minus_zerof)))
     return 1;
@@ -70,12 +72,14 @@ int main (int argc, char *argv[])
               [gl_cv_func_truncf_ieee=yes],
               [gl_cv_func_truncf_ieee=no],
               [case "$host_os" in
-                         # Guess yes on glibc systems.
-                 *-gnu*) gl_cv_func_truncf_ieee="guessing yes" ;;
-                         # Guess yes on native Windows.
-                 mingw*) gl_cv_func_truncf_ieee="guessing yes" ;;
-                         # If we don't know, assume the worst.
-                 *)      gl_cv_func_truncf_ieee="guessing no" ;;
+                                # Guess yes on glibc systems.
+                 *-gnu* | gnu*) gl_cv_func_truncf_ieee="guessing yes" ;;
+                                # Guess yes on musl systems.
+                 *-musl*)       gl_cv_func_truncf_ieee="guessing yes" ;;
+                                # Guess yes on native Windows.
+                 mingw*)        gl_cv_func_truncf_ieee="guessing yes" ;;
+                                # If we don't know, obey --enable-cross-guesses.
+                 *)             gl_cv_func_truncf_ieee="$gl_cross_guess_normal" ;;
                esac
               ])
             LIBS="$save_LIBS"

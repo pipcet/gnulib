@@ -1,5 +1,5 @@
 /* fchdir replacement.
-   Copyright (C) 2006-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -29,7 +29,7 @@
 #include <sys/stat.h>
 
 #include "assure.h"
-#include "dosname.h"
+#include "filename.h"
 #include "filenamecat.h"
 
 #ifndef REPLACE_OPEN_DIRECTORY

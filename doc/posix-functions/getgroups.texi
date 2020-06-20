@@ -2,7 +2,7 @@
 @section @code{getgroups}
 @findex getgroups
 
-POSIX specification:@* @url{http://www.opengroup.org/onlinepubs/9699919799/functions/getgroups.html}
+POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/getgroups.html}
 
 Gnulib module: getgroups
 
@@ -16,7 +16,7 @@ On some platforms, this function fails to reject a negative count,
 even though that is less than the size that would be returned:
 FreeBSD 7.2.
 @item
-On Ultrix 4.3, @code{getgroups (0, NULL)} always fails.  See macro
+On NeXTstep 3.2, @code{getgroups (0, NULL)} always fails.  See macro
 @samp{AC_FUNC_GETGROUPS}.
 @item
 On very old systems, this function operated on an array of @samp{int},

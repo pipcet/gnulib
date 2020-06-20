@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by an array.
-   Copyright (C) 2006-2017 Free Software Foundation, Inc.
+   Copyright (C) 2006-2020 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,23 +13,20 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 /* Specification.  */
 #include "gl_array_list.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 /* Get memcpy.  */
 #include <string.h>
 
 /* Checked size_t computations.  */
 #include "xsize.h"
-
-#ifndef uintptr_t
-# define uintptr_t unsigned long
-#endif
 
 /* -------------------------- gl_list_t Data Type -------------------------- */
 
@@ -512,7 +509,7 @@ gl_array_iterator_next (gl_list_iterator_t *iterator,
 }
 
 static void
-gl_array_iterator_free (gl_list_iterator_t *iterator)
+gl_array_iterator_free (gl_list_iterator_t *iterator _GL_UNUSED)
 {
 }
 

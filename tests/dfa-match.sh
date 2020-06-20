@@ -1,7 +1,7 @@
 #!/bin/sh
 # This would fail with grep-2.21's dfa.c.
 
-# Copyright 2014-2017 Free Software Foundation, Inc.
+# Copyright 2014-2020 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 . "${srcdir=.}/init.sh"; path_prepend_ ../src
 
@@ -22,18 +22,22 @@
 path_prepend_ .
 
 if (type timeout) >/dev/null 2>&1; then
-  timeout_10='timeout 10'
+  if timeout --help 2>&1 | grep BusyBox; then
+    timeout_10='timeout -t 10'
+  else
+    timeout_10='timeout 10'
+  fi
 else
   timeout_10=
 fi
 
 fail=0
 
-dfa-match-aux a ba 0 > out || fail=1
+${CHECKER} dfa-match-aux a ba 0 > out || fail=1
 compare /dev/null out || fail=1
 
 in=$(printf "bb\nbb")
-$timeout_10 dfa-match-aux a "$in" 1 > out || fail=1
+$timeout_10 ${CHECKER} dfa-match-aux a "$in" 1 > out || fail=1
 compare /dev/null out || fail=1
 
 Exit $fail

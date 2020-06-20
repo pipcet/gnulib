@@ -1,5 +1,5 @@
 /* Look at first character in UTF-16 string.
-   Copyright (C) 1999-2000, 2002, 2006-2007, 2009-2017 Free Software
+   Copyright (C) 1999-2000, 2002, 2006-2007, 2009-2020 Free Software
    Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
@@ -14,7 +14,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 

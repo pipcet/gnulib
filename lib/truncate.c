@@ -1,5 +1,5 @@
 /* truncate emulations for native Windows.
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017-2020 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License along
-   with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -29,13 +29,13 @@ truncate (const char *filename, off_t length)
 
   if (length == 0)
     {
-      fd = open (filename, O_WRONLY | O_TRUNC);
+      fd = open (filename, O_WRONLY | O_TRUNC | O_CLOEXEC);
       if (fd < 0)
         return -1;
     }
   else
     {
-      fd = open (filename, O_WRONLY);
+      fd = open (filename, O_WRONLY | O_CLOEXEC);
       if (fd < 0)
         return -1;
       if (ftruncate (fd, length) < 0)

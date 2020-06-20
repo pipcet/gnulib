@@ -3,6 +3,22 @@ Important general notes
 
 Date        Modules         Changes
 
+2019-12-11  Support for     These modules are now supported in C++ mode as well.
+            ISO C or POSIX  This means, while the autoconfiguration uses the C
+            functions       compiler, the resulting header files and function
+                            substitutes can be used with a matching C++ compiler
+                            as well.
+
+2019-02-14  gnulib-tool     If you use multiple --local-dir options at once:
+                            The first one now has the highest priority, not the
+                            last one.
+
+2019-01-04  (all)           The meaning of the 'Link' section in the module
+                            descriptions has been clarified: It overrides the
+                            combined 'Link' sections from the dependencies.
+
+2018-10-22  (all)           Automake >= 1.11 and Autoconf >= 2.63 are required.
+
 2016-09-05  progname        There is now an alternate module 'getprogname'. It
                             defines a getprogname() function; use it to obtain
                             the name of the current program.
@@ -41,6 +57,119 @@ User visible incompatible changes
 ---------------------------------
 
 Date        Modules         Changes
+
+2020-05-27  read-file       The functions provided by this module now take an
+                            'int flags' argument to modify the file reading
+                            behavior.  The read_binary_file function has been
+                            removed as it is no longer necessary.
+
+2020-04-27  getdate         This deprecated module is removed. Use the module
+                            'parse-datetime' instead. Instead of
+                              #include "getdate.h"
+                            write
+                              #include "parse-datetime.h"
+                            The function get_date is renamed to parse_datetime.
+
+2020-04-27  realloc         This deprecated module is removed. Use the module
+                            'realloc-gnu' instead.
+
+2020-04-27  calloc          This deprecated module is removed. Use the module
+                            'calloc-gnu' instead.
+
+2020-04-27  malloc          This deprecated module is removed. Use the module
+                            'malloc-gnu' instead.
+
+2020-04-27  fnmatch-posix   This deprecated module is removed. Use the module
+                            'fnmatch' instead.
+
+2020-04-27  pipe            This deprecated module is removed. Use the module
+                            'spawn-pipe' instead. Instead of
+                              #include "pipe.h"
+                            write
+                              #include "spawn-pipe.h"
+
+2020-04-27  getopt          This deprecated module is removed. Please choose
+                            among getopt-posix and getopt-gnu. getopt-gnu
+                            provides "long options" and "options with optional
+                            arguments", getopt-posix doesn't.
+
+2020-04-27  rename-dest-slash  This deprecated module is removed. Use the
+                               module 'rename' instead.
+
+2020-04-27  unictype/bidicategory-*  These deprecated modules are removed. Use
+                                     the modules unictype/bidiclass-* instead.
+
+2020-03-28  dosname         On native Windows, OS/2, DOS,
+                            IS_RELATIVE_FILE_NAME("c:") now returns false.
+
+2020-03-28  filename        The macro IS_ABSOLUTE_PATH is deprecated. Use
+                            IS_ABSOLUTE_FILE_NAME instead.
+                            The macro IS_PATH_WITH_DIR is deprecated. Use
+                            IS_FILE_NAME_WITH_DIR instead.
+
+2020-02-22  fchownat        This module no longer defines the functions
+                            'chownat' and 'lchownat'.  Program that need these
+                            functions should add the module 'chownat' to the
+                            list of imported modules.
+
+2020-02-22  fchmodat        This module no longer defines the functions
+                            'chmodat' and 'lchmodat'.  Program that need these
+                            functions should add the module 'chmodat' to the
+                            list of imported modules.
+
+2020-02-07  fchmodat        When applied to non-symlinks, these now act like
+            lchmod          chmod (the BSD behavior, which POSIX requires for
+                            fchmodat + AT_SYMLINK_NOFOLLOW), instead of failing
+                            (the GNU/Linux behavior through glibc 2.31).
+                            Future versions of GNU/Linux are planned to act as
+                            per POSIX and BSD.
+
+2020-01-15  gc-pbkdf2-sha1  This module is deprecated.  Use gc-pbkdf2 instead.
+
+2019-12-12  dfa             Its API now uses ptrdiff_t instead of size_t.
+
+2019-12-11  dfa             To call dfamust, one must now call dfaparse
+                            without yet calling dfacomp.  This fixes a bug
+                            introduced on 2018-10-22 that broke dfamust.
+
+2019-12-07  xstrtol         This module no longer defines the function
+            xstrtoll        'xstrtol_fatal'.  Program that need this function
+            xstrtoimax      should add the module 'xstrtol-error' to the list
+            xstrtoumax      of imported modules.
+
+2019-05-90  verify          verify_true (deprecated 2011-06-15) is removed.
+
+2019-03-16  fatal-signal    The function that you pass to at_fatal_signal now
+                            takes the signal as argument.
+
+2019-02-02  c-strtod        This and related modules no longer define
+                            the HAVE_C99_STRTOLD macro.  Programs requiring
+                            standard strtold should use the strtold module.
+
+2019-01-21  diacrit         This module is deprecated. Please use the module
+                            uninorm/canonical-decomposition instead.
+
+2018-10-23  backupfile      backup_file_rename and find_backup_file_name
+                            now take an additional directory file descriptor
+                            argument.  Pass AT_FDCWD to get the old behavior.
+
+2018-08-18  getpass         The include file is changed from "getpass.h" to
+            getpass-gnu     <unistd.h>.
+
+2018-07-17  hard-locale     m4/hard-locale.m4 and gl_HARD_LOCALE are removed.
+
+2018-07-05  renameat2       This module is renamed to 'renameatu' and all
+                            its include files and functions are renamed
+                            accordingly.
+
+2017-12-30  chdir-safer     This module is removed.  It was deprecated
+                            on 2006-07-17.
+
+2017-11-24  posixtm         Previously, callers had to specify either
+                            PDS_LEADING_YEAR or PDS_TRAILING_YEAR (but
+                            not both).  Now, callers should specify
+                            only PDS_TRAILING_YEAR; leading years are
+                            requested by not specifying PDS_TRAILING_YEAR.
 
 2017-08-14  fcntl-h         This module now defaults O_CLOEXEC to a nonzero
                             value instead of to 0, as the 'open' and

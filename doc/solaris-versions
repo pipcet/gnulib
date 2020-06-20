@@ -49,11 +49,11 @@ The common terminology is to use the name "SunOS ..." to designate SunOS 2.x,
 Most of these operating systems are obsolete.  As of 2006-07-24 only
 SunOS 5.7 and later are supported by Sun and are therefore of
 practical porting concern for GNU applications.  For the current list, see
-<http://www.sun.com/service/eosl/solaris/solaris_vintage_eol_5.2005.xml>.
+<https://en.wikipedia.org/wiki/Solaris_(operating_system)#Version_history>.
 
 -----
 
-Copyright (C) 2003, 2005-2006, 2009-2017 Free Software Foundation, Inc.
+Copyright (C) 2003, 2005-2006, 2009-2020 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright

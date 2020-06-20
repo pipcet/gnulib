@@ -1,6 +1,6 @@
 /* A GNU-like <search.h>.
 
-   Copyright (C) 2007-2017 Free Software Foundation, Inc.
+   Copyright (C) 2007-2020 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _@GUARD_PREFIX@_SEARCH_H
 
@@ -48,8 +48,8 @@
 #  endif
 # endif
 
-/* See <http://www.opengroup.org/susv3xbd/search.h.html>,
-       <http://www.opengroup.org/susv3xsh/tsearch.html>
+/* See <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/search.h.html>
+       <https://pubs.opengroup.org/onlinepubs/9699919799/functions/tsearch.html>
    for details.  */
 
 # if !@HAVE_TYPE_VISIT@
@@ -132,21 +132,21 @@ _GL_CXXALIASWARN (tfind);
    returned.  Otherwise, NULL is returned.  */
 # if @REPLACE_TSEARCH@
 _GL_FUNCDECL_RPL (tdelete, void *,
-                  (const void *key, void **vrootp,
+                  (const void *restrict key, void **restrict vrootp,
                    _gl_search_compar_fn compar)
                   _GL_ARG_NONNULL ((1, 2, 3)));
 _GL_CXXALIAS_RPL (tdelete, void *,
-                  (const void *key, void **vrootp,
+                  (const void *restrict key, void **restrict vrootp,
                    _gl_search_compar_fn compar));
 # else
 #  if !@HAVE_TSEARCH@
 _GL_FUNCDECL_SYS (tdelete, void *,
-                  (const void *key, void **vrootp,
+                  (const void *restrict key, void **restrict vrootp,
                    _gl_search_compar_fn compar)
                   _GL_ARG_NONNULL ((1, 2, 3)));
 #  endif
 _GL_CXXALIAS_SYS (tdelete, void *,
-                  (const void *key, void **vrootp,
+                  (const void *restrict key, void **restrict vrootp,
                    _gl_search_compar_fn compar));
 # endif
 _GL_CXXALIASWARN (tdelete);
@@ -169,7 +169,7 @@ _GL_FUNCDECL_RPL (twalk, void,
 _GL_CXXALIAS_RPL (twalk, void,
                   (const void *vroot, _gl_search_action_fn action));
 # else
-#  if !@HAVE_TSEARCH@
+#  if !@HAVE_TWALK@
 _GL_FUNCDECL_SYS (twalk, void,
                   (const void *vroot, _gl_search_action_fn action)
                   _GL_ARG_NONNULL ((2)));
@@ -178,6 +178,10 @@ _GL_CXXALIAS_SYS (twalk, void,
                   (const void *vroot, _gl_search_action_fn action));
 # endif
 _GL_CXXALIASWARN (twalk);
+
+/* Flags used by tsearch.c.  */
+# define GNULIB_defined_tsearch  (@REPLACE_TSEARCH@ || !@HAVE_TSEARCH@)
+# define GNULIB_defined_twalk    (@REPLACE_TSEARCH@ || !@HAVE_TWALK@)
 
 #elif defined GNULIB_POSIXCHECK
 # undef tsearch
