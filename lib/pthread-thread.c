@@ -34,25 +34,18 @@ typedef void * (* pthread_main_function_t) (void *);
 int
 pthread_attr_init (pthread_attr_t *attr)
 {
-  *attr = PTHREAD_CREATE_JOINABLE;
   return 0;
 }
 
 int
 pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstatep)
 {
-  *detachstatep = *attr & (PTHREAD_CREATE_JOINABLE | PTHREAD_CREATE_DETACHED);
   return 0;
 }
 
 int
 pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
 {
-  if (!(detachstate == PTHREAD_CREATE_JOINABLE
-        || detachstate == PTHREAD_CREATE_DETACHED))
-    return EINVAL;
-  *attr ^= (*attr ^ detachstate)
-           & (PTHREAD_CREATE_JOINABLE | PTHREAD_CREATE_DETACHED);
   return 0;
 }
 

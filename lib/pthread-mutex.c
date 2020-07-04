@@ -33,46 +33,30 @@
 int
 pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
-  *attr = (PTHREAD_MUTEX_STALLED << 2) | PTHREAD_MUTEX_DEFAULT;
   return 0;
 }
 
 int
 pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *typep)
 {
-  *typep = *attr & (PTHREAD_MUTEX_DEFAULT | PTHREAD_MUTEX_NORMAL
-                    | PTHREAD_MUTEX_ERRORCHECK | PTHREAD_MUTEX_RECURSIVE);
   return 0;
 }
 
 int
 pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 {
-  if (!(type == PTHREAD_MUTEX_DEFAULT
-        || type == PTHREAD_MUTEX_NORMAL
-        || type == PTHREAD_MUTEX_ERRORCHECK
-        || type == PTHREAD_MUTEX_RECURSIVE))
-    return EINVAL;
-  *attr ^= (*attr ^ type)
-           & (PTHREAD_MUTEX_DEFAULT | PTHREAD_MUTEX_NORMAL
-              | PTHREAD_MUTEX_ERRORCHECK | PTHREAD_MUTEX_RECURSIVE);
   return 0;
 }
 
 int
 pthread_mutexattr_getrobust (const pthread_mutexattr_t *attr, int *robustp)
 {
-  *robustp = (*attr >> 2) & (PTHREAD_MUTEX_STALLED | PTHREAD_MUTEX_ROBUST);
   return 0;
 }
 
 int
 pthread_mutexattr_setrobust (pthread_mutexattr_t *attr, int robust)
 {
-  if (!(robust == PTHREAD_MUTEX_STALLED || robust == PTHREAD_MUTEX_ROBUST))
-    return EINVAL;
-  *attr ^= (*attr ^ (robust << 2))
-           & ((PTHREAD_MUTEX_STALLED | PTHREAD_MUTEX_ROBUST) << 2);
   return 0;
 }
 
@@ -87,17 +71,12 @@ pthread_mutexattr_destroy (pthread_mutexattr_t *attr _GL_UNUSED)
 int
 pthread_mutexattr_getrobust (const pthread_mutexattr_t *attr, int *robustp)
 {
-  *robustp = PTHREAD_MUTEX_STALLED;
   return 0;
 }
 
 int
 pthread_mutexattr_setrobust (pthread_mutexattr_t *attr, int robust)
 {
-  if (!(robust == PTHREAD_MUTEX_STALLED || robust == PTHREAD_MUTEX_ROBUST))
-    return EINVAL;
-  if (!(robust == PTHREAD_MUTEX_STALLED))
-    return ENOTSUP;
   return 0;
 }
 
