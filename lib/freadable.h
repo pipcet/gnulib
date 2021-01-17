@@ -1,5 +1,5 @@
 /* Retrieve information about a FILE stream.
-   Copyright (C) 2007, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,12 @@
    STREAM must not be wide-character oriented.
    The result doesn't change until the stream is closed or re-opened.  */
 
-#if HAVE___FREADABLE /* glibc >= 2.2, Solaris >= 7, Android API >= 23, musl libc */
+#if HAVE___FREADABLE
+/* glibc >= 2.2, Solaris >= 7, UnixWare >= 7.1.4.MP4, Cygwin >= 1.7.34, Android API >= 23, musl libc */
 
-# include <stdio_ext.h>
+# if HAVE_STDIO_EXT_H
+#  include <stdio_ext.h>
+# endif
 # define freadable(stream) (__freadable (stream) != 0)
 
 #else

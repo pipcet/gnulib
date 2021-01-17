@@ -1,5 +1,5 @@
 /* Spin locks (native Windows implementation).
-   Copyright (C) 2019-2020 Free Software Foundation, Inc.
+   Copyright (C) 2019-2021 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ void
 glwthread_spin_init (glwthread_spinlock_t *lock)
 {
   lock->word = 0;
+  MemoryBarrier ();
 }
 
 int

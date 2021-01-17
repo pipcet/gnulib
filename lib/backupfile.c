@@ -1,6 +1,6 @@
 /* backupfile.c -- make Emacs style backup file names
 
-   Copyright (C) 1990-2006, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 1990-2006, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,12 +22,6 @@
 
 #include "backup-internal.h"
 
-#include "attribute.h"
-#include "dirname.h"
-#include "opendirat.h"
-#include "renameatu.h"
-#include "xalloc-oversized.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -36,12 +30,20 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "attribute.h"
+#include "basename-lgpl.h"
+#include "idx.h"
+#include "opendirat.h"
+#include "renameatu.h"
+#include "xalloc-oversized.h"
+
 #ifndef _D_EXACT_NAMLEN
 # define _D_EXACT_NAMLEN(dp) strlen ((dp)->d_name)
 #endif
 
 #if ! (HAVE_PATHCONF && defined _PC_NAME_MAX)
 # define pathconf(file, option) (errno = -1)
+# define fpathconf(fd, option) (errno = -1)
 #endif
 
 #ifndef _POSIX_NAME_MAX
@@ -198,7 +200,7 @@ enum numbered_backup_result
 
 static enum numbered_backup_result
 numbered_backup (int dir_fd, char **buffer, size_t buffer_size, size_t filelen,
-                 ptrdiff_t base_offset, DIR **dirpp, int *pnew_fd)
+                 idx_t base_offset, DIR **dirpp, int *pnew_fd)
 {
   enum numbered_backup_result result = BACKUP_IS_NEW;
   DIR *dirp = *dirpp;
@@ -307,7 +309,7 @@ char *
 backupfile_internal (int dir_fd, char const *file,
                      enum backup_type backup_type, bool rename)
 {
-  ptrdiff_t base_offset = last_component (file) - file;
+  idx_t base_offset = last_component (file) - file;
   size_t filelen = base_offset + strlen (file + base_offset);
 
   if (! simple_backup_suffix)

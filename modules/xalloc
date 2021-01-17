@@ -7,6 +7,7 @@ lib/xmalloc.c
 m4/xalloc.m4
 
 Depends-on:
+c99
 extern-inline
 stdint
 xalloc-die
@@ -14,6 +15,7 @@ xalloc-oversized
 
 configure.ac:
 gl_XALLOC
+gl_MODULE_INDICATOR([xalloc])
 
 Makefile.am:
 lib_SOURCES += xmalloc.c

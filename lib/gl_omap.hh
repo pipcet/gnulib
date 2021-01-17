@@ -1,5 +1,5 @@
 /* Abstract ordered map data type as a C++ class.
-   Copyright (C) 2006-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2018.
 
    This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,8 @@
 
 #include "gl_omap.h"
 #include "gl_xomap.h"
+
+#include <stdlib.h>     /* because Gnulib's <stdlib.h> may '#define free ...' */
 
 /* gl_OMap is a C++ wrapper around the gl_omap data type.
    Its key type is 'KEYTYPE *'.  Its value type is 'VALUETYPE *'.
@@ -89,8 +91,9 @@ public:
      THRESHOLD is defined by the THRESHOLD_FN.
      Returns true and stores the found pair in KEY and VALUE if found.
      Otherwise returns false.  */
-  bool search_atleast (bool (*threshold_fn) (KEYTYPE * /*key*/, KEYTYPE * /*threshold*/),
-                       KEYTYPE * threshold,
+  template <typename THT>
+  bool search_atleast (bool (*threshold_fn) (KEYTYPE * /*key*/, THT * /*threshold*/),
+                       THT * threshold,
                        KEYTYPE *& key, VALUETYPE *& value) const
   { return gl_omap_search_atleast (_ptr, reinterpret_cast<gl_mapkey_threshold_fn>(threshold_fn), threshold, &key, &value); }
 

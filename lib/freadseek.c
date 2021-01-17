@@ -1,5 +1,5 @@
 /* Skipping input from a FILE stream.
-   Copyright (C) 2007-2020 Free Software Foundation, Inc.
+   Copyright (C) 2007-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ freadptrinc (FILE *fp, size_t increment)
 #elif defined __minix               /* Minix */
   fp_->_ptr += increment;
   fp_->_count -= increment;
-#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel, OpenVMS */
+#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, UnixWare, mingw, MSVC, NonStop Kernel, OpenVMS */
   fp_->_ptr += increment;
   fp_->_cnt -= increment;
 #elif defined __UCLIBC__            /* uClibc */

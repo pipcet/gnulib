@@ -1,5 +1,5 @@
 /* count-leading-zeros.h -- counts the number of leading 0 bits in a word.
-   Copyright (C) 2012-2020 Free Software Foundation, Inc.
+   Copyright (C) 2012-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ extern "C" {
    expand to code that computes the number of leading zeros of the local
    variable 'x' of type TYPE (an unsigned integer type) and return it
    from the current function.  */
-#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
+#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) \
+    || (__clang_major__ >= 4)
 # define COUNT_LEADING_ZEROS(BUILTIN, MSC_BUILTIN, TYPE)                \
   return x ? BUILTIN (x) : CHAR_BIT * sizeof x;
 #elif _MSC_VER

@@ -1,6 +1,6 @@
 /* safe-alloc.h: safer memory allocation
 
-   Copyright (C) 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -21,15 +21,6 @@
 # define SAFE_ALLOC_H_
 
 # include <stdlib.h>
-
-#ifndef __GNUC_PREREQ
-# if defined __GNUC__ && defined __GNUC_MINOR__
-#  define __GNUC_PREREQ(maj, min)                                       \
-  ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
-# else
-#  define __GNUC_PREREQ(maj, min) 0
-# endif
-#endif
 
 /* Don't call these directly - use the macros below */
 int

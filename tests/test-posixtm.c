@@ -1,5 +1,5 @@
 /* Test that posixtime works as required.
-   Copyright (C) 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,13 +46,15 @@ static struct posixtm_test const T[] =
     { "12131415.16",     LY, 1,            0}, /* ??? Dec 13 14:15:16 ???? */
     { "12131415",        LY, 1,            0}, /* ??? Dec 13 14:15:00 ???? */
 
-    /* These two tests fail on 64-bit Solaris up through at least
-       Solaris 10, which is off by one day for timestamps before
-       0001-01-01 00:00:00 UTC.  */
+#if !((defined __APPLE__ && defined __MACH__) || defined __sun)
+    /* These two tests fail on 64-bit Mac OS X 10.5 and on 64-bit Solaris up
+       through at least Solaris 11.3, which is off by one day for timestamps
+       before 0001-01-01 00:00:00 UTC.  */
     { "000001010000.00", LY, 1,
                       - INT64_C (62167219200)},/* Sat Jan  1 00:00:00 0    */
     { "000012312359.59", LY, 1,
                       - INT64_C (62135596801)},/* Fri Dec 31 23:59:59 0    */
+#endif
 
     { "000101010000.00", LY, 1,
                       - INT64_C (62135596800)},/* Sat Jan  1 00:00:00 1    */

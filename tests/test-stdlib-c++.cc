@@ -1,5 +1,5 @@
 /* Test of <stdlib.h> substitute in C++ mode.
-   Copyright (C) 2010-2020 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@
 SIGNATURE_CHECK (GNULIB_NAMESPACE::_Exit, void, (int));
 #endif
 
+#if GNULIB_TEST_ALIGNED_ALLOC && HAVE_ALIGNED_ALLOC
+SIGNATURE_CHECK (GNULIB_NAMESPACE::aligned_alloc, void *, (size_t, size_t));
+#endif
+
 //SIGNATURE_CHECK (GNULIB_NAMESPACE::atexit, int, (void (*) (void)));
 
 #if GNULIB_TEST_ATOLL
@@ -41,6 +45,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::calloc, void *, (size_t, size_t));
 #if GNULIB_TEST_CANONICALIZE_FILE_NAME
 SIGNATURE_CHECK (GNULIB_NAMESPACE::canonicalize_file_name, char *,
                  (const char *));
+#endif
+
+#if GNULIB_TEST_FREE_POSIX
+SIGNATURE_CHECK (GNULIB_NAMESPACE::free, void, (void *));
 #endif
 
 #if GNULIB_TEST_GETLOADAVG
@@ -83,6 +91,11 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::mkstemp, int, (char *));
 
 #if GNULIB_TEST_MKSTEMPS
 SIGNATURE_CHECK (GNULIB_NAMESPACE::mkstemps, int, (char *, int));
+#endif
+
+#if GNULIB_TEST_POSIX_MEMALIGN && HAVE_POSIX_MEMALIGN
+SIGNATURE_CHECK (GNULIB_NAMESPACE::posix_memalign, int,
+                 (void **, size_t, size_t));
 #endif
 
 #if GNULIB_TEST_POSIX_OPENPT

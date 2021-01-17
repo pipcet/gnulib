@@ -1,5 +1,5 @@
 /* Copy UTF-8 string.
-   Copyright (C) 2002, 2006, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006, 2009-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify it
@@ -20,21 +20,10 @@
 /* Specification.  */
 #include "unistr.h"
 
-#if HAVE_STRDUP
-
-# include <string.h>
+#include <string.h>
 
 uint8_t *
 u8_strdup (const uint8_t *s)
 {
   return (uint8_t *) strdup ((const char *) s);
 }
-
-#else
-
-# define FUNC u8_strdup
-# define UNIT uint8_t
-# define U_STRLEN u8_strlen
-# include "u-strdup.h"
-
-#endif

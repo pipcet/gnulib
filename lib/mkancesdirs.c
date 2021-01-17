@@ -1,6 +1,6 @@
 /* Make a file's ancestor directories.
 
-   Copyright (C) 2006, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "dirname.h"
+#include "filename.h"
 #include "savewd.h"
 
 /* Ensure that the ancestor directories of FILE exist, using an

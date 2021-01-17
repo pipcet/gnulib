@@ -1,5 +1,5 @@
 /* Functions to make fuzzy comparisons between strings
-   Copyright (C) 1988-1989, 1992-1993, 1995, 2001-2003, 2006, 2008-2020 Free
+   Copyright (C) 1988-1989, 1992-1993, 1995, 2001-2003, 2006, 2008-2021 Free
    Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -46,6 +46,7 @@
   ptrdiff_t edit_count;
 #define NOTE_DELETE(ctxt, xoff) ctxt->edit_count++
 #define NOTE_INSERT(ctxt, yoff) ctxt->edit_count++
+#define NOTE_ORDERED false
 #define EARLY_ABORT(ctxt) ctxt->edit_count > 0
 /* We don't need USE_HEURISTIC, since it is unlikely in typical uses of
    fstrcmp().  */

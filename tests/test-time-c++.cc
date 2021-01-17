@@ -1,5 +1,5 @@
 /* Test of <time.h> substitute in C++ mode.
-   Copyright (C) 2010-2020 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@
 
 #include "signature.h"
 
+
+#if GNULIB_TEST_TIMESPEC_GET
+SIGNATURE_CHECK (GNULIB_NAMESPACE::timespec_get, int, (struct timespec *, int));
+#endif
 
 #if GNULIB_TEST_NANOSLEEP
 SIGNATURE_CHECK (GNULIB_NAMESPACE::nanosleep, int,

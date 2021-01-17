@@ -1,5 +1,5 @@
-# roundf.m4 serial 23
-dnl Copyright (C) 2007-2020 Free Software Foundation, Inc.
+# roundf.m4 serial 24
+dnl Copyright (C) 2007-2021 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -41,7 +41,7 @@ extern
 "C"
 #endif
 float roundf (float);
-#ifdef _MSC_VER
+#if defined _MSC_VER && !defined __clang__
 # pragma fenv_access (off)
 #endif
 int main()

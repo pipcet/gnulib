@@ -1,6 +1,6 @@
 #! /bin/sh
 # Test suite for argp-version-etc.
-# Copyright (C) 2009-2020 Free Software Foundation, Inc.
+# Copyright (C) 2009-2021 Free Software Foundation, Inc.
 # This file is part of the GNUlib Library.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-TMP=ave-expected.tmp
-LC_ALL=C
-export LC_ALL
+. "${srcdir=.}/init.sh"; path_prepend_ .
+
 ERR=0
 
-cat > $TMP <<EOT
+LC_ALL=C
+export LC_ALL
+
+cat > expected <<EOT
 test-argp-version-etc (PROJECT) VERSION
 COPYRIGHT Free Software Foundation, Inc.
 License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
@@ -31,13 +33,12 @@ There is NO WARRANTY, to the extent permitted by law.
 Written by Sergey Poznyakoff.
 EOT
 
-${CHECKER} ./test-argp-version-etc${EXEEXT} --version |
+${CHECKER} test-argp-version-etc${EXEEXT} --version |
  sed '1s/test-argp-version-etc (.*) .*/test-argp-version-etc (PROJECT) VERSION/
       /^Packaged by/d
       2,3 s/Copyright (C) [0-9]\{4,4\}/COPYRIGHT/' |
- tr -d '\015' |
- diff -c $TMP - || ERR=1
+ tr -d '\015' > output
 
-rm $TMP
+compare expected output || ERR=1
 
-exit $ERR
+Exit $ERR

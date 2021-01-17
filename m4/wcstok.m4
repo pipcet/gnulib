@@ -1,5 +1,5 @@
-# wcstok.m4 serial 4
-dnl Copyright (C) 2011-2020 Free Software Foundation, Inc.
+# wcstok.m4 serial 6
+dnl Copyright (C) 2011-2021 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -25,18 +25,10 @@ AC_DEFUN([gl_FUNC_WCSTOK],
           [gl_cv_func_wcstok_posix_signature],
           [AC_COMPILE_IFELSE(
              [AC_LANG_PROGRAM(
-                [[
-/* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
-   <wchar.h>.
-   BSD/OS 4.0.1 has a bug: <stddef.h>, <stdio.h> and <time.h> must be
-   included before <wchar.h>.  */
-#include <stddef.h>
-#include <stdio.h>
-#include <time.h>
-#include <wchar.h>
-wchar_t *wcstok (wchar_t *, const wchar_t *, wchar_t **);
-]],
-                [])],
+                [[#include <wchar.h>
+                  wchar_t *wcstok (wchar_t *, const wchar_t *, wchar_t **);
+                ]],
+                [[]])],
              [gl_cv_func_wcstok_posix_signature=yes],
              [gl_cv_func_wcstok_posix_signature=no])
           ])

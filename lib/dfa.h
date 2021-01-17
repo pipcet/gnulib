@@ -1,5 +1,5 @@
 /* dfa.h - declarations for GNU deterministic regexp compiler
-   Copyright (C) 1988, 1998, 2007, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1998, 2007, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,9 +18,16 @@
 
 /* Written June, 1988 by Mike Haertel */
 
+#ifndef DFA_H_
+#define DFA_H_
+
 #include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct localeinfo; /* See localeinfo.h.  */
 
@@ -113,6 +120,9 @@ extern struct dfa *dfasuperset (struct dfa const *d) _GL_ATTRIBUTE_PURE;
 /* The DFA is likely to be fast.  */
 extern bool dfaisfast (struct dfa const *) _GL_ATTRIBUTE_PURE;
 
+/* Return true if every construct in D is supported by this DFA matcher.  */
+extern bool dfasupported (struct dfa const *) _GL_ATTRIBUTE_PURE;
+
 /* Free the storage held by the components of a struct dfa. */
 extern void dfafree (struct dfa *);
 
@@ -128,3 +138,9 @@ extern void dfawarn (const char *);
    takes a single argument, a NUL-terminated string describing the error.
    The user must supply a dfaerror.  */
 extern _Noreturn void dfaerror (const char *);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* dfa.h */

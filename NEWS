@@ -3,6 +3,8 @@ Important general notes
 
 Date        Modules         Changes
 
+2020-08-16  (all)           Automake >= 1.11 and Autoconf >= 2.64 are required.
+
 2019-12-11  Support for     These modules are now supported in C++ mode as well.
             ISO C or POSIX  This means, while the autoconfiguration uses the C
             functions       compiler, the resulting header files and function
@@ -57,6 +59,97 @@ User visible incompatible changes
 ---------------------------------
 
 Date        Modules         Changes
+
+2020-12-23  execute         These functions no longer execute scripts without
+            spawn-pipe      '#!' marker through /bin/sh. To execute such a
+            posix_spawn     script as a shell script, either add a '#!/bin/sh'
+            posix_spawnp    marker in the first line, or specify "/bin/sh" as
+                            the program to execute and the script as its first
+                            argument.
+
+2020-12-18  free            This module, obsoleted in 2008, is gone.
+
+2020-12-14  findprog-in     The function 'find_in_given_path' now takes a 3rd
+                            argument 'const char *directory'. To maintain the
+                            previous behaviour, insert NULL as additional 3rd
+                            argument.
+
+2020-12-11  sh-quote        The argv argument of the 'shell_quote_argv' function
+                            is now of type 'const char * const *'.  You no
+                            longer need to cast read-only strings to 'char *'
+                            when constructing this argument.
+            execute         The prog_argv argument of the 'execute' function
+                            is now of type 'const char * const *'.  You no
+                            longer need to cast read-only strings to 'char *'
+                            when constructing this argument.
+            spawn-pipe      The prog_argv argument of the functions
+                            'create_pipe_out', 'create_pipe_in',
+                            'create_pipe_bidi' is now of type
+                            'const char * const *'.  You no longer need to cast
+                            read-only strings to 'char *' when constructing this
+                            argument.
+            pipe-filter-gi  The prog_argv argument of the
+                            'pipe_filter_gi_create' function is now of type
+                            'const char * const *'.  You no longer need to cast
+                            read-only strings to 'char *' when constructing this
+                            argument.
+            pipe-filter-ii  The prog_argv argument of the
+                            'pipe_filter_ii_execute' function is now of type
+                            'const char * const *'.  You no longer need to cast
+                            read-only strings to 'char *' when constructing this
+                            argument.
+            javaexec        The prog_argv argument of the 'execute_fn' function
+                            type is now of type 'const char * const *'.  Update
+                            the signature of all your implementations of this
+                            type.
+            csharpexec      The prog_argv argument of the 'execute_fn' function
+                            type is now of type 'const char * const *'.  Update
+                            the signature of all your implementations of this
+                            type.
+
+2020-12-02  spawn-pipe      The functions 'create_pipe_out', 'create_pipe_in',
+                            'create_pipe_bidi' now take a 4th argument
+                            'const char *directory'. To maintain the previous
+                            behaviour, insert NULL as additional 4th argument.
+
+2020-12-02  execute         The function 'execute' now takes a 4th argument
+                            'const char *directory'. To maintain the previous
+                            behaviour, insert NULL as additional 4th argument.
+
+2020-10-16  hash            This module deprecates the 'hash_delete' function
+                            using gcc's "deprecated" attribute.  Use the better-
+                            named 'hash_remove' equivalent.
+
+2020-08-24  diffseq         If you do not define NOTE_ORDERED to true,
+                            the NOTE_DELETE and NOTE_INSERT actions might
+                            not be done in order, to help cut down worst-case
+                            recursion stack space from O(N) to O(log N).
+
+2020-08-01  libtextstyle-optional  You now need to invoke
+                                   gl_LIBTEXTSTYLE_OPTIONAL explicitly, because
+                                   this macro now takes an optional
+                                   MINIMUM-VERSION argument.
+
+2020-08-01  libtextstyle    You now need to invoke gl_LIBTEXTSTYLE explicitly,
+                            because this macro now takes an optional
+                            MINIMUM-VERSION argument.
+
+2020-06-27  clean-temp      The functions open_temp, fopen_temp now take a
+                            'bool delete_on_close' argument. If in doubt, pass
+                            false.
+
+2020-06-27  tempname        The link requirements of these modules are changed
+            mkdtemp         from empty to $(LIB_GETRANDOM).
+            mkstemp
+            mkstemps
+            mkostemp
+            mkostemps
+            tmpfile
+            stdlib-safer
+            tmpfile-safer
+            clean-temp
+            javacomp        $(LIB_GETRANDOM) was added to the link requirements
+                            of this module.
 
 2020-05-27  read-file       The functions provided by this module now take an
                             'int flags' argument to modify the file reading

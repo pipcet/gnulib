@@ -2,6 +2,8 @@
 @subsection @code{finitef}
 @findex finitef
 
+LSB specification:@* @url{https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib-finitef.html}
+
 Documentation:
 @itemize
 @item
@@ -25,5 +27,5 @@ Portability problems not fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-Mac OS X 10.5, Minix 3.1.8, AIX 5.1, HP-UX 11, IRIX 6.5, Solaris 11.4, mingw, MSVC 14.
+Mac OS X 10.13, Minix 3.1.8, AIX 5.1, HP-UX 11, IRIX 6.5, Solaris 11.4, mingw, MSVC 14.
 @end itemize

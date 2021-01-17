@@ -1,5 +1,5 @@
 /* Locating a program in a given path.
-   Copyright (C) 2001-2004, 2006-2020 Free Software Foundation, Inc.
+   Copyright (C) 2001-2004, 2006-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001, 2019.
 
    This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,6 @@
 
 #include "filename.h"
 #include "concat-filename.h"
-#include "xalloc.h"
 
 #if (defined _WIN32 && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
   /* Native Windows, OS/2, DOS */
@@ -74,7 +73,7 @@ static const char * const suffixes[] =
 
 const char *
 find_in_given_path (const char *progname, const char *path,
-                    bool optimize_for_exec)
+                    const char *directory, bool optimize_for_exec)
 {
   {
     bool has_slash = false;
@@ -102,6 +101,12 @@ find_in_given_path (const char *progname, const char *path,
                with such a suffix is actually executable.  */
             int failure_errno;
             size_t i;
+
+            const char *directory_as_prefix =
+              (directory != NULL && IS_RELATIVE_FILE_NAME (progname)
+               ? directory
+               : "");
+
             #if defined _WIN32 && !defined __CYGWIN__ /* Native Windows */
             const char *progbasename;
 
@@ -113,6 +118,8 @@ find_in_given_path (const char *progname, const char *path,
                 if (ISSLASH (*p))
                   progbasename = p + 1;
             }
+
+            bool progbasename_has_dot = (strchr (progbasename, '.') != NULL);
             #endif
 
             /* Try all platform-dependent suffixes.  */
@@ -124,12 +131,16 @@ find_in_given_path (const char *progname, const char *path,
                 #if defined _WIN32 && !defined __CYGWIN__ /* Native Windows */
                 /* File names without a '.' are not considered executable, and
                    for file names with a '.' no additional suffix is tried.  */
-                if ((*suffix != '\0') != (strchr (progbasename, '.') != NULL))
+                if ((*suffix != '\0') != progbasename_has_dot)
                 #endif
                   {
-                    /* Concatenate progname and suffix.  */
+                    /* Concatenate directory_as_prefix, progname, suffix.  */
                     char *progpathname =
-                      xconcatenated_filename ("", progname, suffix);
+                      concatenated_filename (directory_as_prefix, progname,
+                                             suffix);
+
+                    if (progpathname == NULL)
+                      return NULL; /* errno is set here */
 
                     /* On systems which have the eaccess() system call, let's
                        use it.  On other systems, let's hope that this program
@@ -165,6 +176,36 @@ find_in_given_path (const char *progname, const char *path,
                     free (progpathname);
                   }
               }
+            #if defined _WIN32 && !defined __CYGWIN__ /* Native Windows */
+            if (failure_errno == ENOENT && !progbasename_has_dot)
+              {
+                /* In the loop above, we skipped suffix = "".  Do this loop
+                   round now, merely to provide a better errno than ENOENT.  */
+
+                char *progpathname =
+                  concatenated_filename (directory_as_prefix, progname, "");
+
+                if (progpathname == NULL)
+                  return NULL; /* errno is set here */
+
+                if (eaccess (progpathname, X_OK) == 0)
+                  {
+                    struct stat statbuf;
+
+                    if (stat (progpathname, &statbuf) >= 0)
+                      {
+                        if (! S_ISDIR (statbuf.st_mode))
+                          errno = ENOEXEC;
+                        else
+                          errno = EACCES;
+                      }
+                  }
+
+                failure_errno = errno;
+
+                free (progpathname);
+              }
+            #endif
 
             errno = failure_errno;
             return NULL;
@@ -178,17 +219,26 @@ find_in_given_path (const char *progname, const char *path,
     path = "";
 
   {
-    int failure_errno;
     /* Make a copy, to prepare for destructive modifications.  */
-    char *path_copy = xstrdup (path);
+    char *path_copy = strdup (path);
+    if (path_copy == NULL)
+      return NULL; /* errno is set here */
+
+    int failure_errno;
     char *path_rest;
     char *cp;
+
+    #if defined _WIN32 && !defined __CYGWIN__ /* Native Windows */
+    bool progname_has_dot = (strchr (progname, '.') != NULL);
+    #endif
 
     failure_errno = ENOENT;
     for (path_rest = path_copy; ; path_rest = cp + 1)
       {
         const char *dir;
         bool last;
+        char *dir_as_prefix_to_free;
+        const char *dir_as_prefix;
         size_t i;
 
         /* Extract next directory in PATH.  */
@@ -202,6 +252,25 @@ find_in_given_path (const char *progname, const char *path,
         if (dir == cp)
           dir = ".";
 
+        /* Concatenate directory and dir.  */
+        if (directory != NULL && IS_RELATIVE_FILE_NAME (dir))
+          {
+            dir_as_prefix_to_free =
+              concatenated_filename (directory, dir, NULL);
+            if (dir_as_prefix_to_free == NULL)
+              {
+                /* errno is set here.  */
+                failure_errno = errno;
+                goto failed;
+              }
+            dir_as_prefix = dir_as_prefix_to_free;
+          }
+        else
+          {
+            dir_as_prefix_to_free = NULL;
+            dir_as_prefix = dir;
+          }
+
         /* Try all platform-dependent suffixes.  */
         for (i = 0; i < sizeof (suffixes) / sizeof (suffixes[0]); i++)
           {
@@ -210,12 +279,20 @@ find_in_given_path (const char *progname, const char *path,
             #if defined _WIN32 && !defined __CYGWIN__ /* Native Windows */
             /* File names without a '.' are not considered executable, and
                for file names with a '.' no additional suffix is tried.  */
-            if ((*suffix != '\0') != (strchr (progname, '.') != NULL))
+            if ((*suffix != '\0') != progname_has_dot)
             #endif
               {
-                /* Concatenate dir, progname, and suffix.  */
+                /* Concatenate dir_as_prefix, progname, and suffix.  */
                 char *progpathname =
-                  xconcatenated_filename (dir, progname, suffix);
+                  concatenated_filename (dir_as_prefix, progname, suffix);
+
+                if (progpathname == NULL)
+                  {
+                    /* errno is set here.  */
+                    failure_errno = errno;
+                    free (dir_as_prefix_to_free);
+                    goto failed;
+                  }
 
                 /* On systems which have the eaccess() system call, let's
                    use it.  On other systems, let's hope that this program
@@ -237,17 +314,25 @@ find_in_given_path (const char *progname, const char *path,
                                 free (progpathname);
 
                                 /* Add the "./" prefix for real, that
-                                   xconcatenated_filename() optimized away.
+                                   concatenated_filename() optimized away.
                                    This avoids a second PATH search when the
                                    caller uses execl/execv/execlp/execvp.  */
                                 progpathname =
-                                  XNMALLOC (2 + strlen (progname) + 1, char);
+                                  (char *) malloc (2 + strlen (progname) + 1);
+                                if (progpathname == NULL)
+                                  {
+                                    /* errno is set here.  */
+                                    failure_errno = errno;
+                                    free (dir_as_prefix_to_free);
+                                    goto failed;
+                                  }
                                 progpathname[0] = '.';
                                 progpathname[1] = NATIVE_SLASH;
                                 memcpy (progpathname + 2, progname,
                                         strlen (progname) + 1);
                               }
 
+                            free (dir_as_prefix_to_free);
                             free (path_copy);
                             return progpathname;
                           }
@@ -262,11 +347,49 @@ find_in_given_path (const char *progname, const char *path,
                 free (progpathname);
               }
           }
+        #if defined _WIN32 && !defined __CYGWIN__ /* Native Windows */
+        if (failure_errno == ENOENT && !progname_has_dot)
+          {
+            /* In the loop above, we skipped suffix = "".  Do this loop
+               round now, merely to provide a better errno than ENOENT.  */
+
+            char *progpathname =
+              concatenated_filename (dir_as_prefix, progname, "");
+
+            if (progpathname == NULL)
+              {
+                /* errno is set here.  */
+                failure_errno = errno;
+                free (dir_as_prefix_to_free);
+                goto failed;
+              }
+
+            if (eaccess (progpathname, X_OK) == 0)
+              {
+                struct stat statbuf;
+
+                if (stat (progpathname, &statbuf) >= 0)
+                  {
+                    if (! S_ISDIR (statbuf.st_mode))
+                      errno = ENOEXEC;
+                    else
+                      errno = EACCES;
+                  }
+              }
+
+            failure_errno = errno;
+
+            free (progpathname);
+          }
+        #endif
+
+        free (dir_as_prefix_to_free);
 
         if (last)
           break;
       }
 
+   failed:
     /* Not found in PATH.  */
     free (path_copy);
 

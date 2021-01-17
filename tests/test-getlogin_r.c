@@ -1,5 +1,5 @@
 /* Test of getting user name.
-   Copyright (C) 2010-2020 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,14 @@ main (void)
   /* Test with a large enough buffer.  */
   char buf[1024];
   int err = getlogin_r (buf, sizeof buf);
+#if defined __sun
+  if (err == EINVAL)
+    {
+      /* This can happen on Solaris 11 OpenIndiana in the MATE desktop.  */
+      fprintf (stderr, "Skipping test: no entry in /var/adm/utmpx.\n");
+      exit (77);
+    }
+#endif
   test_getlogin_result (buf, err);
 
   /* Test with a small buffer.  */

@@ -1,6 +1,6 @@
 /* Get the system load averages.
 
-   Copyright (C) 1985-1989, 1991-1995, 1997, 1999-2000, 2003-2020 Free Software
+   Copyright (C) 1985-1989, 1991-1995, 1997, 1999-2000, 2003-2021 Free Software
    Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with gnulib.
@@ -567,15 +567,22 @@ getloadavg (double loadavg[], int nelem)
 
   unsigned long int load_ave[3], scale;
   int count;
-  FILE *fp;
-
-  fp = fopen (NETBSD_LDAV_FILE, "re");
-  if (fp == NULL)
-    return -1;
-  count = fscanf (fp, "%lu %lu %lu %lu\n",
+  char readbuf[4 * INT_BUFSIZE_BOUND (unsigned long int) + 1];
+  int fd = open (NETBSD_LDAV_FILE, O_RDONLY | O_CLOEXEC);
+  if (fd < 0)
+    return fd;
+  int nread = read (fd, readbuf, sizeof readbuf - 1);
+  int err = errno;
+  close (fd);
+  if (nread < 0)
+    {
+      errno = err;
+      return -1;
+    }
+  readbuf[nread] = '\0';
+  count = sscanf (readbuf, "%lu %lu %lu %lu\n",
                   &load_ave[0], &load_ave[1], &load_ave[2],
                   &scale);
-  (void) fclose (fp);
   if (count != 4)
     {
       errno = ENOTSUP;

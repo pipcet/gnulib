@@ -1,6 +1,6 @@
-# serial 13
+# serial 14
 
-# Copyright (C) 2000-2001, 2005-2006, 2009-2020 Free Software Foundation, Inc.
+# Copyright (C) 2000-2001, 2005-2006, 2009-2021 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -26,6 +26,7 @@ AC_DEFUN([gl_FUNC_RMDIR_NOTEMPTY],
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
+]GL_MDA_DEFINES[
         int main ()
         {
           FILE *s;

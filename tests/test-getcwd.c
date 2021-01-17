@@ -1,5 +1,5 @@
 /* Test of getcwd() function.
-   Copyright (C) 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include "pathmax.h"
 #include "macros.h"
 
-#if ! HAVE_GETPAGESIZE
+#if !(HAVE_GETPAGESIZE || defined getpagesize)
 # define getpagesize() 0
 #endif
 

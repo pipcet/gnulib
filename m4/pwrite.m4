@@ -1,5 +1,5 @@
-# pwrite.m4 serial 5
-dnl Copyright (C) 2010-2020 Free Software Foundation, Inc.
+# pwrite.m4 serial 6
+dnl Copyright (C) 2010-2021 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -37,7 +37,7 @@ changequote([,])dnl
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
-             ]],
+             ]GL_MDA_DEFINES],
              [[
 {
   /* This test fails on HP-UX 11.00..11.11.  */

@@ -1,5 +1,5 @@
 /* Create a temporary file.
-   Copyright (C) 2007, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include <stdbool.h>
 
 #if defined _WIN32 && ! defined __CYGWIN__
-/* A native Windows platforms.  */
+/* A native Windows platform.  */
 
 # include <fcntl.h>
 # include <string.h>
@@ -50,7 +50,7 @@
    used on native Windows and Android.  */
 
 #if defined _WIN32 && ! defined __CYGWIN__
-/* A native Windows platforms.  */
+/* A native Windows platform.  */
 
 /* Don't assume that UNICODE is not defined.  */
 # undef OSVERSIONINFO

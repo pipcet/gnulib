@@ -1,5 +1,5 @@
 /* ffs.c -- find the first set bit in a word.
-   Copyright (C) 2011-2020 Free Software Foundation, Inc.
+   Copyright (C) 2011-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,23 @@
 
 #include <limits.h>
 
+#if defined _MSC_VER && !(__clang_major__ >= 4)
+# include <intrin.h>
+#endif
+
 int
 ffs (int i)
 {
-#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
+#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || (__clang_major__ >= 4)
   return __builtin_ffs (i);
+#elif defined _MSC_VER
+  /* _BitScanForward
+     <https://docs.microsoft.com/en-us/cpp/intrinsics/bitscanforward-bitscanforward64> */
+  unsigned long bit;
+  if (_BitScanForward (&bit, i))
+    return bit + 1;
+  else
+    return 0;
 #else
   /* <https://github.com/gibsjose/BitHacks>
      gives this deBruijn constant for a branch-less computation, although
