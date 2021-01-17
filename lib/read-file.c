@@ -1,5 +1,5 @@
 /* read-file.c -- read file contents into a string
-   Copyright (C) 2006, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2021 Free Software Foundation, Inc.
    Written by Simon Josefsson and Bruno Haible.
 
    This program is free software; you can redistribute it and/or modify
@@ -156,7 +156,6 @@ fread_file (FILE *stream, int flags, size_t *length)
               memcpy (new_buf, buf, save_alloc);
               explicit_bzero (buf, save_alloc);
               free (buf);
-              buf = new_buf;
             }
           else if (!(new_buf = realloc (buf, alloc)))
             {

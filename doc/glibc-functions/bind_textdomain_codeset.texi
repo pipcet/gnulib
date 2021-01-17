@@ -2,6 +2,8 @@
 @subsection @code{bind_textdomain_codeset}
 @findex bind_textdomain_codeset
 
+LSB specification:@* @url{https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib-bind-textdomain-codeset.html}
+
 Documentation:
 @itemize
 @item
@@ -25,5 +27,5 @@ Portability problems not fixed by Gnulib:
 @itemize
 @item
 This function is missing on some platforms:
-Mac OS X 10.5, FreeBSD 6.0, OpenBSD 3.8, Minix 3.1.8, HP-UX 11, IRIX 6.5, Cygwin, mingw, MSVC 14, Android 9.0.
+Mac OS X 10.13, FreeBSD 6.0, OpenBSD 6.7, Minix 3.1.8, HP-UX 11, IRIX 6.5, Cygwin 2.9, mingw, MSVC 14, Android 9.0.
 @end itemize

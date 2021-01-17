@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a hash table with a binary tree.
-   Copyright (C) 2006-2007, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ struct gl_multiple_nodes
 #define MULTIPLE_NODES_MAGIC  (void *) -1
 
 /* Returns the position of the given node in the tree.  */
-static size_t
+static size_t _GL_ATTRIBUTE_PURE
 node_position (gl_list_node_t node)
 {
   size_t position = 0;
@@ -55,7 +55,7 @@ node_position (gl_list_node_t node)
 }
 
 /* Compares two nodes by their position in the tree.  */
-static int
+static int _GL_ATTRIBUTE_PURE
 compare_by_position (const void *x1, const void *x2)
 {
   gl_list_node_t node1 = (gl_list_node_t) x1;
@@ -68,7 +68,7 @@ compare_by_position (const void *x1, const void *x2)
 }
 
 /* Compares a node's position in the tree with a given threshold.  */
-static bool
+static bool _GL_ATTRIBUTE_PURE
 compare_position_threshold (const void *x, const void *threshold)
 {
   gl_list_node_t node = (gl_list_node_t) x;
@@ -340,7 +340,7 @@ add_nodes_to_buckets (gl_list_t list)
   return -1;
 }
 /* Tell GCC that the likely return value is 0.  */
-#if __GNUC__ >= 3
+#if (__GNUC__ >= 3) || (__clang_major__ >= 4)
 # define add_nodes_to_buckets(list) \
     __builtin_expect ((add_nodes_to_buckets) (list), 0)
 #endif

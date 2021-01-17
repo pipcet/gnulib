@@ -1,5 +1,5 @@
 /* Hierarchical argument parsing, layered over getopt.
-   Copyright (C) 1995-2020 Free Software Foundation, Inc.
+   Copyright (C) 1995-2021 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Miles Bader <miles@gnu.ai.mit.edu>.
 
@@ -39,7 +39,8 @@
    Other compilers use __restrict, __restrict__, and _Restrict, and
    'configure' might #define 'restrict' to those words.  */
 #ifndef __restrict
-# if ! (2 < __GNUC__ || (2 == __GNUC__ && 95 <= __GNUC_MINOR__))
+# if ! (2 < __GNUC__ || (2 == __GNUC__ && 95 <= __GNUC_MINOR__) \
+        || __clang_major__ >= 3)
 #  if 199901L <= __STDC_VERSION__
 #   define __restrict restrict
 #  else
@@ -520,10 +521,20 @@ extern void __argp_usage (const struct argp_state *__state);
    message, then exit (1).  */
 extern void argp_error (const struct argp_state *__restrict __state,
                         const char *__restrict __fmt, ...)
-     _GL_ATTRIBUTE_FORMAT ((__printf__, 2, 3));
+#if GNULIB_VFPRINTF_POSIX
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 2, 3))
+#else
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM, 2, 3))
+#endif
+     ;
 extern void __argp_error (const struct argp_state *__restrict __state,
                           const char *__restrict __fmt, ...)
-     _GL_ATTRIBUTE_FORMAT ((__printf__, 2, 3));
+#if GNULIB_VFPRINTF_POSIX
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 2, 3))
+#else
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM, 2, 3))
+#endif
+     ;
 
 /* Similar to the standard gnu error-reporting function error(), but will
    respect the ARGP_NO_EXIT and ARGP_NO_ERRS flags in STATE, and will print
@@ -536,11 +547,21 @@ extern void __argp_error (const struct argp_state *__restrict __state,
 extern void argp_failure (const struct argp_state *__restrict __state,
                           int __status, int __errnum,
                           const char *__restrict __fmt, ...)
-     _GL_ATTRIBUTE_FORMAT ((__printf__, 4, 5));
+#if GNULIB_VFPRINTF_POSIX
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 4, 5))
+#else
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM, 4, 5))
+#endif
+     ;
 extern void __argp_failure (const struct argp_state *__restrict __state,
                             int __status, int __errnum,
                             const char *__restrict __fmt, ...)
-     _GL_ATTRIBUTE_FORMAT ((__printf__, 4, 5));
+#if GNULIB_VFPRINTF_POSIX
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 4, 5))
+#else
+     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM, 4, 5))
+#endif
+     ;
 
 #if _LIBC
 /* Returns true if the option OPT is a valid short option.  */

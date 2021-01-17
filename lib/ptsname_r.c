@@ -1,5 +1,5 @@
 /* Determine name of the slave side of a pseudo-terminal.
-   Copyright (C) 1998, 2002, 2010-2020 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2002, 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -86,7 +86,6 @@ __ptsname_r (int fd, char *buf, size_t buflen)
     return errno;
 #else
   int save_errno = errno;
-  int err;
   struct stat st;
 
   if (buf == NULL)
@@ -98,7 +97,7 @@ __ptsname_r (int fd, char *buf, size_t buflen)
 # if defined __sun /* Solaris */
   if (fstat (fd, &st) < 0)
     return errno;
-  if (!(S_ISCHR (st.st_mode) && major (st.st_rdev) == 0))
+  if (!S_ISCHR (st.st_mode))
     {
       errno = ENOTTY;
       return errno;
@@ -187,7 +186,7 @@ __ptsname_r (int fd, char *buf, size_t buflen)
       return ERANGE;
     }
 
-  err = __ttyname_r (fd, buf, buflen);
+  int err = __ttyname_r (fd, buf, buflen);
   if (err != 0)
     {
       __set_errno (err);
@@ -198,7 +197,7 @@ __ptsname_r (int fd, char *buf, size_t buflen)
     buf[sizeof (_PATH_DEV) - 1] = 't';
 # endif
 
-  if (__stat (buf, &st) < 0)
+  if (__stat (buf, &st) < 0 && errno != EOVERFLOW)
     return errno;
 
   __set_errno (save_errno);

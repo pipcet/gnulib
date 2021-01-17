@@ -1,5 +1,5 @@
 /* Shell quoting.
-   Copyright (C) 2001-2002, 2004, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2004, 2009-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ extern char * shell_quote (const char *string);
 
 /* Returns a freshly allocated string containing all argument strings, quoted,
    separated through spaces.  */
-extern char * shell_quote_argv (char * const *argv);
+extern char * shell_quote_argv (const char * const *argv);
 
 #ifdef __cplusplus
 }

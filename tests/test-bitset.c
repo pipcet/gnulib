@@ -1,5 +1,5 @@
 /* Test of bitset.
-   Copyright (C) 2018-2020 Free Software Foundation, Inc.
+   Copyright (C) 2018-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 
 #define RANDOM(n) (rand () % (n))
 
-static
-void assert_bitset_equal (bitset bs1, bitset bs2)
+static void
+assert_bitset_equal (bitset bs1, bitset bs2)
 {
   debug_bitset (bs1);
   debug_bitset (bs2);
@@ -32,8 +32,8 @@ void assert_bitset_equal (bitset bs1, bitset bs2)
     ASSERT (bitset_test (bs1, i) == bitset_test (bs2, i));
 }
 
-static
-void bitset_random (bitset bs)
+static void
+bitset_random (bitset bs)
 {
   for (bitset_bindex i = 0; i < bitset_size (bs); ++i)
     bitset_set (bs, RANDOM (2));
@@ -43,30 +43,39 @@ void bitset_random (bitset bs)
 /* Check various operations on random bitsets with two different
    implementations.  */
 
-static
-void compare (enum bitset_attr a, enum bitset_attr b)
+static void
+compare (enum bitset_attr a, enum bitset_attr b)
 {
-  const int nbits = RANDOM (256);
+  /* bitset_list (used in many operations) uses a cache whose size is
+     BITSET_LIST_SIZE */
+  const int nbits = RANDOM (2 * BITSET_LIST_SIZE);
 
-  bitset asrc0 = bitset_create (nbits, a);
+  /* Four read only random initial values of type A.  */
+  const bitset asrc0 = bitset_create (nbits, a);
   bitset_random (asrc0);
-  bitset asrc1 = bitset_create (nbits, a);
+  const bitset asrc1 = bitset_create (nbits, a);
   bitset_random (asrc1);
-  bitset asrc2 = bitset_create (nbits, a);
+  const bitset asrc2 = bitset_create (nbits, a);
   bitset_random (asrc2);
-  bitset asrc3 = bitset_create (nbits, a);
+  const bitset asrc3 = bitset_create (nbits, a);
   bitset_random (asrc3);
-  bitset adst = bitset_create (nbits, a);
 
-  bitset bsrc0 = bitset_create (nbits, b);
+  /* Four read only values of type B, equal to the values of type A. */
+  const bitset bsrc0 = bitset_create (nbits, b);
   bitset_copy (bsrc0, asrc0);
-  bitset bsrc1 = bitset_create (nbits, b);
+  const bitset bsrc1 = bitset_create (nbits, b);
   bitset_copy (bsrc1, asrc1);
-  bitset bsrc2 = bitset_create (nbits, b);
+  const bitset bsrc2 = bitset_create (nbits, b);
   bitset_copy (bsrc2, asrc2);
-  bitset bsrc3 = bitset_create (nbits, b);
+  const bitset bsrc3 = bitset_create (nbits, b);
   bitset_copy (bsrc3, asrc3);
+
+  /* Destinations for each operation.  */
+  bitset adst = bitset_create (nbits, a);
   bitset bdst = bitset_create (nbits, b);
+
+  /* count */
+  ASSERT (bitset_count (asrc0) == bitset_count (bsrc0));
 
   /* not */
   bitset_not (adst, asrc0);
@@ -139,6 +148,88 @@ void compare (enum bitset_attr a, enum bitset_attr b)
   bitset_zero (bdst);
   assert_bitset_equal (adst, bdst);
 
+  /* first and last and FOR_EACH.  */
+  /* Work on bdst to exercise all the bitset types (adst is
+     BITSET_VARIABLE).  */
+  bitset_copy (bdst, bsrc0);
+  debug_bitset (bdst);
+  debug_bitset (bsrc0);
+  bitset_copy (adst, bdst);
+
+  /* count. */
+  ASSERT (bitset_count (adst) == bitset_count (bdst));
+
+  /* first and last */
+  {
+    bitset_bindex first = bitset_first (adst);
+    ASSERT (first == bitset_first (bdst));
+
+    bitset_bindex last  = bitset_last (adst);
+    ASSERT (last == bitset_last (bdst));
+
+    ASSERT (first <= last);
+  }
+
+
+  /* FOR_EACH.  */
+  {
+    bitset_iterator iter;
+    bitset_bindex j;
+    bitset_bindex first = bitset_first (bdst);
+    bitset_bindex last  = bitset_last (bdst);
+    bool seen_first = false;
+    bool seen_last = false;
+    BITSET_FOR_EACH (iter, bdst, j, 0)
+      {
+        ASSERT (first <= j && j <= last);
+        ASSERT (bitset_test (bdst, j));
+        if (j == first)
+          seen_first = true;
+        if (j == last)
+          seen_last = true;
+      }
+    if (first == BITSET_BINDEX_MAX)
+      {
+        ASSERT (!seen_first);
+        ASSERT (!seen_last);
+      }
+    else
+      {
+        ASSERT (seen_first);
+        ASSERT (seen_last);
+      }
+  }
+
+  /* FOR_EACH_REVERSE.  */
+  {
+    bitset_iterator iter;
+    bitset_bindex j;
+    bitset_bindex first = bitset_first (bdst);
+    bitset_bindex last  = bitset_last (bdst);
+    bool seen_first = false;
+    bool seen_last = false;
+    BITSET_FOR_EACH_REVERSE (iter, bdst, j, 0)
+      {
+        ASSERT (first <= j && j <= last);
+        ASSERT (bitset_test (bdst, j));
+        if (j == first)
+          seen_first = true;
+        if (j == last)
+          seen_last = true;
+      }
+    if (first == BITSET_BINDEX_MAX)
+      {
+        ASSERT (!seen_first);
+        ASSERT (!seen_last);
+      }
+    else
+      {
+        ASSERT (seen_first);
+        ASSERT (seen_last);
+      }
+  }
+
+
   /* resize.
 
      ARRAY bitsets cannot be resized.  */
@@ -165,16 +256,104 @@ void compare (enum bitset_attr a, enum bitset_attr b)
 }
 
 
+/* Check empty bitsets.  */
+
+static void
+check_zero (bitset bs)
+{
+  fprintf (stderr, "check_zero\n");
+  bitset_zero (bs);
+
+  /* count. */
+  ASSERT (bitset_count (bs) == 0);
+
+  /* first and last */
+  ASSERT (bitset_first (bs) == BITSET_BINDEX_MAX);
+  ASSERT (bitset_last (bs)  == BITSET_BINDEX_MAX);
+
+  /* FOR_EACH.  */
+  {
+    bitset_iterator iter;
+    bitset_bindex i;
+    BITSET_FOR_EACH (iter, bs, i, 0)
+      ASSERT (0);
+    BITSET_FOR_EACH_REVERSE (iter, bs, i, 0)
+      ASSERT (0);
+  }
+}
+
+/* Exercise on a single-bit values: it's easy to get the handling of
+   the most significant bit wrong.  */
+
+static void
+check_one_bit (bitset bs, int bitno)
+{
+  fprintf (stderr, "check_one_bit(%d)\n", bitno);
+  bitset_zero (bs);
+  bitset_set (bs, bitno);
+
+  /* count. */
+  ASSERT (bitset_count (bs) == 1);
+
+  /* test. */
+  ASSERT (bitset_test (bs, bitno));
+
+  /* first and last */
+  ASSERT (bitset_first (bs) == bitno);
+  ASSERT (bitset_last (bs) == bitno);
+
+  /* FOR_EACH.  */
+  {
+    bitset_iterator iter;
+    bitset_bindex i;
+    BITSET_FOR_EACH (iter, bs, i, 0)
+      ASSERT (i == bitno);
+
+    BITSET_FOR_EACH_REVERSE (iter, bs, i, 0)
+      ASSERT (i == bitno);
+  }
+}
+
+/* Check full bitsets.  */
+
+static void
+check_ones (bitset bs)
+{
+  fprintf (stderr, "check_ones\n");
+  const bitset_bindex size = bitset_size (bs);
+
+  bitset_ones (bs);
+  debug_bitset (bs);
+
+  /* count. */
+  ASSERT (bitset_count (bs) == size);
+
+  /* first and last */
+  ASSERT (bitset_first (bs) == 0);
+  ASSERT (bitset_last (bs)  == size - 1);
+
+  /* FOR_EACH.  */
+  {
+    bitset_iterator iter;
+    bitset_bindex i;
+    bitset_bindex count = 0;
+    BITSET_FOR_EACH (iter, bs, i, 0)
+      ASSERT (i == count++);
+    ASSERT (count == size);
+    BITSET_FOR_EACH_REVERSE (iter, bs, i, 0)
+      ASSERT (i == --count);
+    ASSERT (count == 0);
+  }
+}
+
 /* Check various operations against expected values for a bitset
    having attributes ATTR.  */
 
-static
-void check_attributes (enum bitset_attr attr)
+static void
+check_attributes (enum bitset_attr attr, int nbits)
 {
-  enum { nbits = 32 };
-
   bitset bs0 = bitset_create (nbits, attr);
-  ASSERT (bitset_size (bs0) == 32);
+  ASSERT (bitset_size (bs0) == nbits);
   ASSERT (bitset_count (bs0) == 0);
   ASSERT (bitset_empty_p (bs0));
 
@@ -202,6 +381,14 @@ void check_attributes (enum bitset_attr attr)
   bitset_or (bs, bs1, bs2);
   ASSERT (bitset_count (bs) == 6);
 
+  check_zero (bs);
+  check_ones (bs);
+
+  /* Exercise on all the single-bit values: it's easy to get the
+     handling of the most significant bit wrong.  */
+  for (int bitno = 0; bitno < nbits; ++bitno)
+    check_one_bit (bs, bitno);
+
   bitset_free (bs);
   bitset_free (bs2);
   bitset_free (bs1);
@@ -210,12 +397,25 @@ void check_attributes (enum bitset_attr attr)
 
 int main (void)
 {
-  check_attributes (BITSET_FIXED);
-  check_attributes (BITSET_VARIABLE);
-  check_attributes (BITSET_DENSE);
-  check_attributes (BITSET_SPARSE);
-  check_attributes (BITSET_FRUGAL);
-  check_attributes (BITSET_GREEDY);
+  bitset_stats_enable ();
+
+  for (int i = 0; i < 4; ++i)
+    {
+      /* table bitsets have elements that store 256 bits.  bitset_list
+         (used in many operations) uses a cache whose size is
+         BITSET_LIST_SIZE.  */
+      int nbits =
+        i == 0   ? 1
+        : i == 1 ? 32
+        : i == 2 ? 257
+        :          (BITSET_LIST_SIZE + 1);
+      check_attributes (BITSET_FIXED,    nbits);
+      check_attributes (BITSET_VARIABLE, nbits);
+      check_attributes (BITSET_DENSE,    nbits);
+      check_attributes (BITSET_SPARSE,   nbits);
+      check_attributes (BITSET_FRUGAL,   nbits);
+      check_attributes (BITSET_GREEDY,   nbits);
+    }
 
   compare (BITSET_VARIABLE, BITSET_FIXED);
   compare (BITSET_VARIABLE, BITSET_VARIABLE);
@@ -223,5 +423,7 @@ int main (void)
   compare (BITSET_VARIABLE, BITSET_SPARSE);
   compare (BITSET_VARIABLE, BITSET_FRUGAL);
   compare (BITSET_VARIABLE, BITSET_GREEDY);
+
+  bitset_stats_dump (stderr);
   return 0;
 }

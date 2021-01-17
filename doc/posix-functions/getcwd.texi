@@ -4,6 +4,8 @@
 
 POSIX specification:@* @url{https://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html}
 
+LSB specification:@* @url{https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib-getcwd.html}
+
 Gnulib module: getcwd or getcwd-lgpl
 
 Portability problems fixed by either Gnulib module @code{getcwd} or
@@ -34,11 +36,9 @@ mingw.
 Portability problems fixed by Gnulib module @code{getcwd}:
 @itemize
 @item
-This function is missing on some older platforms.
-@item
 This function does not handle long file names (greater than @code{PATH_MAX})
 correctly on some platforms:
-glibc on Linux 2.4.20, Mac OS X 10.5, FreeBSD 6.4, NetBSD 5.1, OpenBSD 4.9, AIX 7.1.
+glibc on Linux 2.4.20, Mac OS X 10.13, FreeBSD 6.4, NetBSD 9.0, OpenBSD 4.9, AIX 7.1.
 @end itemize
 
 Portability problems not fixed by Gnulib:

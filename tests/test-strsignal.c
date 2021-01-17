@@ -1,5 +1,5 @@
 /* Test of strsignal() function.
-   Copyright (C) 2008-2020 Free Software Foundation, Inc.
+   Copyright (C) 2008-2021 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,10 +28,12 @@ SIGNATURE_CHECK (strsignal, char *, (int));
 #include "macros.h"
 
 #if HAVE_DECL_SYS_SIGLIST
-# define ASSERT_DESCRIPTION(got, expect)
+# define ASSERT_DESCRIPTION(actual, expected)
 #else
-/* In this case, we can guarantee some signal descriptions.  */
-# define ASSERT_DESCRIPTION(got, expect) ASSERT (!strcmp (got, expect))
+/* In this case, we can guarantee some signal descriptions.
+   But allow the actual result to be longer than the expected result.  */
+# define ASSERT_DESCRIPTION(actual, expected) \
+   ASSERT (strncmp (actual, expected, strlen (expected)) == 0)
 #endif
 
 int

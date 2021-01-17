@@ -1,5 +1,5 @@
 /* Test changing the protections of a file.
-   Copyright (C) 2011-2020 Free Software Foundation, Inc.
+   Copyright (C) 2011-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,12 @@
 SIGNATURE_CHECK (fchmod, int, (int, mode_t));
 
 #include <errno.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include "macros.h"
+
+#define BASE "test-fchmod."
 
 int
 main (void)
@@ -40,6 +43,25 @@ main (void)
     errno = 0;
     ASSERT (fchmod (99, 0600) == -1);
     ASSERT (errno == EBADF);
+  }
+
+  /* Test that fchmod works on regular files.  */
+  {
+    struct stat statbuf;
+    int fd;
+
+    unlink (BASE "file");
+    ASSERT (close (creat (BASE "file", 0600)) == 0);
+    fd = open (BASE "file", O_RDWR);
+    ASSERT (fd >= 0);
+    ASSERT (fchmod (fd, 0400) == 0);
+    ASSERT (stat (BASE "file", &statbuf) >= 0);
+    ASSERT ((statbuf.st_mode & 0700) == 0400);
+    ASSERT (close (fd) == 0);
+
+    /* Clean up.  */
+    ASSERT (chmod (BASE "file", 0600) == 0);
+    ASSERT (unlink (BASE "file") == 0);
   }
 
   return 0;

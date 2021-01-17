@@ -1,5 +1,5 @@
 /* Abstract sequential list data type as a C++ class.
-   Copyright (C) 2006-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,8 @@
 #include "gl_xlist.h"
 #include "gl_sublist.h"
 #include "gl_xsublist.h"
+
+#include <stdlib.h>     /* because Gnulib's <stdlib.h> may '#define free ...' */
 
 /* gl_List is a C++ wrapper around the gl_list data type.
    Its element type is 'ELTYPE *'.

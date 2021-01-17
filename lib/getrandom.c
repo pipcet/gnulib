@@ -1,6 +1,6 @@
 /* Obtain a series of random bytes.
 
-   Copyright 2020 Free Software Foundation, Inc.
+   Copyright 2020-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,16 @@
 #if defined _WIN32 && ! defined __CYGWIN__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
-# include <bcrypt.h>
+# if HAVE_BCRYPT_H
+#  include <bcrypt.h>
+# else
+#  define NTSTATUS LONG
+typedef void * BCRYPT_ALG_HANDLE;
+#  define BCRYPT_USE_SYSTEM_PREFERRED_RNG 0x00000002
+#  if HAVE_LIB_BCRYPT
+extern NTSTATUS WINAPI BCryptGenRandom (BCRYPT_ALG_HANDLE, UCHAR *, ULONG, ULONG);
+#  endif
+# endif
 # if !HAVE_LIB_BCRYPT
 #  include <wincrypt.h>
 #  ifndef CRYPT_VERIFY_CONTEXT

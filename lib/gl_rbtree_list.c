@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a binary tree.
-   Copyright (C) 2006, 2008-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2008-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -37,6 +37,8 @@
 #include "gl_anytree_list2.h"
 
 /* For debugging.  */
+extern void gl_rbtree_list_check_invariants (gl_list_t list);
+
 static unsigned int
 check_invariants (gl_list_node_t node, gl_list_node_t parent)
 {
@@ -64,7 +66,7 @@ void
 gl_rbtree_list_check_invariants (gl_list_t list)
 {
   if (list->root != NULL)
-    check_invariants (list->root, NULL);
+    (void) check_invariants (list->root, NULL);
 }
 
 const struct gl_list_implementation gl_rbtree_list_implementation =

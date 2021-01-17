@@ -1,5 +1,5 @@
 /* Fused multiply-add.
-   Copyright (C) 2007, 2009, 2011-2020 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009, 2011-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@
 
 /* MSVC with option -fp:strict refuses to compile constant initializers that
    contain floating-point operations.  Pacify this compiler.  */
-#ifdef _MSC_VER
+#if defined _MSC_VER && !defined __clang__
 # pragma fenv_access (off)
 #endif
 

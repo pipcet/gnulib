@@ -1,5 +1,5 @@
 /* Test of <sys/stat.h> substitute in C++ mode.
-   Copyright (C) 2010-2020 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::fstatat, int,
 #if GNULIB_TEST_FUTIMENS
 SIGNATURE_CHECK (GNULIB_NAMESPACE::futimens, int,
                  (int, struct timespec const[2]));
+#endif
+
+#if GNULIB_TEST_GETUMASK
+SIGNATURE_CHECK (GNULIB_NAMESPACE::getumask, mode_t, (void));
 #endif
 
 #if GNULIB_TEST_LCHMOD

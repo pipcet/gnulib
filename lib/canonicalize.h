@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2007, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 1996-2007, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,8 @@ typedef enum canonicalize_mode_t canonicalize_mode_t;
    does not contain any `.', `..' components nor any repeated file name
    separators ('/') or, depending on other CAN_MODE flags, symlinks.
    Whether components must exist or not depends on canonicalize mode.
-   The result is malloc'd.  */
+   The result is malloc'd.
+   Upon failure, return NULL with errno set.  */
 char *canonicalize_filename_mode (const char *, canonicalize_mode_t);
 
 #ifdef __cplusplus

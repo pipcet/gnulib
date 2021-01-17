@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (C) 2002-2020 Free Software Foundation, Inc.
+# Copyright (C) 2002-2021 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,11 +48,11 @@ nl='
 '
 IFS=" ""	$nl"
 
-# You can set AUTOCONFPATH to empty if autoconf 2.63 is already in your PATH.
+# You can set AUTOCONFPATH to empty if autoconf 2.64 is already in your PATH.
 AUTOCONFPATH=
 #case $USER in
 #  bruno )
-#    AUTOCONFBINDIR=/arch/x86-linux/gnu-inst-autoconf/2.63/bin
+#    AUTOCONFBINDIR=/arch/x86-linux/gnu-inst-autoconf/2.64/bin
 #    AUTOCONFPATH="eval env PATH=${AUTOCONFBINDIR}:\$PATH "
 #    ;;
 #esac
@@ -1541,7 +1541,7 @@ func_determine_path_separator
 
   # Determine the minimum supported autoconf version from the project's
   # configure.ac.
-  DEFAULT_AUTOCONF_MINVERSION="2.63"
+  DEFAULT_AUTOCONF_MINVERSION="2.64"
   autoconf_minversion=
   configure_ac=
   if case "$mode" in import | add-import | remove-import | update) true;; *) false;; esac \
@@ -1588,8 +1588,8 @@ func_determine_path_separator
     autoconf_minversion=$DEFAULT_AUTOCONF_MINVERSION
   fi
   case "$autoconf_minversion" in
-    1.* | 2.[0-5]* | 2.6[0-2]*)
-      func_fatal_error "minimum supported autoconf version is 2.63. Try adding AC_PREREQ([$DEFAULT_AUTOCONF_MINVERSION]) to your configure.ac." ;;
+    1.* | 2.[0-5]* | 2.6[0-3]*)
+      func_fatal_error "minimum supported autoconf version is 2.64. Try adding AC_PREREQ([$DEFAULT_AUTOCONF_MINVERSION]) to your configure.ac." ;;
   esac
 
   # Remove trailing slashes from the directory names. This is necessary for
@@ -3280,6 +3280,21 @@ func_determine_use_libtests ()
   done
 }
 
+# func_remove_if_blocks
+# removes if...endif blocks from an automake snippet.
+func_remove_if_blocks ()
+{
+  sed -n -e '/^if / {
+    :a
+      n
+      s/^endif//
+      tb
+      ba
+    :b
+  }
+  p'
+}
+
 # func_modules_add_dummy
 # Input:
 # - local_gnulib_path  from --local-dir
@@ -3299,8 +3314,9 @@ func_modules_add_dummy ()
         # contribute to lib_SOURCES.
         :
       else
-        # Extract the value of "lib_SOURCES += ...".
+        # Extract the value of unconditional "lib_SOURCES += ..." augmentations.
         for file in `func_get_automake_snippet "$module" | combine_lines |
+                     func_remove_if_blocks |
                      sed -n -e 's,^lib_SOURCES[	 ]*+=\([^#]*\).*$,\1,p'`; do
           # Ignore .h files since they are not compiled.
           case "$file" in
@@ -3634,7 +3650,6 @@ func_update_file ()
 # - uses_subdirs    nonempty if object files in subdirs exist
 func_emit_lib_Makefile_am ()
 {
-
   # When using GNU make, or when creating an includable Makefile.am snippet,
   # augment variables with += instead of assigning them.
   if $gnu_make || test -n "$makefile_name"; then
@@ -4028,7 +4043,7 @@ func_emit_tests_Makefile_am ()
       fi
       if test -n "$module"; then
         {
-          func_get_automake_snippet "$module" |
+          func_get_automake_snippet_conditional "$module" |
             LC_ALL=C \
             sed -e 's,lib_LIBRARIES,lib%_LIBRARIES,g' \
                 -e 's,lib_LTLIBRARIES,lib%_LTLIBRARIES,g' \
@@ -4042,9 +4057,13 @@ func_emit_tests_Makefile_am ()
             echo "libtests_a_LIBADD += @ALLOCA@"
             echo "libtests_a_DEPENDENCIES += @ALLOCA@"
           fi
-        } > "$tmp"/amsnippet
+        } | combine_lines "libtests_a_SOURCES" > "$tmp"/amsnippet1
+        {
+          func_get_automake_snippet_unconditional "$module" |
+            LC_ALL=C sed -e 's,lib_\([A-Z][A-Z]*\),libtests_a_\1,g'
+        } > "$tmp"/amsnippet2
         # Skip the contents if it's entirely empty.
-        if grep '[^	 ]' "$tmp"/amsnippet > /dev/null ; then
+        if grep '[^	 ]' "$tmp"/amsnippet1 "$tmp"/amsnippet2 > /dev/null ; then
           # Mention long-running tests at the end.
           ofd=3
           for word in `func_get_status "$module"`; do
@@ -4056,9 +4075,28 @@ func_emit_tests_Makefile_am ()
           { echo "## begin gnulib module $module"
             if $gnu_make; then
               echo "ifeq (,\$(OMIT_GNULIB_MODULE_$module))"
+              convert_to_gnu_make='s/^if \(.*\)/ifneq (,$(\1))/'
+            else
+              convert_to_gnu_make=
             fi
             echo
-            cat "$tmp"/amsnippet
+            if test "$cond_dependencies" = true; then
+              if func_cond_module_p "$module"; then
+                func_module_conditional_name "$module"
+                if $gnu_make; then
+                  echo "ifneq (,\$($conditional))"
+                else
+                  echo "if $conditional"
+                fi
+              fi
+            fi
+            sed "$convert_to_gnu_make" "$tmp"/amsnippet1
+            if test "$cond_dependencies" = true; then
+              if func_cond_module_p "$module"; then
+                echo "endif"
+              fi
+            fi
+            sed "$convert_to_gnu_make" "$tmp"/amsnippet2
             if $gnu_make; then
               echo "endif"
             fi
@@ -4066,7 +4104,7 @@ func_emit_tests_Makefile_am ()
             echo
           } >&$ofd
         fi
-        rm -f "$tmp"/amsnippet
+        rm -f "$tmp"/amsnippet1 "$tmp"/amsnippet2
         # Test whether there are some source files in subdirectories.
         for f in `func_get_filelist "$module"`; do
           case $f in
@@ -4170,11 +4208,12 @@ func_emit_tests_Makefile_am ()
     # It needs to be passed to the linker before ${libname}.${libext}, since
     # the tests-related modules depend on the main modules.
     # It also needs to be passed to the linker after ${libname}.${libext}
-    # because the latter might contain incomplete modules (such as the 'error'
-    # module whose dependency to 'progname' is voluntarily omitted).
+    # because the latter might contain incomplete modules (such as the
+    # 'version-etc' module whose dependency to 'version-etc-fsf' is voluntarily
+    # omitted).
     # The LIBTESTS_LIBDEPS can be passed to the linker once or twice, it does
     # not matter.
-    echo "LDADD = libtests.a ${testsbase_inverse}/${sourcebase-lib}/${libname}.${libext} libtests.a ${testsbase_inverse}/${sourcebase-lib}/${libname}.${libext} \$(LIBTESTS_LIBDEPS)"
+    echo "LDADD = libtests.a ${testsbase_inverse}/${sourcebase-lib}/${libname}.${libext} libtests.a ${testsbase_inverse}/${sourcebase-lib}/${libname}.${libext} libtests.a \$(LIBTESTS_LIBDEPS)"
   else
     echo "LDADD = ${testsbase_inverse}/${sourcebase-lib}/${libname}.${libext}"
   fi
@@ -6254,7 +6293,7 @@ func_create_testdir ()
   # Note:
   # If $single_configure, we use the module lists $main_modules and
   # $testsrelated_modules; $modules is merely a temporary variable.
-  # Whereas if ! $configure, the module list is $modules.
+  # Whereas if ! $single_configure, the module list is $modules.
 
   # Show banner notice of every module.
   if $single_configure; then

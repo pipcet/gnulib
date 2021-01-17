@@ -1,5 +1,5 @@
 /* Store a character in UTF-16 string.
-   Copyright (C) 2002, 2005-2006, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005-2006, 2009-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify it
@@ -28,7 +28,7 @@
 #if !HAVE_INLINE
 
 int
-u16_uctomb (uint16_t *s, ucs4_t uc, int n)
+u16_uctomb (uint16_t *s, ucs4_t uc, ptrdiff_t n)
 {
   if (uc < 0xd800)
     {

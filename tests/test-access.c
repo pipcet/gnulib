@@ -1,5 +1,5 @@
 /* Tests of access.
-   Copyright (C) 2019-2020 Free Software Foundation, Inc.
+   Copyright (C) 2019-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ main ()
   /* Remove anything from prior partial run.  */
   unlink (BASE "f");
   unlink (BASE "f1");
+  chmod (BASE "f2", 0600);
   unlink (BASE "f2");
 
   {
@@ -86,8 +87,9 @@ main ()
   }
 
   /* Cleanup.  */
-  unlink (BASE "f1");
-  unlink (BASE "f2");
+  ASSERT (unlink (BASE "f1") == 0);
+  ASSERT (chmod (BASE "f2", 0600) == 0);
+  ASSERT (unlink (BASE "f2") == 0);
 
   return 0;
 }

@@ -1,6 +1,6 @@
 /* Detect cycles in file tree walks.
 
-   Copyright (C) 2003-2006, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2003-2006, 2009-2021 Free Software Foundation, Inc.
 
    Written by Jim Meyering.
 
@@ -131,7 +131,7 @@ leave_dir (FTS *fts, FTSENT *ent)
       void *found;
       obj.dev = st->st_dev;
       obj.ino = st->st_ino;
-      found = hash_delete (fts->fts_cycle.ht, &obj);
+      found = hash_remove (fts->fts_cycle.ht, &obj);
       if (!found)
         abort ();
       free (found);

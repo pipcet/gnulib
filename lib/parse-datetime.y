@@ -1,7 +1,7 @@
 %{
 /* Parse a string into an internal timestamp.
 
-   Copyright (C) 1999-2000, 2002-2020 Free Software Foundation, Inc.
+   Copyright (C) 1999-2000, 2002-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
    Modified by Paul Eggert <eggert@twinsun.com> in 1999 to do the
    right thing about local DST.  Also modified by Paul Eggert
    <eggert@cs.ucla.edu> in 2004 to support nanosecond-resolution
-   timestamps, in 2004 to support TZ strings in dates, and in 2017 to
+   timestamps, in 2004 to support TZ strings in dates, and in 2017 and 2020 to
    check for integer overflow and to support longer-than-'long'
    'time_t' and 'tv_nsec'.  */
 
@@ -35,6 +35,7 @@
 
 #include "parse-datetime.h"
 
+#include "idx.h"
 #include "intprops.h"
 #include "timespec.h"
 #include "verify.h"
@@ -63,7 +64,6 @@
 
 #include <inttypes.h>
 #include <c-ctype.h>
-#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,7 +140,7 @@ typedef struct
 {
   bool negative;
   intmax_t value;
-  ptrdiff_t digits;
+  idx_t digits;
 } textint;
 
 /* An entry in the lexical lookup table.  */
@@ -213,12 +213,12 @@ typedef struct
   /* Presence or counts of nonterminals of various flavors parsed so far.  */
   bool timespec_seen;
   bool rels_seen;
-  ptrdiff_t dates_seen;
-  ptrdiff_t days_seen;
-  ptrdiff_t local_zones_seen;
-  ptrdiff_t dsts_seen;
-  ptrdiff_t times_seen;
-  ptrdiff_t zones_seen;
+  idx_t dates_seen;
+  idx_t days_seen;
+  idx_t local_zones_seen;
+  idx_t dsts_seen;
+  idx_t times_seen;
+  idx_t zones_seen;
   bool year_seen;
 
   /* Print debugging output to stderr.  */
@@ -1335,7 +1335,7 @@ lookup_word (parser_control const *pc, char *word)
 {
   char *p;
   char *q;
-  ptrdiff_t wordlen;
+  idx_t wordlen;
   table const *tp;
   bool period_found;
   bool abbrev;
@@ -1410,13 +1410,12 @@ yylex (union YYSTYPE *lvalp, parser_control *pc)
 
       if (c_isdigit (c) || c == '-' || c == '+')
         {
-          char const *p;
+          char const *p = pc->input;
           int sign;
-          intmax_t value = 0;
           if (c == '-' || c == '+')
             {
               sign = c == '-' ? -1 : 1;
-              while (c = *++pc->input, c_isspace (c))
+              while (c = *(pc->input = ++p), c_isspace (c))
                 continue;
               if (! c_isdigit (c))
                 /* skip the '-' sign */
@@ -1424,8 +1423,8 @@ yylex (union YYSTYPE *lvalp, parser_control *pc)
             }
           else
             sign = 0;
-          p = pc->input;
 
+          time_t value = 0;
           do
             {
               if (INT_MULTIPLY_WRAPV (value, 10, &value))
@@ -1438,17 +1437,12 @@ yylex (union YYSTYPE *lvalp, parser_control *pc)
 
           if ((c == '.' || c == ',') && c_isdigit (p[1]))
             {
-              time_t s;
-              int ns;
+              time_t s = value;
               int digits;
-
-              if (time_overflow (value))
-                return '?';
-              s = value;
 
               /* Accumulate fraction, to ns precision.  */
               p++;
-              ns = *p++ - '0';
+              int ns = *p++ - '0';
               for (digits = 2; digits <= LOG10_BILLION; digits++)
                 {
                   ns *= 10;
@@ -1472,9 +1466,8 @@ yylex (union YYSTYPE *lvalp, parser_control *pc)
                  negative.  */
               if (sign < 0 && ns)
                 {
-                  if (s == TYPE_MINIMUM (time_t))
+                  if (INT_SUBTRACT_WRAPV (s, 1, &s))
                     return '?';
-                  s--;
                   ns = BILLION - ns;
                 }
 
@@ -1522,7 +1515,7 @@ yylex (union YYSTYPE *lvalp, parser_control *pc)
       if (c != '(')
         return to_uchar (*pc->input++);
 
-      ptrdiff_t count = 0;
+      idx_t count = 0;
       do
         {
           c = *pc->input++;
@@ -1758,7 +1751,7 @@ parse_datetime2 (struct timespec *result, char const *p,
   if (strncmp (p, "TZ=\"", 4) == 0)
     {
       char const *tzbase = p + 4;
-      ptrdiff_t tzsize = 1;
+      idx_t tzsize = 1;
       char const *s;
 
       for (s = tzbase; *s; s++, tzsize++)
@@ -1857,11 +1850,9 @@ parse_datetime2 (struct timespec *result, char const *p,
     int quarter;
     for (quarter = 1; quarter <= 3; quarter++)
       {
-        intmax_t iprobe;
-        if (INT_ADD_WRAPV (Start, quarter * (90 * 24 * 60 * 60), &iprobe)
-            || time_overflow (iprobe))
+        time_t probe;
+        if (INT_ADD_WRAPV (Start, quarter * (90 * 24 * 60 * 60), &probe))
           break;
-        time_t probe = iprobe;
         struct tm probe_tm;
         if (localtime_rz (tz, &probe, &probe_tm) && probe_tm.tm_zone
             && probe_tm.tm_isdst != pc.local_time_zone_table[0].value)
@@ -2237,7 +2228,6 @@ parse_datetime2 (struct timespec *result, char const *p,
          so this block must follow others that clobber Start.  */
       if (pc.zones_seen)
         {
-          intmax_t delta = pc.time_zone, t1;
           bool overflow = false;
 #ifdef HAVE_TM_GMTOFF
           long int utcoff = tm.tm_gmtoff;
@@ -2248,9 +2238,11 @@ parse_datetime2 (struct timespec *result, char const *p,
                         ? tm_diff (&tm, &gmt)
                         : (overflow = true, 0));
 #endif
-          overflow |= INT_SUBTRACT_WRAPV (delta, utcoff, &delta);
+          intmax_t delta;
+          overflow |= INT_SUBTRACT_WRAPV (pc.time_zone, utcoff, &delta);
+          time_t t1;
           overflow |= INT_SUBTRACT_WRAPV (Start, delta, &t1);
-          if (overflow || time_overflow (t1))
+          if (overflow)
             {
               if (pc.parse_datetime_debug)
                 dbg_printf (_("error: timezone %d caused time_t overflow\n"),
@@ -2281,14 +2273,14 @@ parse_datetime2 (struct timespec *result, char const *p,
         intmax_t sum_ns = orig_ns + pc.rel.ns;
         int normalized_ns = (sum_ns % BILLION + BILLION) % BILLION;
         int d4 = (sum_ns - normalized_ns) / BILLION;
-        intmax_t d1, t1, d2, t2, t3, t4;
+        intmax_t d1, t1, d2, t2, t3;
+        time_t t4;
         if (INT_MULTIPLY_WRAPV (pc.rel.hour, 60 * 60, &d1)
             || INT_ADD_WRAPV (Start, d1, &t1)
             || INT_MULTIPLY_WRAPV (pc.rel.minutes, 60, &d2)
             || INT_ADD_WRAPV (t1, d2, &t2)
             || INT_ADD_WRAPV (t2, pc.rel.seconds, &t3)
-            || INT_ADD_WRAPV (t3, d4, &t4)
-            || time_overflow (t4))
+            || INT_ADD_WRAPV (t3, d4, &t4))
           {
             if (pc.parse_datetime_debug)
               dbg_printf (_("error: adding relative time caused an "
@@ -2307,7 +2299,8 @@ parse_datetime2 (struct timespec *result, char const *p,
                           "%+"PRIdMAX" seconds, %+d ns),\n"),
                         pc.rel.hour, pc.rel.minutes, pc.rel.seconds,
                         pc.rel.ns);
-            dbg_printf (_("    new time = %"PRIdMAX" epoch-seconds\n"), t4);
+            intmax_t t4i = t4;
+            dbg_printf (_("    new time = %"PRIdMAX" epoch-seconds\n"), t4i);
 
             /* Warn about crossing DST due to time adjustment.
                Example: https://bugs.gnu.org/8357

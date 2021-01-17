@@ -1,6 +1,6 @@
 /* mgetgroups.c -- return a list of the groups a user or current process is in
 
-   Copyright (C) 2007-2020 Free Software Foundation, Inc.
+   Copyright (C) 2007-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 
 /* Work around an incompatibility of OS X 10.11: getgrouplist
    accepts int *, not gid_t *, and int and gid_t differ in sign.  */
-#if 4 < __GNUC__ + (3 <= __GNUC_MINOR__)
+#if 4 < __GNUC__ + (3 <= __GNUC_MINOR__) || defined __clang__
 # pragma GCC diagnostic ignored "-Wpointer-sign"
 #endif
 

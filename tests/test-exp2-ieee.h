@@ -1,5 +1,5 @@
 /* Test of exp2*() function family.
-   Copyright (C) 2012-2020 Free Software Foundation, Inc.
+   Copyright (C) 2012-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ test_function (void)
 
   /* Underflow.  */
   {
-    DOUBLE z = EXP2 (-100000.0);
+    volatile DOUBLE z = EXP2 (-100000.0);
     ASSERT (z == L_(0.0));
     ASSERT (!signbit (z));
   }

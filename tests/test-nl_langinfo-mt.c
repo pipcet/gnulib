@@ -1,5 +1,5 @@
 /* Multithread-safety test for nl_langinfo().
-   Copyright (C) 2019-2020 Free Software Foundation, Inc.
+   Copyright (C) 2019-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,6 +17,11 @@
 /* Written by Bruno Haible <bruno@clisp.org>, 2019.  */
 
 #include <config.h>
+
+/* Work around GCC bug 44511.  */
+#if 4 < __GNUC__ + (3 <= __GNUC_MINOR__)
+# pragma GCC diagnostic ignored "-Wreturn-type"
+#endif
 
 #if USE_ISOC_THREADS || USE_POSIX_THREADS || USE_ISOC_AND_POSIX_THREADS || USE_WINDOWS_THREADS
 
@@ -72,7 +77,6 @@ thread1_func (void *arg)
     }
 
   /*NOTREACHED*/
-  return NULL;
 }
 
 static char *expected2;
@@ -91,7 +95,6 @@ thread2_func (void *arg)
     }
 
   /*NOTREACHED*/
-  return NULL;
 }
 
 static char *expected3;
@@ -110,7 +113,6 @@ thread3_func (void *arg)
     }
 
   /*NOTREACHED*/
-  return NULL;
 }
 
 static char *expected4;
@@ -129,7 +131,6 @@ thread4_func (void *arg)
     }
 
   /*NOTREACHED*/
-  return NULL;
 }
 
 static char *expected5;
@@ -148,7 +149,6 @@ thread5_func (void *arg)
     }
 
   /*NOTREACHED*/
-  return NULL;
 }
 
 static char *expected6;
@@ -167,7 +167,6 @@ thread6_func (void *arg)
     }
 
   /*NOTREACHED*/
-  return NULL;
 }
 
 static void *
@@ -188,7 +187,6 @@ threadN_func (void *arg)
     }
 
   /*NOTREACHED*/
-  return NULL;
 }
 
 int

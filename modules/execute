@@ -4,21 +4,24 @@ Creation of autonomous subprocesses.
 Files:
 lib/execute.h
 lib/execute.c
-lib/w32spawn.h
 m4/execute.m4
 
 Depends-on:
-cloexec
 dup2
+canonicalize
+environ
 error
 fatal-signal
-wait-process
-gettext-h
+filename
+findprog-in
 msvc-nothrow
+gettext-h
 spawn
+posix_spawn
 posix_spawnp
 posix_spawn_file_actions_init
 posix_spawn_file_actions_addopen
+posix_spawn_file_actions_addchdir
 posix_spawn_file_actions_destroy
 posix_spawnattr_init
 posix_spawnattr_setsigmask
@@ -26,18 +29,23 @@ posix_spawnattr_setflags
 posix_spawnattr_destroy
 stdbool
 stdlib
-strpbrk
+sys_wait
 unistd
-environ
+wait-process
+windows-spawn
+xalloc-die
 
 configure.ac:
 gl_EXECUTE
 
 Makefile.am:
-lib_SOURCES += execute.h execute.c w32spawn.h
+lib_SOURCES += execute.h execute.c
 
 Include:
 "execute.h"
+
+Link:
+$(LIBTHREAD)
 
 License:
 GPL

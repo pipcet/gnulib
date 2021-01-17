@@ -1,5 +1,5 @@
 /* Filtering of data through a subprocess.
-   Copyright (C) 2001-2003, 2008-2020 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2008-2021 Free Software Foundation, Inc.
    Written by Paolo Bonzini <bonzini@gnu.org>, 2009,
    and Bruno Haible <bruno@clisp.org>, 2009.
 
@@ -28,6 +28,7 @@
 #include <unistd.h>
 #if defined _WIN32 && ! defined __CYGWIN__
 # include <windows.h>
+# include <process.h> /* _beginthreadex, _endthreadex */
 #else
 # include <signal.h>
 # include <sys/select.h>
@@ -484,7 +485,7 @@ filter_retcode (struct pipe_filter_gi *filter)
 
 struct pipe_filter_gi *
 pipe_filter_gi_create (const char *progname,
-                       const char *prog_path, const char **prog_argv,
+                       const char *prog_path, const char * const *prog_argv,
                        bool null_stderr, bool exit_on_error,
                        prepare_read_fn prepare_read,
                        done_read_fn done_read,
@@ -496,8 +497,8 @@ pipe_filter_gi_create (const char *progname,
     (struct pipe_filter_gi *) xmalloc (sizeof (struct pipe_filter_gi));
 
   /* Open a bidirectional pipe to a subprocess.  */
-  filter->child = create_pipe_bidi (progname, prog_path, (char **) prog_argv,
-                                    null_stderr, true, exit_on_error,
+  filter->child = create_pipe_bidi (progname, prog_path, prog_argv,
+                                    NULL, null_stderr, true, exit_on_error,
                                     filter->fd);
   filter->progname = progname;
   filter->null_stderr = null_stderr;
