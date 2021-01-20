@@ -1,7 +1,7 @@
 # Variables for srclist-update and srclist.txt.
 # Will likely change for each user.
 
-# Copyright 2002-2020 Free Software Foundation, Inc.
+# Copyright 2002-2021 Free Software Foundation, Inc.
 
 # This file is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -27,12 +27,13 @@ esac
 # Default to sibling (of parent) directories.
 : ${AUTOCONF=../autoconf}
 : ${AUTOMAKE=../automake}
+: ${GMP=../gmp} # https://gmplib.org/devel/repo-usage -> hg pull -u
 : ${GNUCONFIG=../config}
 : ${GNULIBSRC=../gnulib}
 : ${GNUORG=../gnuorg}
 : ${GNUSTANDARDS=../gnustandards}
 : ${GNUWWWLICENSES=../www/www/licenses}
 : ${LIBCSRC=../libc}
-: ${LIBGCRYPT=../libgcrypt}
+: ${LIBGCRYPT=../libgcrypt} # https://dev.gnupg.org/source/libgcrypt.git
 : ${LIBTOOL=../libtool}
 : ${TEXINFOTEX=../../ftp.gnu.org/gnu/texinfo}

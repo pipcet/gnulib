@@ -13,7 +13,9 @@ lib/xalloc.h
 m4/xvasprintf.m4
 
 Depends-on:
+stdio
 vasprintf
+xalloc
 xalloc-die
 xsize
 stdarg

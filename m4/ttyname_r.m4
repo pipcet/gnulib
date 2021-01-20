@@ -1,5 +1,5 @@
-# ttyname_r.m4 serial 10
-dnl Copyright (C) 2010-2020 Free Software Foundation, Inc.
+# ttyname_r.m4 serial 11
+dnl Copyright (C) 2010-2021 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -57,6 +57,7 @@ AC_DEFUN([gl_FUNC_TTYNAME_R],
                [AC_LANG_SOURCE([[
 #include <errno.h>
 #include <unistd.h>
+]GL_MDA_DEFINES[
 int
 main (void)
 {
@@ -96,6 +97,7 @@ changequote([,])dnl
               [AC_LANG_SOURCE([[
 #include <fcntl.h>
 #include <unistd.h>
+]GL_MDA_DEFINES[
 int
 main (void)
 {

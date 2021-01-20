@@ -1,5 +1,5 @@
 /* Schedule other threads to run.
-   Copyright (C) 2019-2020 Free Software Foundation, Inc.
+   Copyright (C) 2019-2021 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,19 @@ int
 sched_yield (void)
 {
   Sleep (0);
+  return 0;
+}
+
+#elif defined __KLIBC__
+/* OS/2 kLIBC implementation */
+
+# define INCL_DOS
+# include <os2.h>
+
+int
+sched_yield (void)
+{
+  DosSleep (0);
   return 0;
 }
 

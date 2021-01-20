@@ -19,6 +19,7 @@ stdint
 stdlib
 sys_select
 unistd
+xalloc
 
 configure.ac:
 AC_CHECK_FUNCS_ONCE([select])
@@ -28,6 +29,9 @@ lib_SOURCES += pipe-filter-gi.c pipe-filter-aux.c
 
 Include:
 "pipe-filter.h"
+
+Link:
+$(LIBTHREAD)
 
 License:
 GPL

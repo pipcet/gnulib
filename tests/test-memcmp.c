@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2020 Free Software Foundation, Inc.
+ * Copyright (C) 2008-2021 Free Software Foundation, Inc.
  * Written by Simon Josefsson
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,10 @@ main (void)
   int (* volatile memcmp_ptr) (const void *, const void *, size_t) = memcmp;
 
   /* Test equal / not equal distinction.  */
-  ASSERT (memcmp (zerosize_ptr (), zerosize_ptr (), 0) == 0);
+  void *page_boundary1 = zerosize_ptr ();
+  void *page_boundary2 = zerosize_ptr ();
+  if (page_boundary1 && page_boundary2)
+    ASSERT (memcmp (page_boundary1, page_boundary2, 0) == 0);
   ASSERT (memcmp ("foo", "foobar", 2) == 0);
   ASSERT (memcmp ("foo", "foobar", 3) == 0);
   ASSERT (memcmp ("foo", "foobar", 4) != 0);

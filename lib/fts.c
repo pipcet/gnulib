@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004-2020 Free Software Foundation, Inc.
+   Copyright (C) 2004-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -200,11 +200,11 @@ enum Fts_stat
     while (false)
 #endif
 
-#ifndef FALLTHROUGH
-# if __GNUC__ < 7
-#  define FALLTHROUGH ((void) 0)
-# else
+#ifdef _LIBC
+# if __GNUC__ >= 7
 #  define FALLTHROUGH __attribute__ ((__fallthrough__))
+# else
+#  define FALLTHROUGH ((void) 0)
 # endif
 #endif
 
@@ -1190,8 +1190,7 @@ fts_children (register FTS *sp, int instr)
 static int
 fts_compare_ino (struct _ftsent const **a, struct _ftsent const **b)
 {
-  return (a[0]->fts_statp->st_ino < b[0]->fts_statp->st_ino ? -1
-          : b[0]->fts_statp->st_ino < a[0]->fts_statp->st_ino ? 1 : 0);
+  return _GL_CMP (a[0]->fts_statp->st_ino, b[0]->fts_statp->st_ino);
 }
 
 /* Map the dirent.d_type value, DTYPE, to the corresponding stat.st_mode

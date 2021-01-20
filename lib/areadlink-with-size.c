@@ -1,7 +1,7 @@
 /* readlink wrapper to return the link name in malloc'd storage.
    Unlike xreadlink and xreadlink_with_size, don't ever call exit.
 
-   Copyright (C) 2001, 2003-2007, 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003-2007, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -79,15 +79,16 @@ areadlink_with_size (char const *file, size_t size)
         {
           buf = buffer = malloc (buf_size);
           if (!buffer)
-            return NULL;
+            {
+              errno = ENOMEM;
+              return NULL;
+            }
         }
 
       r = readlink (file, buf, buf_size);
       link_length = r;
 
-      /* On AIX 5L v5.3 and HP-UX 11i v2 04/09, readlink returns -1
-         with errno == ERANGE if the buffer is too small.  */
-      if (r < 0 && errno != ERANGE)
+      if (r < 0)
         {
           int saved_errno = errno;
           free (buffer);

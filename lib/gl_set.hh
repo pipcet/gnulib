@@ -1,5 +1,5 @@
 /* Abstract set data type as a C++ class.
-   Copyright (C) 2006-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2018.
 
    This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,8 @@
 
 #include "gl_set.h"
 #include "gl_xset.h"
+
+#include <stdlib.h>     /* because Gnulib's <stdlib.h> may '#define free ...' */
 
 /* gl_Set is a C++ wrapper around the gl_set data type.
    Its element type is 'ELTYPE *'.

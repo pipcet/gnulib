@@ -1,5 +1,12 @@
 Files:
-tests/test-posix_spawn3.c
+tests/test-posix_spawn-open1.c
+tests/test-posix_spawn-open2.c
+tests/test-posix_spawn-inherit0.c
+tests/test-posix_spawn-inherit1.c
+tests/test-posix_spawn-script.c
+tests/executable-script
+tests/executable-script.sh
+tests/executable-shell-script
 tests/signature.h
 
 Depends-on:
@@ -10,19 +17,23 @@ stdbool
 unistd
 sys_wait
 environ
+fflush
+freopen
+waitpid
 
 configure.ac:
-AC_EGREP_CPP([notposix], [[
-#if defined _MSC_VER || defined __MINGW32__
-  notposix
-#endif
-  ]],
-  [posix_spawn_ported=no],
-  [posix_spawn_ported=yes])
-AM_CONDITIONAL([POSIX_SPAWN_PORTED], [test $posix_spawn_ported = yes])
 
 Makefile.am:
-if POSIX_SPAWN_PORTED
-TESTS += test-posix_spawn3
-check_PROGRAMS += test-posix_spawn3
-endif
+TESTS += \
+  test-posix_spawn-open1 \
+  test-posix_spawn-open2 \
+  test-posix_spawn-inherit0 \
+  test-posix_spawn-inherit1 \
+  test-posix_spawn-script
+check_PROGRAMS += \
+  test-posix_spawn-open1 \
+  test-posix_spawn-open2 \
+  test-posix_spawn-inherit0 \
+  test-posix_spawn-inherit1 \
+  test-posix_spawn-script
+test_posix_spawn_script_CPPFLAGS = $(AM_CPPFLAGS) -DSRCDIR=\"$(srcdir)/\"

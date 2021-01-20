@@ -1,5 +1,5 @@
 /* Test of <unistd.h> substitute in C++ mode.
-   Copyright (C) 2010-2020 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,6 +50,41 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::dup2, int, (int, int));
 
 #if GNULIB_TEST_DUP3
 SIGNATURE_CHECK (GNULIB_NAMESPACE::dup3, int, (int, int, int));
+#endif
+
+#if GNULIB_TEST_EXECL
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execl, int,
+                 (const char *, const char *, ...));
+#endif
+
+#if GNULIB_TEST_EXECLE
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execle, int,
+                 (const char *, const char *, ...));
+#endif
+
+#if GNULIB_TEST_EXECLP
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execlp, int,
+                 (const char *, const char *, ...));
+#endif
+
+#if GNULIB_TEST_EXECV
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execv, int,
+                 (const char *, char * const *));
+#endif
+
+#if GNULIB_TEST_EXECVE
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execve, int,
+                 (const char *, char * const *, char * const *));
+#endif
+
+#if GNULIB_TEST_EXECVP
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execvp, int,
+                 (const char *, char * const *));
+#endif
+
+#if GNULIB_TEST_EXECVPE
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execvpe, int,
+                 (const char *, char * const *, char * const *));
 #endif
 
 #if GNULIB_TEST_EUIDACCESS

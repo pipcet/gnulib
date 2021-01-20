@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a binary tree.
-   Copyright (C) 2006, 2008-2020 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2008-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -61,7 +61,6 @@ check_invariants (gl_list_node_t node, gl_list_node_t parent)
 
   return 1 + (left_height > right_height ? left_height : right_height);
 }
-
 void
 gl_avltree_list_check_invariants (gl_list_t list)
 {

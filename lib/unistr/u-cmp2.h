@@ -1,5 +1,5 @@
 /* Compare pieces of UTF-8/UTF-16/UTF-32 strings.
-   Copyright (C) 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -21,12 +21,7 @@ FUNC (const UNIT *s1, size_t n1, const UNIT *s2, size_t n2)
   int cmp = U_CMP (s1, s2, MIN (n1, n2));
 
   if (cmp == 0)
-    {
-      if (n1 < n2)
-        cmp = -1;
-      else if (n1 > n2)
-        cmp = 1;
-    }
+    cmp = _GL_CMP (n1, n2);
 
   return cmp;
 }

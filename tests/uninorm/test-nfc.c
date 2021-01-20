@@ -1,5 +1,5 @@
 /* Test of canonical normalization of Unicode strings.
-   Copyright (C) 2009-2020 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 #include "uninorm.h"
 
-#if !(WOE32DLL || defined __ANDROID__)
+#if !(((defined _WIN32 || defined __CYGWIN__) && (HAVE_LIBUNISTRING || WOE32DLL)) || defined __ANDROID__)
 /* Check that UNINORM_NFC is defined and links.  */
 uninorm_t n = UNINORM_NFC;
 #endif

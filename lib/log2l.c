@@ -1,5 +1,5 @@
 /* Base 2 logarithm.
-   Copyright (C) 2011-2020 Free Software Foundation, Inc.
+   Copyright (C) 2011-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ log2l (long double x)
       else
         {
           /* Return NaN.  */
-#if defined _MSC_VER || (defined __sgi && !defined __GNUC__)
+#if (defined _MSC_VER && !defined __clang__) || (defined __sgi && !defined __GNUC__)
           static long double zero;
           return zero / zero;
 #else

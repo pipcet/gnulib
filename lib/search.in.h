@@ -1,6 +1,6 @@
 /* A GNU-like <search.h>.
 
-   Copyright (C) 2007-2020 Free Software Foundation, Inc.
+   Copyright (C) 2007-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,6 +36,51 @@
 /* The definition of _GL_ARG_NONNULL is copied here.  */
 
 /* The definition of _GL_WARN_ON_USE is copied here.  */
+
+
+#if @GNULIB_MDA_LFIND@
+/* On native Windows, map 'lfind' to '_lfind', so that -loldnames is not
+   required.  In C++ with GNULIB_NAMESPACE, avoid differences between
+   platforms by defining GNULIB_NAMESPACE::lfind always.  */
+# if defined _WIN32 && !defined __CYGWIN__
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef lfind
+#   define lfind _lfind
+#  endif
+_GL_CXXALIAS_MDA (lfind, void *,
+                  (const void *key, const void *base, unsigned int *nmemb,
+                   unsigned int size,
+                   int (*compar) (const void *, const void *)));
+# else
+_GL_CXXALIAS_SYS (lfind, void *,
+                  (const void *key, const void *base, size_t *nmemb,
+                   size_t size,
+                   int (*compar) (const void *, const void *)));
+# endif
+_GL_CXXALIASWARN (lfind);
+#endif
+
+#if @GNULIB_MDA_LSEARCH@
+/* On native Windows, map 'lsearch' to '_lsearch', so that -loldnames is not
+   required.  In C++ with GNULIB_NAMESPACE, avoid differences between
+   platforms by defining GNULIB_NAMESPACE::lsearch always.  */
+# if defined _WIN32 && !defined __CYGWIN__
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef lsearch
+#   define lsearch _lsearch
+#  endif
+_GL_CXXALIAS_MDA (lsearch, void *,
+                  (const void *key, void *base, unsigned int *nmemb,
+                   unsigned int size,
+                   int (*compar) (const void *, const void *)));
+# else
+_GL_CXXALIAS_SYS (lsearch, void *,
+                  (const void *key, void *base, size_t *nmemb,
+                   size_t size,
+                   int (*compar) (const void *, const void *)));
+# endif
+_GL_CXXALIASWARN (lsearch);
+#endif
 
 
 #if @GNULIB_TSEARCH@

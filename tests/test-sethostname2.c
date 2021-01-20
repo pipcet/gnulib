@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2020 Free Software Foundation, Inc.
+ * Copyright (C) 2011-2021 Free Software Foundation, Inc.
  * Written by Ben Walton.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -76,7 +76,9 @@ main (int argc, char *argv[] _GL_UNUSED)
                    "Skipping test: sethostname is not really implemented.\n");
           return 77;
         }
-      else if (rcs == -1 && errno == EPERM)
+      else if (rcs == -1
+               && (errno == EPERM
+                   || errno == EACCES)) /* Cygwin */
         {
           fprintf (stderr, "Skipping test: insufficient permissions.\n");
           return 77;

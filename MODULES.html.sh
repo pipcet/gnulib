@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2002-2020 Free Software Foundation, Inc.
+# Copyright (C) 2002-2021 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1700,7 +1700,7 @@ func_all_modules ()
   func_begin_table
   func_module calloc-gnu
   func_module eealloc
-  func_module free
+  func_module free-posix
   func_module malloc-gnu
   func_module realloc-gnu
   func_module reallocarray
@@ -1727,7 +1727,6 @@ func_all_modules ()
 
   func_begin_table
   func_module fprintftime
-  func_module localtime-buffer
   func_module nstrftime
   func_module strftime-fixes
   func_module time_rz
@@ -2032,6 +2031,7 @@ func_all_modules ()
   func_module readline
   func_module readtokens
   func_module readtokens0
+  func_module stack
   func_module strverscmp
   func_module filevercmp
   func_end_table
@@ -2319,6 +2319,8 @@ func_all_modules ()
   func_echo "$element"
 
   func_begin_table
+  func_module c-dtoastr
+  func_module c-ldtoastr
   func_module dtoastr
   func_module ftoastr
   func_module intprops
@@ -2368,6 +2370,15 @@ func_all_modules ()
   func_module builtin-expect
   func_module ieee754-h
   func_module limits-h
+  func_end_table
+
+  element="Support for GNU multiple precision arithmetic"
+  func_section_wrap gmp
+  func_wrap H2
+  func_echo "$element"
+
+  func_begin_table
+  func_module libgmp
   func_end_table
 
   element="Support for sharing code with the GNU C Library"

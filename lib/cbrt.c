@@ -1,5 +1,5 @@
 /* Compute cubic root of double value.
-   Copyright (C) 1997, 2012-2020 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2012-2021 Free Software Foundation, Inc.
 
    Contributed by Dirk Alboth <dirka@uni-paderborn.de> and
    Ulrich Drepper <drepper@cygnus.com>, 1997.
@@ -24,7 +24,7 @@
 
 /* MSVC with option -fp:strict refuses to compile constant initializers that
    contain floating-point operations.  Pacify this compiler.  */
-#ifdef _MSC_VER
+#if defined _MSC_VER && !defined __clang__
 # pragma fenv_access (off)
 #endif
 

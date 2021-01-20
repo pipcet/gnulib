@@ -1,5 +1,5 @@
 /* Compare two memory areas with possibly different lengths, case-insensitive.
-   Copyright (C) 1998-1999, 2005-2020 Free Software Foundation, Inc.
+   Copyright (C) 1998-1999, 2005-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009,
    based on earlier glibc code.
 
@@ -33,7 +33,7 @@ int
 mbmemcasecmp (const char *s1, size_t n1, const char *s2, size_t n2)
 {
   if (s1 == s2)
-    return (n1 < n2 ? -1 : n1 > n2 ? 1 : 0);
+    return _GL_CMP (n1, n2);
 
   if (MB_CUR_MAX > 1)
     {
@@ -80,7 +80,7 @@ mbmemcasecmp (const char *s1, size_t n1, const char *s2, size_t n2)
                 /* On machines where 'char' and 'int' are types of the same
                    size, the difference of two 'unsigned char' values
                    - including the sign bit - doesn't fit in an 'int'.  */
-                return (c1 > c2 ? 1 : c1 < c2 ? -1 : 0);
+                return _GL_CMP (c1, c2);
             }
           ++p1;
           ++p2;

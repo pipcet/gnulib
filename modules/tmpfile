@@ -26,6 +26,10 @@ Makefile.am:
 Include:
 <stdio.h>
 
+Link:
+$(LIB_GETRANDOM)
+$(LIB_CLOCK_GETTIME)
+
 License:
 LGPL
 

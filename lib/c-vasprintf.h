@@ -1,5 +1,5 @@
 /* vasprintf and asprintf, in C locale.
-   Copyright (C) 2002-2004, 2006-2020 Free Software Foundation, Inc.
+   Copyright (C) 2002-2004, 2006-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 /* Get va_list.  */
 #include <stdarg.h>
 
+/* Get _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD.  */
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,9 +31,9 @@ extern "C" {
    is, the decimal point used in floating-point formatting directives is always
    '.'. */
 int c_asprintf (char **resultp, const char *format, ...)
-       _GL_ATTRIBUTE_FORMAT ((__printf__, 2, 3));
+       _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 2, 3));
 int c_vasprintf (char **resultp, const char *format, va_list args)
-       _GL_ATTRIBUTE_FORMAT ((__printf__, 2, 0));
+       _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 2, 0));
 
 #ifdef __cplusplus
 }

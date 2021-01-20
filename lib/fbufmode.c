@@ -1,5 +1,5 @@
 /* Retrieve information about a FILE stream.
-   Copyright (C) 2007-2020 Free Software Foundation, Inc.
+   Copyright (C) 2007-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
 #include "fbufmode.h"
 
 #if HAVE___FLBF
-# include <stdio_ext.h>
+# if HAVE_STDIO_EXT_H
+#  include <stdio_ext.h>
+# endif
 #endif
 
 #include "stdio-impl.h"
@@ -54,7 +56,7 @@ fbufmode (FILE *fp)
   return fp->_flags & (_IOLBF | _IONBF | _IOFBF);
 #elif defined __minix               /* Minix */
   return fp->_flags & (_IOLBF | _IONBF | _IOFBF);
-#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel, OpenVMS */
+#elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, UnixWare, mingw, MSVC, NonStop Kernel, OpenVMS */
 # if defined WINDOWS_OPAQUE_FILE
   if (fp_->_flag & 0x100)
     return _IOFBF; /* Impossible to distinguish _IOFBF and _IOLBF.  */

@@ -1,6 +1,6 @@
 /* Implement lchmod on platforms where it does not work correctly.
 
-   Copyright 2020 Free Software Foundation, Inc.
+   Copyright 2020-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ lchmod (char const *file, mode_t mode)
       return -1;
     }
 
-# if defined __linux__ || defined __ANDROID__
+# if defined __linux__ || defined __ANDROID__ || defined __CYGWIN__
   static char const fmt[] = "/proc/self/fd/%d";
   char buf[sizeof fmt - sizeof "%d" + INT_BUFSIZE_BOUND (int)];
   sprintf (buf, fmt, fd);

@@ -1,5 +1,5 @@
-# ansi-c++.m4 serial 11
-dnl Copyright (C) 2002-2003, 2005, 2010-2020 Free Software Foundation, Inc.
+# ansi-c++.m4 serial 12
+dnl Copyright (C) 2002-2003, 2005, 2010-2021 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -145,4 +145,8 @@ EOF
 AC_DEFUN([gl_ANSI_CXX],
 [
   gl_PROG_ANSI_CXX([CXX], [ANSICXX])
+  dnl This line is needed in order to avoid trouble with Autoconf.  It makes
+  dnl sure that Autoconf does not insert expansions of AC_PROG_CXX at random
+  dnl places.  See <https://savannah.gnu.org/support/?110294>.
+  m4_provide([AC_PROG_CXX])
 ])
