@@ -2,13 +2,12 @@ Description:
 Generic crypto random number functions.
 
 Files:
-m4/gc-random.m4
 
 Depends-on:
 crypto/gc
+getrandom [test "$ac_cv_libgcrypt" != yes]
 
 configure.ac:
-gl_GC_RANDOM
 gl_MODULE_INDICATOR([gc-random])
 
 Makefile.am:
@@ -17,7 +16,7 @@ Include:
 "gc.h"
 
 Link:
-$(LIB_GC_RANDOM)
+$(LIB_GETRANDOM)
 
 License:
 LGPLv2+
