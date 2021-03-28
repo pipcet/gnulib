@@ -9,8 +9,10 @@ m4/mountlist.m4
 
 Depends-on:
 fopen-gnu
+free-posix
 getline
 open
+unlocked-io-internal
 stdbool
 stdint
 strstr-simple

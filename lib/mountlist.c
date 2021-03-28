@@ -149,9 +149,8 @@
 # define MNT_IGNORE(M) 0
 #endif
 
-#if USE_UNLOCKED_IO
-# include "unlocked-io.h"
-#endif
+/* Each of the FILE streams in this file is only used in a single thread.  */
+#include "unlocked-io.h"
 
 /* The results of opendir() in this file are not used with dirfd and fchdir,
    therefore save some unnecessary work in fchdir.c.  */
@@ -991,9 +990,7 @@ read_file_system_list (bool need_fs_type)
     n_entries = mntctl (MCTL_QUERY, bufsize, entries);
     if (n_entries < 0)
       {
-        int saved_errno = errno;
         free (entries);
-        errno = saved_errno;
         return NULL;
       }
 
@@ -1110,7 +1107,8 @@ read_file_system_list (bool need_fs_type)
 
 /* Free a mount entry as returned from read_file_system_list ().  */
 
-void free_mount_entry (struct mount_entry *me)
+void
+free_mount_entry (struct mount_entry *me)
 {
   free (me->me_devname);
   free (me->me_mountdir);
